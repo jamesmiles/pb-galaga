@@ -2,6 +2,14 @@
  * Galaga Clone - Game Logic
  */
 
+// Constants for entity types
+const ENTITY_TYPES = {
+    PLAYER: 'player',
+    ENEMY: 'enemy',
+    PLAYER_BULLET: 'playerBullet',
+    ENEMY_BULLET: 'enemyBullet'
+};
+
 // Player ship
 class Player extends Entity {
     constructor(x, y) {
@@ -10,7 +18,7 @@ class Player extends Entity {
         this.shootCooldown = 0;
         this.shootDelay = 0.3;
         this.collidesWith = true;
-        this.type = 'player';
+        this.type = ENTITY_TYPES.PLAYER;
     }
     
     update(deltaTime) {
@@ -45,7 +53,7 @@ class Player extends Entity {
             this.y,
             0,
             -500,
-            'player'
+            ENTITY_TYPES.PLAYER_BULLET
         );
         this.game.addEntity(bullet);
     }
@@ -68,7 +76,7 @@ class Player extends Entity {
     }
     
     onCollision(other) {
-        if (other.type === 'enemy' || other.type === 'enemyBullet') {
+        if (other.type === ENTITY_TYPES.ENEMY || other.type === ENTITY_TYPES.ENEMY_BULLET) {
             this.destroy();
             this.explode();
             if (window.gameState) {
@@ -106,7 +114,7 @@ class Enemy extends Entity {
         this.speed = 100;
         this.shootCooldown = Math.random() * 3 + 2;
         this.collidesWith = true;
-        this.type = 'enemy';
+        this.type = ENTITY_TYPES.ENEMY;
         this.diving = false;
         this.diveTime = 0;
     }
@@ -162,7 +170,7 @@ class Enemy extends Entity {
             this.y + this.height,
             0,
             300,
-            'enemyBullet'
+            ENTITY_TYPES.ENEMY_BULLET
         );
         this.game.addEntity(bullet);
     }
@@ -185,7 +193,7 @@ class Enemy extends Entity {
     }
     
     onCollision(other) {
-        if (other.type === 'playerBullet') {
+        if (other.type === ENTITY_TYPES.PLAYER_BULLET) {
             this.destroy();
             this.explode();
             if (window.gameState) {
@@ -214,11 +222,11 @@ class Enemy extends Entity {
 
 // Bullet
 class Bullet extends Entity {
-    constructor(x, y, vx, vy, type) {
+    constructor(x, y, vx, vy, bulletType) {
         super(x, y, 4, 10);
         this.vx = vx;
         this.vy = vy;
-        this.type = type;
+        this.type = bulletType;
         this.collidesWith = true;
     }
     
@@ -232,20 +240,20 @@ class Bullet extends Entity {
     }
     
     render(ctx) {
-        ctx.fillStyle = this.type === 'playerBullet' ? '#0ff' : '#ff0';
+        ctx.fillStyle = this.type === ENTITY_TYPES.PLAYER_BULLET ? '#0ff' : '#ff0';
         ctx.fillRect(this.x, this.y, this.width, this.height);
         
         // Add glow
         ctx.shadowBlur = 5;
-        ctx.shadowColor = this.type === 'playerBullet' ? '#0ff' : '#ff0';
+        ctx.shadowColor = this.type === ENTITY_TYPES.PLAYER_BULLET ? '#0ff' : '#ff0';
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.shadowBlur = 0;
     }
     
     onCollision(other) {
-        if (this.type === 'playerBullet' && other.type === 'enemy') {
+        if (this.type === ENTITY_TYPES.PLAYER_BULLET && other.type === ENTITY_TYPES.ENEMY) {
             this.destroy();
-        } else if (this.type === 'enemyBullet' && other.type === 'player') {
+        } else if (this.type === ENTITY_TYPES.ENEMY_BULLET && other.type === ENTITY_TYPES.PLAYER) {
             this.destroy();
         }
     }
@@ -344,7 +352,7 @@ class GameState {
     }
     
     checkWaveComplete() {
-        const enemies = this.game.entities.filter(e => e.type === 'enemy');
+        const enemies = this.game.entities.filter(e => e.type === ENTITY_TYPES.ENEMY);
         if (enemies.length === 0) {
             this.wave++;
             setTimeout(() => {
