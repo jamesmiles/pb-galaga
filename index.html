@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaga Clone - Patchboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui">
+            <div id="score">Score: <span id="score-value">0</span></div>
+            <div id="lives">Lives: <span id="lives-value">3</span></div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+        <div id="game-over" class="hidden">
+            <h1>GAME OVER</h1>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <button id="restart-btn">Play Again</button>
+        </div>
+        <div id="start-screen">
+            <h1>GALAGA</h1>
+            <p>Use Arrow Keys to Move</p>
+            <p>Press SPACE to Shoot</p>
+            <button id="start-btn">Start Game</button>
+        </div>
+    </div>
+    <script src="patchboard.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
