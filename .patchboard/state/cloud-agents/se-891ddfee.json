@@ -21,7 +21,8 @@
   "last_heartbeat": null,
   "config": {
     "base_branch": "main",
-    "conversation_id": "a1d6c154-6d3d-4a6e-94c0-f1cac61b918a"
+    "conversation_id": "a1d6c154-6d3d-4a6e-94c0-f1cac61b918a",
+    "diagnostic_pr_url": "https://github.com/jamesmiles/pb-galaga/pull/6"
   },
   "task_id": "E-0001"
 }
