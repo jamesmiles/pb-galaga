@@ -2,9 +2,9 @@
 id: T-0005
 title: "Implement player laser projectile with firing"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - gameplay
   - projectile

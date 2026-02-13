@@ -3,6 +3,10 @@ import { GameLoop } from './GameLoop';
 import { StateManager } from './StateManager';
 import { InputHandler } from './InputHandler';
 import { FIXED_TIMESTEP } from './constants';
+import { updatePlayer, respawnPlayer } from '../objects/player/code/PlayerShip';
+import { updateProjectiles, handlePlayerFiring } from './ProjectileManager';
+import { updateEnemies } from './EnemyManager';
+import { updateBackground, createBackground } from '../objects/environment/Background';
 
 export interface GameManagerOptions {
   headless?: boolean;
@@ -71,6 +75,7 @@ export class GameManager {
     state.currentLevel = 1;
     state.currentWave = 0;
     state.waveStatus = 'transition';
+    state.background = createBackground();
   }
 
   /** Trigger game over. */
@@ -160,8 +165,32 @@ export class GameManager {
       player.input = this.inputHandler.getPlayerInput(player.id);
     }
 
-    // 2-5: Game object updates, collision, state transitions
-    // Wired in later tasks (T-0003 through T-0012)
+    // 2. Update players
+    for (const player of state.players) {
+      if (player.isAlive) {
+        updatePlayer(player, player.input, dtSeconds);
+        handlePlayerFiring(state, player);
+      } else if (player.lives > 0) {
+        // Auto-respawn after death
+        respawnPlayer(player);
+      }
+    }
+
+    // 3. Update projectiles
+    updateProjectiles(state, dtSeconds);
+
+    // 4. Update enemies
+    updateEnemies(state, dtSeconds);
+
+    // 5. Update background
+    updateBackground(state.background, dtSeconds);
+
+    // 6. Collision detection (wired in T-0004/T-0006)
+
+    // 7. Check game over
+    if (this.checkGameOver()) {
+      this.gameOver();
+    }
   }
 
   /** Render callback — extended in T-0012. */

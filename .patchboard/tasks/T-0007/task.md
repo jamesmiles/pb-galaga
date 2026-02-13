@@ -2,9 +2,9 @@
 id: T-0007
 title: "Implement Enemy Type A (non-firing transport)"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - gameplay
   - enemy
