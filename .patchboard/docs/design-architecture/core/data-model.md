@@ -21,7 +21,7 @@ interface GameState {
   // Meta information
   currentTime: number;
   deltaTime: number;
-  gameMode: 'single' | 'coop';
+  gameMode: 'single' | 'co-op';
   gameStatus: 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete';
   
   // Level information
@@ -145,7 +145,7 @@ interface FlightPath {
 interface Projectile {
   id: string;
   type: 'laser' | 'bullet' | 'rocket' | 'missile' | 'plasma';
-  owner: 'player1' | 'player2' | string; // string for enemy ID
+  owner: ProjectileOwner;
   
   // Position and movement
   position: Vector2D;
@@ -163,6 +163,10 @@ interface Projectile {
   collisionRadius: number;
   hasCollided: boolean;
 }
+
+type ProjectileOwner = 
+  | { type: 'player'; id: 'player1' | 'player2' }
+  | { type: 'enemy'; id: string };
 ```
 
 ### Powerup Schema
@@ -374,7 +378,7 @@ interface PersistentData {
 interface HighScore {
   score: number;
   playerCount: number;
-  date: string;
+  date: string; // ISO 8601 format (e.g., "2026-02-13T11:45:05.897Z")
   level: number;
 }
 

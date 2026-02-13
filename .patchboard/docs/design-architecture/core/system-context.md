@@ -53,7 +53,7 @@
    - Manages audio playback
    - Supported browsers: Modern Chrome, Firefox, Safari, Edge
 
-2. **Phaser Framework**
+2. **Phaser Framework (v3.x)**
    - Game rendering engine
    - Sprite and animation management
    - Audio subsystem
