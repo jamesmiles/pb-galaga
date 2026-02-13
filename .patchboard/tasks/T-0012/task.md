@@ -2,9 +2,9 @@
 id: T-0012
 title: "Implement Phaser renderer with interpolation"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - rendering
   - infrastructure
