@@ -2,9 +2,9 @@
 id: T-0002
 title: "Implement core game engine with fixed time step"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - engine
   - core
