@@ -6,9 +6,9 @@
   ],
   "prompt": "---\ntitle: Claim & implement task or epic\n---\n\nPlease claim & implement E-0001 including any child tasks.\n\nPlease assume the role of engineer (read .patchboard/agents/engineer/index.md)",
   "model": "default",
-  "status": "queued",
+  "status": "active",
   "started_at": "2026-02-13T12:47:02.717013Z",
-  "updated_at": "2026-02-13T12:47:02.717013Z",
+  "updated_at": "2026-02-13T12:47:40Z",
   "completed_at": null,
   "provider_session_id": null,
   "provider_run_id": null,
@@ -16,8 +16,8 @@
   "workspace_id": "engineer",
   "context_type": "backlog_item",
   "context_id": "E-0001",
-  "claimed_by": null,
-  "claimed_at": null,
+  "claimed_by": "DESKTOP-C94BI4G",
+  "claimed_at": "2026-02-13T12:47:40Z",
   "last_heartbeat": null,
   "config": {
     "base_branch": "main"
