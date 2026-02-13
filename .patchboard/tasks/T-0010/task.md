@@ -2,9 +2,9 @@
 id: T-0010
 title: "Implement Level 1 with enemy swarm wave"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - gameplay
   - level

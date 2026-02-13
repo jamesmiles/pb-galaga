@@ -8,6 +8,8 @@ import { updateProjectiles, handlePlayerFiring } from './ProjectileManager';
 import { updateEnemies } from './EnemyManager';
 import { updateBackground, createBackground } from '../objects/environment/Background';
 import { processCollisions } from './CollisionDetector';
+import { LevelManager } from './LevelManager';
+import { LEVEL_1 } from '../levels/level1';
 
 export interface GameManagerOptions {
   headless?: boolean;
@@ -17,12 +19,14 @@ export class GameManager {
   stateManager: StateManager;
   inputHandler: InputHandler;
   gameLoop: GameLoop;
+  levelManager: LevelManager;
   private headless: boolean;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
     this.stateManager = new StateManager();
     this.inputHandler = new InputHandler(this.headless);
+    this.levelManager = new LevelManager();
     this.gameLoop = new GameLoop(
       (dt) => this.update(dt),
       (alpha) => this.render(alpha),
@@ -77,6 +81,10 @@ export class GameManager {
     state.currentWave = 0;
     state.waveStatus = 'transition';
     state.background = createBackground();
+
+    // Load Level 1
+    this.levelManager = new LevelManager();
+    this.levelManager.loadLevel(LEVEL_1, state);
   }
 
   /** Trigger game over. */
@@ -185,6 +193,9 @@ export class GameManager {
 
     // 5. Update background
     updateBackground(state.background, dtSeconds);
+
+    // 5.5. Update level manager (wave spawning)
+    this.levelManager.update(state, dtSeconds * 1000);
 
     // 6. Collision detection
     processCollisions(state);
