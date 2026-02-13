@@ -3,9 +3,9 @@ import { ENEMY_A_HEALTH, ENEMY_A_SCORE_VALUE, ENEMY_A_COLLISION_RADIUS } from '.
 
 let nextEnemyId = 0;
 
-export function createEnemyA(path: FlightPath, startPosition?: Vector2D): Enemy {
+export function createEnemyA(path: FlightPath | null, startPosition?: Vector2D): Enemy {
   const id = `enemyA-${nextEnemyId++}`;
-  const pos = startPosition ?? (path.points.length > 0 ? { ...path.points[0] } : { x: 0, y: 0 });
+  const pos = startPosition ?? (path && path.points.length > 0 ? { ...path.points[0] } : { x: 0, y: 0 });
 
   return {
     id,

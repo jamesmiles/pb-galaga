@@ -2,9 +2,9 @@
 id: T-0006
 title: "Implement laser collision detection and test harness"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - gameplay
   - projectile

@@ -7,6 +7,7 @@ import { updatePlayer, respawnPlayer } from '../objects/player/code/PlayerShip';
 import { updateProjectiles, handlePlayerFiring } from './ProjectileManager';
 import { updateEnemies } from './EnemyManager';
 import { updateBackground, createBackground } from '../objects/environment/Background';
+import { processCollisions } from './CollisionDetector';
 
 export interface GameManagerOptions {
   headless?: boolean;
@@ -185,7 +186,8 @@ export class GameManager {
     // 5. Update background
     updateBackground(state.background, dtSeconds);
 
-    // 6. Collision detection (wired in T-0004/T-0006)
+    // 6. Collision detection
+    processCollisions(state);
 
     // 7. Check game over
     if (this.checkGameOver()) {
