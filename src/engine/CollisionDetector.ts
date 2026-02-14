@@ -1,5 +1,5 @@
 import type { GameState, Player, Enemy, Projectile, Vector2D } from '../types';
-import { PLAYER_COLLISION_RADIUS, ENEMY_A_COLLISION_RADIUS } from './constants';
+import { PLAYER_COLLISION_RADIUS } from './constants';
 import { damagePlayer } from '../objects/player/code/PlayerShip';
 import { damageEnemy } from '../objects/enemies/enemyA/code/EnemyA';
 
@@ -24,7 +24,7 @@ function detectPlayerEnemyCollisions(state: GameState): void {
     for (const enemy of state.enemies) {
       if (!enemy.isAlive) continue;
       const dist = distance(player.position, enemy.position);
-      if (dist < PLAYER_COLLISION_RADIUS + ENEMY_A_COLLISION_RADIUS) {
+      if (dist < PLAYER_COLLISION_RADIUS + enemy.collisionRadius) {
         // Both take damage
         const playerDied = damagePlayer(player, player.maxHealth); // instant kill
         damageEnemy(enemy, enemy.maxHealth); // instant kill
@@ -41,7 +41,7 @@ function detectProjectileEnemyCollisions(state: GameState): void {
       for (const enemy of state.enemies) {
         if (!enemy.isAlive) continue;
         const dist = distance(proj.position, enemy.position);
-        if (dist < proj.collisionRadius + ENEMY_A_COLLISION_RADIUS) {
+        if (dist < proj.collisionRadius + enemy.collisionRadius) {
           proj.hasCollided = true;
           proj.isActive = false;
           const killed = damageEnemy(enemy, proj.damage);

@@ -199,7 +199,9 @@ export class GameScene extends Phaser.Scene {
       let sprite = this.enemySprites.get(enemy.id);
 
       if (!sprite) {
-        sprite = this.add.image(0, 0, 'enemy-a').setDepth(5);
+        const textureMap: Record<string, string> = { A: 'enemy-a', B: 'enemy-b', C: 'enemy-c' };
+        const texture = textureMap[enemy.type] || 'enemy-a';
+        sprite = this.add.image(0, 0, texture).setDepth(5);
         this.enemySprites.set(enemy.id, sprite);
       }
 

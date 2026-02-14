@@ -1,5 +1,5 @@
 import type { Enemy } from '../../../../types';
-import { ENEMY_A_HEALTH, ENEMY_A_SCORE_VALUE } from '../../../../engine/constants';
+import { ENEMY_A_HEALTH, ENEMY_A_SCORE_VALUE, ENEMY_A_COLLISION_RADIUS } from '../../../../engine/constants';
 
 let nextEnemyId = 0;
 
@@ -21,6 +21,7 @@ export function createEnemyA(row: number, col: number): Enemy {
     isFiring: false,
     collisionState: 'none',
     scoreValue: ENEMY_A_SCORE_VALUE,
+    collisionRadius: ENEMY_A_COLLISION_RADIUS,
     formationRow: row,
     formationCol: col,
   };

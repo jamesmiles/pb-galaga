@@ -97,6 +97,95 @@ export function createEnemyACanvas(): HTMLCanvasElement {
   return canvas;
 }
 
+// 28x28 pixel art enemy Type B - armored slow fighter (blue/green)
+export function createEnemyBCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (blue/teal)
+  ctx.fillStyle = '#2288cc';
+  // Top dome (wider/tougher looking)
+  ctx.fillRect(8, 2, 16, 4);
+  ctx.fillRect(6, 6, 20, 4);
+  // Mid body (armored)
+  ctx.fillRect(4, 10, 24, 8);
+  // Lower body
+  ctx.fillRect(6, 18, 20, 4);
+  // Legs/stabilizers
+  ctx.fillRect(2, 22, 6, 4);
+  ctx.fillRect(12, 22, 8, 4);
+  ctx.fillRect(24, 22, 6, 4);
+
+  // Armor plates (darker blue)
+  ctx.fillStyle = '#115588';
+  ctx.fillRect(6, 12, 4, 4);
+  ctx.fillRect(22, 12, 4, 4);
+  ctx.fillRect(12, 8, 8, 2);
+
+  // Eyes (yellow/orange - menacing)
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(9, 7, 4, 3);
+  ctx.fillRect(19, 7, 4, 3);
+
+  // Eye cores
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(10, 8, 2, 1);
+  ctx.fillRect(20, 8, 2, 1);
+
+  // Body highlights (lighter cyan)
+  ctx.fillStyle = '#44bbee';
+  ctx.fillRect(14, 4, 4, 2);
+  ctx.fillRect(10, 14, 12, 2);
+
+  return canvas;
+}
+
+// 28x28 pixel art enemy Type C - fast aggressive fighter (red/orange)
+export function createEnemyCCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 28;
+  canvas.height = 28;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (red/orange - aggressive)
+  ctx.fillStyle = '#dd4422';
+  // Pointed nose
+  ctx.fillRect(12, 2, 4, 4);
+  // Upper body (sleek)
+  ctx.fillRect(10, 6, 8, 4);
+  // Mid body
+  ctx.fillRect(6, 10, 16, 4);
+  // Wings (swept back)
+  ctx.fillRect(2, 14, 24, 4);
+  // Tail
+  ctx.fillRect(10, 18, 8, 4);
+  ctx.fillRect(8, 22, 4, 4);
+  ctx.fillRect(16, 22, 4, 4);
+
+  // Wing tips (orange)
+  ctx.fillStyle = '#ff8822';
+  ctx.fillRect(2, 16, 4, 2);
+  ctx.fillRect(22, 16, 4, 2);
+
+  // Eyes (green - alien)
+  ctx.fillStyle = '#44ff44';
+  ctx.fillRect(10, 8, 3, 2);
+  ctx.fillRect(15, 8, 3, 2);
+
+  // Nose highlight
+  ctx.fillStyle = '#ff6644';
+  ctx.fillRect(13, 3, 2, 2);
+
+  // Engine glow
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(9, 24, 2, 2);
+  ctx.fillRect(17, 24, 2, 2);
+
+  return canvas;
+}
+
 // Explosion animation frames (4 frames of expanding debris)
 export function createExplosionFrames(): HTMLCanvasElement[] {
   const frames: HTMLCanvasElement[] = [];

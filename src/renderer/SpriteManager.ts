@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import {
   createPlayerShipCanvas,
   createEnemyACanvas,
+  createEnemyBCanvas,
+  createEnemyCCanvas,
   createExplosionFrames,
   createLaserCanvas,
   createBulletCanvas,
@@ -24,6 +26,18 @@ export function registerTextures(scene: Phaser.Scene): void {
   if (!textures.exists('enemy-a')) {
     const enemyCanvas = createEnemyACanvas();
     textures.addCanvas('enemy-a', enemyCanvas);
+  }
+
+  // Enemy Type B
+  if (!textures.exists('enemy-b')) {
+    const enemyBCanvas = createEnemyBCanvas();
+    textures.addCanvas('enemy-b', enemyBCanvas);
+  }
+
+  // Enemy Type C
+  if (!textures.exists('enemy-c')) {
+    const enemyCCanvas = createEnemyCCanvas();
+    textures.addCanvas('enemy-c', enemyCCanvas);
   }
 
   // Laser projectile

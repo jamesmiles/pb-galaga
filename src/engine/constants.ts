@@ -31,6 +31,16 @@ export const ENEMY_A_HEALTH = 50;
 export const ENEMY_A_SCORE_VALUE = 100;
 export const ENEMY_A_COLLISION_RADIUS = 14;
 
+// Enemy Type B defaults
+export const ENEMY_B_HEALTH = 100;
+export const ENEMY_B_SCORE_VALUE = 200;
+export const ENEMY_B_COLLISION_RADIUS = 16;
+
+// Enemy Type C defaults
+export const ENEMY_C_HEALTH = 50;
+export const ENEMY_C_SCORE_VALUE = 150;
+export const ENEMY_C_COLLISION_RADIUS = 12;
+
 // Formation defaults
 export const FORMATION_BASE_SPEED = 60; // pixels per second
 export const FORMATION_CELL_WIDTH = 48;

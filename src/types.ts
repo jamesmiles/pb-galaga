@@ -75,6 +75,7 @@ export interface Enemy {
   isFiring: boolean;
   collisionState: 'none' | 'colliding' | 'destroyed';
   scoreValue: number;
+  collisionRadius: number;
   // Formation slot (for Type A block formation)
   formationRow: number;
   formationCol: number;
