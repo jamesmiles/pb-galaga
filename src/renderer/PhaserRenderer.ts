@@ -6,8 +6,9 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
 /**
  * Phaser-based renderer implementing the typed GameRenderer interface.
  *
- * - Phaser's internal game loop is STOPPED after boot
+ * - Phaser's internal rAF loop is STOPPED after boot
  * - Rendering is driven entirely by our GameLoop's render callback
+ *   via game.step() which flushes scene updates to the canvas
  * - No arcade physics enabled
  */
 export class PhaserRenderer implements GameRenderer {
@@ -33,8 +34,12 @@ export class PhaserRenderer implements GameRenderer {
         pixelArt: true,
         antialias: false,
       },
-      // Let Phaser run its own render loop — we just update scene state
-      // from our GameLoop's render callback
+      // Disable Phaser's built-in rAF loop — we drive rendering
+      callbacks: {
+        postBoot: (game) => {
+          game.loop.stop();
+        },
+      },
       // Disable Phaser's input — we handle our own
       input: {
         keyboard: false,
@@ -42,7 +47,6 @@ export class PhaserRenderer implements GameRenderer {
         touch: false,
         gamepad: false,
       },
-      // Don't let Phaser mess with focus/visibility
       banner: false,
     });
 
@@ -62,8 +66,13 @@ export class PhaserRenderer implements GameRenderer {
   render(current: GameState, previous: GameState, alpha: number): void {
     if (!this.ready || !this.gameScene) return;
 
-    // Update scene state — Phaser's own loop handles the actual canvas draw
+    // Update scene state from game state
     this.gameScene.renderState(current, previous, alpha, this.engineFps, this.renderFps);
+
+    // Flush to canvas — game.step() runs scene update + Phaser renderer
+    // without Phaser's own rAF loop (which we stopped)
+    const now = performance.now();
+    (this.game as any).step(now, 16.667);
   }
 
   destroy(): void {

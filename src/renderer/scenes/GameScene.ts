@@ -4,6 +4,7 @@ import { registerTextures } from '../SpriteManager';
 import { lerpPosition } from '../InterpolationUtils';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
 
+const GAME_VERSION = '0.1.2';
 const EXPLOSION_DURATION = 400; // ms per explosion
 const EXPLOSION_FRAMES = 4;
 
@@ -346,6 +347,14 @@ export class GameScene extends Phaser.Scene {
 
       // Menu options
       this.renderMenuOptions(menu.options, menu.selectedOption, 350);
+
+      // Version
+      const version = this.add.text(0, GAME_HEIGHT - 30, `v${GAME_VERSION}`, {
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        color: '#555555',
+      }).setOrigin(0.5);
+      this.menuContainer.add(version);
 
     } else if (menu.type === 'gameover') {
       const gameOverText = this.add.text(0, 150, 'GAME OVER', {
