@@ -84,11 +84,12 @@ export function updateFormation(state: GameState, dtSeconds: number): void {
   updateEnemyPositions(state);
 }
 
-/** Set each alive enemy's position from their formation slot. */
+/** Set each alive enemy's position from their formation slot. Skip diving enemies. */
 export function updateEnemyPositions(state: GameState): void {
   const formation = state.formation;
   for (const enemy of state.enemies) {
     if (!enemy.isAlive) continue;
+    if (enemy.diveState) continue; // Diving enemies control their own position
     enemy.position.x = formation.offsetX + (enemy.formationCol + 0.5) * formation.cellWidth;
     enemy.position.y = formation.offsetY + (enemy.formationRow + 0.5) * formation.cellHeight;
   }

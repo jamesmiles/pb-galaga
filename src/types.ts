@@ -67,6 +67,13 @@ export interface Player {
 
 // --- Enemy ---
 
+export interface DiveState {
+  phase: 'break' | 'approach' | 'sweep';
+  progress: number;
+  targetX: number;
+  startPos: Vector2D;
+}
+
 export interface Enemy {
   id: string;
   type: 'A' | 'B' | 'C';
@@ -87,6 +94,7 @@ export interface Enemy {
   // Formation slot (for Type A block formation)
   formationRow: number;
   formationCol: number;
+  diveState: DiveState | null;
 }
 
 // --- Projectile ---

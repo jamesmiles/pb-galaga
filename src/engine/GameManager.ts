@@ -9,6 +9,7 @@ import { createBackground, updateBackground } from '../objects/environment/Backg
 import { detectCollisions } from './CollisionDetector';
 import { LevelManager } from './LevelManager';
 import { EnemyFiringManager } from './EnemyFiringManager';
+import { DiveManager } from './DiveManager';
 import { SoundManager } from '../audio/SoundManager';
 import { level1 } from '../levels/level1';
 
@@ -29,6 +30,7 @@ export class GameManager {
   private headless: boolean;
   private levelManager: LevelManager;
   private enemyFiringManager: EnemyFiringManager;
+  private diveManager: DiveManager;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -42,6 +44,7 @@ export class GameManager {
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
     this.enemyFiringManager = new EnemyFiringManager();
+    this.diveManager = new DiveManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
@@ -132,6 +135,7 @@ export class GameManager {
     state.players = [createPlayer('player1')];
     state.projectiles = [];
     this.enemyFiringManager.reset();
+    this.diveManager.reset();
     this.levelManager.startLevel(state, 1);
   }
 
@@ -167,20 +171,23 @@ export class GameManager {
       updateFormation(state, dtSeconds);
     }
 
-    // 5. Enemy firing
+    // 5. Dive attacks
+    this.diveManager.update(state, dtSeconds);
+
+    // 6. Enemy firing
     const projCountBeforeEnemy = state.projectiles.length;
     this.enemyFiringManager.update(state, dtSeconds);
     if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
 
-    // 6. Update background
+    // 7. Update background
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
 
-    // 7. Level/wave progression
+    // 8. Level/wave progression
     this.levelManager.update(state);
 
-    // 8. Collision detection — track deaths for sound
+    // 9. Collision detection — track deaths for sound
     const aliveEnemiesBefore = state.enemies.filter(e => e.isAlive).length;
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
@@ -189,7 +196,7 @@ export class GameManager {
     if (aliveEnemiesAfter < aliveEnemiesBefore) SoundManager.play('explosion');
     if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
 
-    // 9. Handle death sequences and delayed respawn
+    // 10. Handle death sequences and delayed respawn
     for (const player of state.players) {
       if (player.deathSequence?.active) {
         const elapsed = state.currentTime - player.deathSequence.startTime;
@@ -202,7 +209,7 @@ export class GameManager {
       }
     }
 
-    // 10. Check game over (only after all death sequences complete)
+    // 11. Check game over (only after all death sequences complete)
     this.checkGameOver(state);
   }
 

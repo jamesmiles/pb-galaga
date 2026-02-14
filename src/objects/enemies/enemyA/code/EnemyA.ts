@@ -24,6 +24,7 @@ export function createEnemyA(row: number, col: number): Enemy {
     collisionRadius: ENEMY_A_COLLISION_RADIUS,
     formationRow: row,
     formationCol: col,
+    diveState: null,
   };
 }
 
