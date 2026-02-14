@@ -138,6 +138,26 @@ export function createExplosionFrames(): HTMLCanvasElement[] {
   return frames;
 }
 
+// Bullet projectile (small yellow/orange circle)
+export function createBulletCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 6;
+  canvas.height = 6;
+  const ctx = canvas.getContext('2d')!;
+
+  // Outer glow (orange)
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(1, 0, 4, 6);
+  ctx.fillRect(0, 1, 6, 4);
+
+  // Inner core (yellow)
+  ctx.fillStyle = '#ffff44';
+  ctx.fillRect(2, 1, 2, 4);
+  ctx.fillRect(1, 2, 4, 2);
+
+  return canvas;
+}
+
 // Laser projectile (small bright cyan bar)
 export function createLaserCanvas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');

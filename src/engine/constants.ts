@@ -38,6 +38,12 @@ export const FORMATION_CELL_HEIGHT = 40;
 export const FORMATION_SPEED_INCREASE = 1.5; // multiplier when enemies destroyed
 export const FORMATION_STEP_DOWN = 20; // pixels to descend on direction change
 
+// Bullet defaults
+export const BULLET_SPEED = 200; // pixels per second
+export const BULLET_DAMAGE = 50;
+export const BULLET_MAX_LIFETIME = 3000; // ms
+export const BULLET_COLLISION_RADIUS = 3;
+
 // Background
 export const STAR_COUNT = 100;
 export const STAR_BASE_SCROLL_SPEED = 30; // pixels per second

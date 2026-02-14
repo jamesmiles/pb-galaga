@@ -232,7 +232,8 @@ export class GameScene extends Phaser.Scene {
       let sprite = this.projectileSprites.get(proj.id);
 
       if (!sprite) {
-        sprite = this.add.image(0, 0, 'laser').setDepth(8);
+        const texture = proj.type === 'bullet' ? 'bullet' : 'laser';
+        sprite = this.add.image(0, 0, texture).setDepth(8);
         this.projectileSprites.set(proj.id, sprite);
       }
 

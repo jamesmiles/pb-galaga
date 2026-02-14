@@ -4,6 +4,7 @@ import {
   createEnemyACanvas,
   createExplosionFrames,
   createLaserCanvas,
+  createBulletCanvas,
 } from '../assets/sprites';
 
 /**
@@ -29,6 +30,12 @@ export function registerTextures(scene: Phaser.Scene): void {
   if (!textures.exists('laser')) {
     const laserCanvas = createLaserCanvas();
     textures.addCanvas('laser', laserCanvas);
+  }
+
+  // Bullet projectile
+  if (!textures.exists('bullet')) {
+    const bulletCanvas = createBulletCanvas();
+    textures.addCanvas('bullet', bulletCanvas);
   }
 
   // Explosion frames
