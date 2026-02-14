@@ -199,31 +199,31 @@ function drawEnemyE(
 ): void {
   ctx.fillStyle = colors.fill;
 
-  // Flying wing — main chevron body
+  // Flying wing — main chevron body (flipped: nose faces downward)
   ctx.beginPath();
-  ctx.moveTo(x, y - 8);           // Nose
-  ctx.lineTo(x - 18, y + 6);      // Left wingtip
-  ctx.lineTo(x - 14, y + 10);     // Left wing trailing
-  ctx.lineTo(x - 4, y + 2);       // Left inner
-  ctx.lineTo(x, y + 6);           // Center notch
-  ctx.lineTo(x + 4, y + 2);       // Right inner
-  ctx.lineTo(x + 14, y + 10);     // Right wing trailing
-  ctx.lineTo(x + 18, y + 6);      // Right wingtip
+  ctx.moveTo(x, y + 8);           // Nose (bottom)
+  ctx.lineTo(x - 18, y - 6);      // Left wingtip
+  ctx.lineTo(x - 14, y - 10);     // Left wing trailing
+  ctx.lineTo(x - 4, y - 2);       // Left inner
+  ctx.lineTo(x, y - 6);           // Center notch
+  ctx.lineTo(x + 4, y - 2);       // Right inner
+  ctx.lineTo(x + 14, y - 10);     // Right wing trailing
+  ctx.lineTo(x + 18, y - 6);      // Right wingtip
   ctx.closePath();
   ctx.fill();
 
   // Engine vents (accent)
   ctx.fillStyle = colors.accent;
-  ctx.fillRect(x - 8, y + 2, 3, 3);
-  ctx.fillRect(x + 5, y + 2, 3, 3);
+  ctx.fillRect(x - 8, y - 5, 3, 3);
+  ctx.fillRect(x + 5, y - 5, 3, 3);
 
   // Cockpit slit
   ctx.shadowBlur = 0;
   ctx.fillStyle = '#ff4444';
-  ctx.fillRect(x - 3, y - 4, 6, 2);
+  ctx.fillRect(x - 3, y + 2, 6, 2);
 
   // Wingtip accents
   ctx.fillStyle = colors.accent;
-  ctx.fillRect(x - 17, y + 6, 3, 2);
-  ctx.fillRect(x + 14, y + 6, 3, 2);
+  ctx.fillRect(x - 17, y - 8, 3, 2);
+  ctx.fillRect(x + 14, y - 8, 3, 2);
 }
