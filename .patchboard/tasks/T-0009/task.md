@@ -1,29 +1,30 @@
 ---
 id: T-0009
-title: "Implement start menu and game over sequences"
+title: Implement start menu and game over sequences
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - ui
-  - menu
-depends_on: [T-0002]
+- ui
+- menu
+depends_on:
+- T-0002
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - Start menu displays on game launch
-  - Start menu shows control information for player 1
-  - Start menu has "Start Game" and "Quit" options
-  - Menu navigation works with keyboard
-  - Game transitions from menu to playing state on start
-  - Game over sequence displays when player has 0 lives
-  - Game over shows final score
-  - Game over has "Restart" and "Main Menu" options
-  - State transitions work correctly (menu ↔ playing ↔ gameover)
-  - Menu state integrates with engine
+- Start menu displays on game launch
+- Start menu shows control information for player 1
+- Start menu has "Start Game" and "Quit" options
+- Menu navigation works with keyboard
+- Game transitions from menu to playing state on start
+- Game over sequence displays when player has 0 lives
+- Game over shows final score
+- Game over has "Restart" and "Main Menu" options
+- State transitions work correctly (menu ↔ playing ↔ gameover)
+- Menu state integrates with engine
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
