@@ -95,6 +95,30 @@ const MENU_STYLES = `
     font-size: 12px;
     color: #444;
   }
+
+  .intro-level-label {
+    font-size: 18px;
+    color: #888;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+  }
+
+  .intro-typing {
+    font-size: 28px;
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff, 0 0 20px #006688;
+    min-height: 40px;
+  }
+
+  .intro-cursor {
+    animation: blink 0.6s step-end infinite;
+    color: #00ffff;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
 `;
 
 /**
@@ -128,7 +152,7 @@ export class MenuOverlay {
   /** Update the overlay based on current game state. Called each render frame. */
   update(state: GameState): void {
     const menu = state.menu;
-    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete';
+    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete' || state.gameStatus === 'levelintro';
 
     if (!showMenu || !menu) {
       this.hide();
@@ -186,6 +210,16 @@ export class MenuOverlay {
         <div class="menu-title gameover">GAME OVER</div>
         ${scoreHtml}
         ${this.buildOptions(options)}
+      `;
+    } else if (type === 'levelintro') {
+      const level = data?.level ?? 1;
+      const text = (data?.introText as string) ?? '';
+      const chars = (data?.introChars as number) ?? 0;
+      const revealed = text.slice(0, chars);
+      const done = chars >= text.length;
+      this.overlay.innerHTML = `
+        <div class="intro-level-label">Level ${level}</div>
+        <div class="intro-typing">${revealed}${done ? '' : '<span class="intro-cursor">_</span>'}</div>
       `;
     } else if (type === 'levelselect') {
       this.overlay.innerHTML = `

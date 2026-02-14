@@ -90,7 +90,7 @@ export class Canvas2DRenderer implements GameRenderer {
     // Update particles (runs regardless of game status for lingering effects)
     this.particleSystem.update(renderDt);
 
-    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete') {
+    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete' || current.gameStatus === 'levelintro') {
       // Menu screens: render stars in background, particles, then overlay
       if (current.background) {
         drawStars(ctx, current.background.stars);
@@ -208,7 +208,7 @@ export class Canvas2DRenderer implements GameRenderer {
 
   /**
    * Draw background celestial bodies behind starfield.
-   * Each object starts below the screen and drifts upward through the viewport.
+   * Each object starts above the screen and drifts downward through the viewport.
    * The config `y` value staggers entry timing (higher y = enters later).
    */
   private drawBackgrounds(ctx: CanvasRenderingContext2D, level: number, dt: number): void {
@@ -220,13 +220,13 @@ export class Canvas2DRenderer implements GameRenderer {
       const img = this.bgImageCache.get(config.url);
       if (!img || !img.complete) continue;
 
-      // Advance scroll (accumulates upward distance)
+      // Advance scroll (accumulates downward distance)
       this.bgScrollOffsets[i] += config.scrollSpeed * dt / 1000;
 
       const h = img.height * config.scale;
       const w = img.width * config.scale;
-      // Start below screen; y config acts as stagger (higher = later entry)
-      const drawY = GAME_HEIGHT + h / 2 + config.y - this.bgScrollOffsets[i];
+      // Start above screen; y config acts as stagger (higher = enters later)
+      const drawY = -(h / 2) - config.y + this.bgScrollOffsets[i];
       const drawX = config.x;
 
       // Only draw while visible

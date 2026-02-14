@@ -159,7 +159,7 @@ export interface BackgroundState {
 // --- Menu ---
 
 export interface MenuState {
-  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect';
+  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro';
   selectedOption: number;
   options: string[];
   data?: {
@@ -167,6 +167,8 @@ export interface MenuState {
     p2Score?: number;
     level?: number;
     wave?: number;
+    introText?: string;
+    introChars?: number;
   };
 }
 
@@ -187,7 +189,7 @@ export interface FormationState {
 
 // --- Game State ---
 
-export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete';
+export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete' | 'levelintro';
 export type GameMode = 'single' | 'co-op';
 
 export interface GameState {

@@ -76,7 +76,7 @@ describe('SoundManager', () => {
   });
 
   it('has presets for all sound effects', () => {
-    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC', 'hitD', 'hitE'];
+    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC', 'hitD', 'hitE', 'typeKey'];
     for (const effect of effects) {
       const preset = SoundManager.getPreset(effect);
       expect(preset).toBeDefined();
@@ -85,11 +85,11 @@ describe('SoundManager', () => {
   });
 
   it('all effects call zzfx successfully', () => {
-    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC', 'hitD', 'hitE'];
+    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC', 'hitD', 'hitE', 'typeKey'];
     for (const effect of effects) {
       SoundManager.play(effect);
     }
-    expect(mockZzfx).toHaveBeenCalledTimes(10);
+    expect(mockZzfx).toHaveBeenCalledTimes(11);
   });
 
   it('hit sounds have distinct parameters per enemy type', () => {
