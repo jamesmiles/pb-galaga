@@ -8,6 +8,7 @@ import { updateFormation } from './FormationManager';
 import { createBackground, updateBackground } from '../objects/environment/Background';
 import { detectCollisions } from './CollisionDetector';
 import { LevelManager } from './LevelManager';
+import { EnemyFiringManager } from './EnemyFiringManager';
 import { level1 } from '../levels/level1';
 
 export interface GameManagerOptions {
@@ -26,6 +27,7 @@ export class GameManager {
   private renderer: GameRenderer | null;
   private headless: boolean;
   private levelManager: LevelManager;
+  private enemyFiringManager: EnemyFiringManager;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -38,6 +40,7 @@ export class GameManager {
     );
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
+    this.enemyFiringManager = new EnemyFiringManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
@@ -126,6 +129,7 @@ export class GameManager {
     state.menu = null;
     state.players = [createPlayer('player1')];
     state.projectiles = [];
+    this.enemyFiringManager.reset();
     this.levelManager.startLevel(state, 1);
   }
 
@@ -151,25 +155,28 @@ export class GameManager {
       updateFormation(state, dtSeconds);
     }
 
-    // 5. Update background
+    // 5. Enemy firing
+    this.enemyFiringManager.update(state, dtSeconds);
+
+    // 6. Update background
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
 
-    // 6. Level/wave progression
+    // 7. Level/wave progression
     this.levelManager.update(state);
 
-    // 7. Collision detection
+    // 8. Collision detection
     detectCollisions(state);
 
-    // 8. Respawn dead players with remaining lives
+    // 9. Respawn dead players with remaining lives
     for (const player of state.players) {
       if (!player.isAlive && player.lives > 0) {
         respawnPlayer(player);
       }
     }
 
-    // 9. Check game over
+    // 10. Check game over
     this.checkGameOver(state);
   }
 
