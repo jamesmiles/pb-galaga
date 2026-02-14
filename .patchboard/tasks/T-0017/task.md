@@ -1,27 +1,30 @@
 ---
 id: T-0017
-title: "Implement enemy firing system"
+title: Implement enemy firing system
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-  - combat
-depends_on: [T-0014, T-0015, T-0016]
+- gameplay
+- enemy
+- combat
+depends_on:
+- T-0014
+- T-0015
+- T-0016
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - EnemyFiringManager created in src/engine/EnemyFiringManager.ts
-  - Type B enemies fire lasers downward at configurable intervals (~3s)
-  - Type C enemies fire bullets downward at configurable intervals (~2s)
-  - Type A enemies do not fire (fireMode 'none')
-  - Only front-row enemies fire (no friendly fire through formation)
-  - Fire intervals have random jitter to avoid synchronized volleys
-  - Enemy projectiles are spawned via ProjectileManager with owner 'enemy'
-  - Wired into GameManager.updatePlaying()
-  - Unit tests verify fire rates, cooldowns, and front-row targeting
+- EnemyFiringManager created in src/engine/EnemyFiringManager.ts
+- Type B enemies fire lasers downward at configurable intervals (~3s)
+- Type C enemies fire bullets downward at configurable intervals (~2s)
+- Type A enemies do not fire (fireMode 'none')
+- Only front-row enemies fire (no friendly fire through formation)
+- Fire intervals have random jitter to avoid synchronized volleys
+- Enemy projectiles are spawned via ProjectileManager with owner 'enemy'
+- Wired into GameManager.updatePlaying()
+- Unit tests verify fire rates, cooldowns, and front-row targeting
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
