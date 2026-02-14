@@ -36,6 +36,8 @@ export class GameScene extends Phaser.Scene {
   // UI text
   private scoreText!: Phaser.GameObjects.Text;
   private livesText!: Phaser.GameObjects.Text;
+  private p2ScoreText!: Phaser.GameObjects.Text;
+  private p2LivesText!: Phaser.GameObjects.Text;
   private fpsText!: Phaser.GameObjects.Text;
 
   // Menu elements
@@ -64,6 +66,18 @@ export class GameScene extends Phaser.Scene {
       fontSize: '16px',
       color: '#ffffff',
     }).setOrigin(1, 0).setDepth(100);
+
+    this.p2ScoreText = this.add.text(GAME_WIDTH - 10, 54, 'P2 Score: 0', {
+      fontFamily: 'monospace',
+      fontSize: '16px',
+      color: '#4488ff',
+    }).setOrigin(1, 0).setDepth(100).setVisible(false);
+
+    this.p2LivesText = this.add.text(GAME_WIDTH - 10, 74, 'P2 Lives: 3', {
+      fontFamily: 'monospace',
+      fontSize: '16px',
+      color: '#4488ff',
+    }).setOrigin(1, 0).setDepth(100).setVisible(false);
 
     this.fpsText = this.add.text(10, 10, 'Engine: 0 | Render: 0', {
       fontFamily: 'monospace',
@@ -152,7 +166,8 @@ export class GameScene extends Phaser.Scene {
       let sprite = this.playerSprites.get(player.id);
 
       if (!sprite) {
-        sprite = this.add.image(0, 0, 'player-ship').setDepth(10);
+        const texture = player.shipColor === 'blue' ? 'player-ship-blue' : 'player-ship';
+        sprite = this.add.image(0, 0, texture).setDepth(10);
         this.playerSprites.set(player.id, sprite);
       }
 
@@ -290,12 +305,24 @@ export class GameScene extends Phaser.Scene {
   }
 
   private renderUI(state: GameState, engineFps: number, renderFps: number): void {
-    const player = state.players[0];
-    if (player) {
-      this.scoreText.setText(`Score: ${player.score}`);
-      this.livesText.setText(`Lives: ${player.lives}`);
+    const p1 = state.players.find(p => p.id === 'player1');
+    if (p1) {
+      const label = state.gameMode === 'co-op' ? 'P1 ' : '';
+      this.scoreText.setText(`${label}Score: ${p1.score}`);
+      this.livesText.setText(`${label}Lives: ${p1.lives}`);
       this.scoreText.setVisible(true);
       this.livesText.setVisible(true);
+    }
+
+    const p2 = state.players.find(p => p.id === 'player2');
+    if (p2) {
+      this.p2ScoreText.setText(`P2 Score: ${p2.score}`);
+      this.p2LivesText.setText(`P2 Lives: ${p2.lives}`);
+      this.p2ScoreText.setVisible(true);
+      this.p2LivesText.setVisible(true);
+    } else {
+      this.p2ScoreText.setVisible(false);
+      this.p2LivesText.setVisible(false);
     }
 
     this.fpsText.setText(`Engine: ${engineFps} | Render: ${renderFps}`);
@@ -377,6 +404,15 @@ export class GameScene extends Phaser.Scene {
         this.menuContainer.add(scoreText);
       }
 
+      if (menu.data?.p2Score !== undefined) {
+        const p2Score = this.add.text(0, 255, `P2 Score: ${menu.data.p2Score}`, {
+          fontFamily: 'monospace',
+          fontSize: '18px',
+          color: '#4488ff',
+        }).setOrigin(0.5);
+        this.menuContainer.add(p2Score);
+      }
+
       this.renderMenuOptions(menu.options, menu.selectedOption, 320);
     }
   }
@@ -414,6 +450,8 @@ export class GameScene extends Phaser.Scene {
     }
     this.scoreText.setVisible(false);
     this.livesText.setVisible(false);
+    this.p2ScoreText.setVisible(false);
+    this.p2LivesText.setVisible(false);
     if (this.starGraphics) {
       this.starGraphics.setVisible(false);
     }

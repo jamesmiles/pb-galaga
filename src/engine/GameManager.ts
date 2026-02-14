@@ -1,4 +1,5 @@
-import type { GameState, GameRenderer, Player } from '../types';
+import type { GameState, GameRenderer } from '../types';
+import { GAME_WIDTH } from './constants';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer } from './StateManager';
 import { InputHandler } from './InputHandler';
@@ -123,7 +124,11 @@ export class GameManager {
     if (menuInput.confirm) {
       SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
-      if (selected === 'Start Game') {
+      if (selected === '1 Player') {
+        state.gameMode = 'single';
+        this.startGame(state);
+      } else if (selected === '2 Players') {
+        state.gameMode = 'co-op';
         this.startGame(state);
       }
     }
@@ -132,8 +137,18 @@ export class GameManager {
   private startGame(state: GameState): void {
     state.gameStatus = 'playing';
     state.menu = null;
-    state.players = [createPlayer('player1')];
     state.projectiles = [];
+
+    if (state.gameMode === 'co-op') {
+      const p1 = createPlayer('player1');
+      p1.position.x = GAME_WIDTH * 0.33;
+      const p2 = createPlayer('player2');
+      p2.position.x = GAME_WIDTH * 0.66;
+      state.players = [p1, p2];
+    } else {
+      state.players = [createPlayer('player1')];
+    }
+
     this.enemyFiringManager.reset();
     this.diveManager.reset();
     this.levelManager.startLevel(state, 1);
@@ -150,6 +165,8 @@ export class GameManager {
       if (player.deathSequence?.active) continue;
       if (player.id === 'player1') {
         player.input = this.inputHandler.getPlayerInput();
+      } else if (player.id === 'player2') {
+        player.input = this.inputHandler.getPlayer2Input();
       }
     }
 
@@ -259,12 +276,17 @@ export class GameManager {
     const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
     if (state.players.length > 0 && alivePlayers.length === 0) {
       state.gameStatus = 'gameover';
-      const finalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+      const p1 = state.players.find(p => p.id === 'player1');
+      const p2 = state.players.find(p => p.id === 'player2');
+      const finalScore = p1?.score ?? 0;
       state.menu = {
         type: 'gameover',
         selectedOption: 0,
         options: ['Restart', 'Main Menu'],
-        data: { finalScore },
+        data: {
+          finalScore,
+          ...(p2 ? { p2Score: p2.score } : {}),
+        },
       };
     }
   }

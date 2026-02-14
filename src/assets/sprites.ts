@@ -52,6 +52,45 @@ export function createPlayerShipCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
+// 32x32 pixel art player ship (blue) - same shape, blue color scheme
+export function createPlayerShipBlueCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (blue)
+  ctx.fillStyle = '#2266ff';
+  ctx.fillRect(15, 2, 2, 4);
+  ctx.fillRect(13, 6, 6, 4);
+  ctx.fillRect(11, 10, 10, 6);
+  ctx.fillRect(9, 16, 14, 4);
+  ctx.fillRect(3, 20, 26, 4);
+  ctx.fillRect(1, 24, 30, 2);
+  ctx.fillRect(11, 26, 4, 4);
+  ctx.fillRect(17, 26, 4, 4);
+
+  // Cockpit (dark red)
+  ctx.fillStyle = '#aa2244';
+  ctx.fillRect(14, 8, 4, 4);
+
+  // Highlights (brighter blue/cyan)
+  ctx.fillStyle = '#44aaff';
+  ctx.fillRect(15, 4, 2, 2);
+  ctx.fillRect(13, 12, 2, 2);
+  ctx.fillRect(17, 12, 2, 2);
+
+  // Engine glow (cyan/white)
+  ctx.fillStyle = '#22ccff';
+  ctx.fillRect(12, 28, 2, 2);
+  ctx.fillRect(18, 28, 2, 2);
+  ctx.fillStyle = '#aaffff';
+  ctx.fillRect(12, 30, 2, 2);
+  ctx.fillRect(18, 30, 2, 2);
+
+  return canvas;
+}
+
 // 24x24 pixel art enemy Type A - alien transport shape
 export function createEnemyACanvas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');

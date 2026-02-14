@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   createPlayerShipCanvas,
+  createPlayerShipBlueCanvas,
   createEnemyACanvas,
   createEnemyBCanvas,
   createEnemyCCanvas,
@@ -20,6 +21,12 @@ export function registerTextures(scene: Phaser.Scene): void {
   if (!textures.exists('player-ship')) {
     const shipCanvas = createPlayerShipCanvas();
     textures.addCanvas('player-ship', shipCanvas);
+  }
+
+  // Player ship (blue)
+  if (!textures.exists('player-ship-blue')) {
+    const blueShipCanvas = createPlayerShipBlueCanvas();
+    textures.addCanvas('player-ship-blue', blueShipCanvas);
   }
 
   // Enemy Type A

@@ -12,7 +12,7 @@ describe('GameManager', () => {
     it('starts on the menu screen', () => {
       const gm = new GameManager({ headless: true });
       expect(gm.getState().menu?.type).toBe('start');
-      expect(gm.getState().menu?.options).toContain('Start Game');
+      expect(gm.getState().menu?.options).toContain('1 Player');
       gm.destroy();
     });
   });
@@ -230,6 +230,79 @@ describe('GameManager', () => {
       // Position should not change during death sequence
       // (player is dead so updatePlayerShip is skipped)
       expect(player.position.x).toBe(startX);
+      gm.destroy();
+    });
+  });
+
+  describe('two-player co-op', () => {
+    function startCoOp(gm: GameManager): void {
+      // Navigate to "2 Players" option (index 1)
+      gm.inputHandler.injectMenuInput({ down: true });
+      gm.tickHeadless(1);
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+    }
+
+    it('starts with 2 players in co-op mode', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      expect(gm.getState().gameMode).toBe('co-op');
+      expect(gm.getState().players).toHaveLength(2);
+      expect(gm.getState().players[0].id).toBe('player1');
+      expect(gm.getState().players[1].id).toBe('player2');
+      gm.destroy();
+    });
+
+    it('places players at different X positions', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      const p1x = gm.getState().players[0].position.x;
+      const p2x = gm.getState().players[1].position.x;
+      expect(p1x).not.toBe(p2x);
+      expect(p1x).toBeLessThan(p2x);
+      gm.destroy();
+    });
+
+    it('P2 has blue ship color', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      expect(gm.getState().players[0].shipColor).toBe('red');
+      expect(gm.getState().players[1].shipColor).toBe('blue');
+      gm.destroy();
+    });
+
+    it('both players have independent scores', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      const p1 = gm.getState().players[0];
+      const p2 = gm.getState().players[1];
+      p1.score = 500;
+      p2.score = 300;
+      expect(p1.score).toBe(500);
+      expect(p2.score).toBe(300);
+      gm.destroy();
+    });
+
+    it('game continues when only one player dies', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      const p1 = gm.getState().players[0];
+      p1.lives = 0;
+      p1.isAlive = false;
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('playing');
+      gm.destroy();
+    });
+
+    it('game over when both players have 0 lives', () => {
+      const gm = new GameManager({ headless: true });
+      startCoOp(gm);
+      for (const player of gm.getState().players) {
+        player.lives = 0;
+        player.isAlive = false;
+      }
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('gameover');
       gm.destroy();
     });
   });

@@ -156,6 +156,7 @@ export interface MenuState {
   options: string[];
   data?: {
     finalScore?: number;
+    p2Score?: number;
     level?: number;
     wave?: number;
   };
