@@ -508,16 +508,9 @@ IMPORTANT: You are running in a non-interactive, headless environment. There is 
     echo -e "${BLUE}[agent] Launching ${SELECTED_CLI} (${SELECTED_MODEL})...${NC}"
     echo ""
 
-    # Pre-generate conversation UUID for Claude (enables --resume recovery)
+    # Reset conversation ID — will be captured from Claude's output after the run
     if [[ "$SELECTED_CLI" == "claude" ]]; then
-        AGENT_CONV_ID=$(generate_uuid)
-
-        # Store conversation ID in session config (committed with final status update)
-        jq --arg conv_id "$AGENT_CONV_ID" \
-           '.config.conversation_id = $conv_id' \
-           "$session_file" > "${session_file}.tmp" && mv "${session_file}.tmp" "$session_file"
-
-        echo -e "${CYAN}[agent] Claude session ID: ${AGENT_CONV_ID}${NC}"
+        AGENT_CONV_ID=""
     fi
 
     # Run agent, capture exit code, stderr, and stdout
@@ -547,15 +540,27 @@ IMPORTANT: You are running in a non-interactive, headless environment. There is 
             set +eo pipefail
             $timeout_cmd claude --model "$SELECTED_MODEL" -p "$prompt" \
                 --output-format stream-json --verbose --include-partial-messages \
-                --session-id "$AGENT_CONV_ID" \
                 --dangerously-skip-permissions \
                 2> >(tee "$stderr_file" >&2) | tee "$stdout_file" | \
                 jq -rj 'select(.type == "stream_event" and .event.delta?.type? == "text_delta") | .event.delta.text' 2>/dev/null
             agent_exit=${PIPESTATUS[0]}
             set -eo pipefail
+
+            # Extract actual conversation ID from stream-json output for recovery
+            if [[ -f "$stdout_file" ]]; then
+                local extracted_id=""
+                extracted_id=$(jq -r 'select(.type == "system") | .session_id // empty' "$stdout_file" 2>/dev/null | head -1) || true
+                if [[ -n "$extracted_id" ]]; then
+                    AGENT_CONV_ID="$extracted_id"
+                    echo -e "${CYAN}[agent] Captured Claude session ID: ${AGENT_CONV_ID}${NC}"
+                    # Store conversation ID in session config for recovery
+                    jq --arg conv_id "$AGENT_CONV_ID" \
+                       '.config.conversation_id = $conv_id' \
+                       "$session_file" > "${session_file}.tmp" && mv "${session_file}.tmp" "$session_file"
+                fi
+            fi
         else
             $timeout_cmd claude --model "$SELECTED_MODEL" \
-                --session-id "$AGENT_CONV_ID" \
                 --allowedTools "${CLAUDE_ALLOWED_TOOLS[@]}" \
                 -c "$prompt" \
                 2> >(tee "$stderr_file" >&2) | tee "$stdout_file"

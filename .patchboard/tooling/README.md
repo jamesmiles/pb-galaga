@@ -16,6 +16,35 @@ pip install -r requirements.txt
 # 4. Now you can run the tooling
 python .patchboard/tooling/patchboard.py validate
 
+## Quick Validation
+
+The easiest way to run validation is with the helper script:
+
+```bash
+bash .patchboard/tooling/validate.sh          # basic
+bash .patchboard/tooling/validate.sh --verbose # detailed output
+```
+
+This automatically creates a lightweight Python venv (at `.patchboard-local/venv/`),
+installs the required dependencies, and runs `patchboard.py validate`.
+
+## CI / GitHub Actions
+
+A GitHub Actions workflow template is included at `.patchboard/tooling/workflows/patchboard-validate.yml`.
+To enable CI validation on your repo, copy it into place:
+
+```bash
+mkdir -p .github/workflows
+cp .patchboard/tooling/workflows/patchboard-validate.yml .github/workflows/
+git add .github/workflows/patchboard-validate.yml
+git commit -m "Enable patchboard CI validation"
+```
+
+The workflow runs on PRs and pushes to main/master. It:
+- Validates task schema, dependencies, and epic relationships
+- Checks PR titles contain a task ID (T-XXXX)
+- Prevents tasks from being set to `done` via PR (must use `review`)
+
 ## CLI Tools
 
 ### patchboard.py
