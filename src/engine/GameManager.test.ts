@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { GameManager } from './GameManager';
+import { WAVE_COMPLETE_BONUS } from './constants';
 
 describe('GameManager', () => {
   describe('construction', () => {
@@ -303,6 +304,73 @@ describe('GameManager', () => {
       }
       gm.tickHeadless(1);
       expect(gm.getState().gameStatus).toBe('gameover');
+      gm.destroy();
+    });
+  });
+
+  describe('wave and level complete', () => {
+    function startGame(gm: GameManager): void {
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+    }
+
+    it('awards wave bonus when wave is cleared', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      // Tick to activate the wave (transition → active)
+      gm.tickHeadless(1);
+
+      const player = gm.getState().players[0];
+      player.isInvulnerable = false;
+      const scoreBefore = player.score;
+
+      // Kill all enemies to clear wave
+      gm.getState().enemies.forEach(e => { e.isAlive = false; });
+      gm.tickHeadless(1);
+
+      expect(player.score).toBe(scoreBefore + WAVE_COMPLETE_BONUS);
+      gm.destroy();
+    });
+
+    it('transitions to levelcomplete after final wave', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      // Speed through all 5 waves
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+
+        // Wait for wave transition if not final
+        if (wave < 4) {
+          gm.tickHeadless(200); // ~3.3s to pass transition
+        }
+      }
+
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+      expect(gm.getState().menu?.type).toBe('levelcomplete');
+      gm.destroy();
+    });
+
+    it('level complete menu returns to main menu', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      // Clear all 5 waves
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        if (wave < 4) gm.tickHeadless(200);
+      }
+
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+
+      // Select "Main Menu"
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      expect(gm.getState().gameStatus).toBe('menu');
       gm.destroy();
     });
   });

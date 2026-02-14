@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { LevelManager } from './LevelManager';
 import { createInitialState, createPlayer } from './StateManager';
 import { level1 } from '../levels/level1';
-import { FIXED_TIMESTEP } from './constants';
+import { FIXED_TIMESTEP, WAVE_COMPLETE_BONUS } from './constants';
 import type { GameState } from '../types';
 
 describe('LevelManager', () => {

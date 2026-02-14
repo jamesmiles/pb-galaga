@@ -54,6 +54,9 @@ export const BULLET_DAMAGE = 50;
 export const BULLET_MAX_LIFETIME = 3000; // ms
 export const BULLET_COLLISION_RADIUS = 3;
 
+// Score
+export const WAVE_COMPLETE_BONUS = 500;
+
 // Death sequence
 export const DEATH_SEQUENCE_DURATION = 2000; // ms
 

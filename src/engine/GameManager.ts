@@ -1,5 +1,5 @@
 import type { GameState, GameRenderer } from '../types';
-import { GAME_WIDTH } from './constants';
+import { GAME_WIDTH, WAVE_COMPLETE_BONUS } from './constants';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer } from './StateManager';
 import { InputHandler } from './InputHandler';
@@ -101,6 +101,7 @@ export class GameManager {
         this.updateGameOver(state);
         break;
       case 'levelcomplete':
+        this.updateLevelComplete(state);
         break;
     }
   }
@@ -202,7 +203,32 @@ export class GameManager {
     }
 
     // 8. Level/wave progression
+    const waveBefore = state.currentWave;
+    const waveStatusBefore = state.waveStatus;
     this.levelManager.update(state);
+
+    // Detect wave completion
+    if (waveStatusBefore === 'active' && state.waveStatus !== 'active') {
+      // Award wave bonus to alive players
+      for (const player of state.players) {
+        if (player.isAlive) {
+          player.score += WAVE_COMPLETE_BONUS;
+        }
+      }
+
+      // If waveStatus is 'complete' (no more waves), transition to level complete
+      if (state.waveStatus === 'complete') {
+        state.gameStatus = 'levelcomplete';
+        const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+        state.menu = {
+          type: 'levelcomplete',
+          selectedOption: 0,
+          options: ['Main Menu'],
+          data: { finalScore: totalScore, wave: state.currentWave },
+        };
+        return;
+      }
+    }
 
     // 9. Collision detection — track deaths for sound
     const aliveEnemiesBefore = state.enemies.filter(e => e.isAlive).length;
@@ -262,6 +288,20 @@ export class GameManager {
         this.stateManager.currentState.background = createBackground();
         this.startGame(this.stateManager.currentState);
       } else if (selected === 'Main Menu') {
+        this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
+      }
+    }
+  }
+
+  private updateLevelComplete(state: GameState): void {
+    const menuInput = this.inputHandler.getMenuInput();
+    if (!state.menu) return;
+
+    if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
+      const selected = state.menu.options[state.menu.selectedOption];
+      if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
       }

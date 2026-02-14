@@ -109,7 +109,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.lastGameStatus = current.gameStatus;
 
-    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover') {
+    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete') {
       this.renderMenu(current);
       this.hideGameElements();
       this.fpsText.setText(`Engine: ${engineFps} | Render: ${renderFps}`);
@@ -422,6 +422,26 @@ export class GameScene extends Phaser.Scene {
           color: '#4488ff',
         }).setOrigin(0.5);
         this.menuContainer.add(p2Score);
+      }
+
+      this.renderMenuOptions(menu.options, menu.selectedOption, 320);
+
+    } else if (menu.type === 'levelcomplete') {
+      const completeText = this.add.text(0, 150, 'LEVEL COMPLETE!', {
+        fontFamily: 'monospace',
+        fontSize: '42px',
+        color: '#44ff44',
+        fontStyle: 'bold',
+      }).setOrigin(0.5);
+      this.menuContainer.add(completeText);
+
+      if (menu.data?.finalScore !== undefined) {
+        const scoreText = this.add.text(0, 220, `Total Score: ${menu.data.finalScore}`, {
+          fontFamily: 'monospace',
+          fontSize: '24px',
+          color: '#ffffff',
+        }).setOrigin(0.5);
+        this.menuContainer.add(scoreText);
       }
 
       this.renderMenuOptions(menu.options, menu.selectedOption, 320);
