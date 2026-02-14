@@ -16,6 +16,7 @@ function distance(a: Vector2D, b: Vector2D): number {
 export function detectCollisions(state: GameState): void {
   detectPlayerEnemyCollisions(state);
   detectProjectileEnemyCollisions(state);
+  detectEnemyProjectilePlayerCollisions(state);
 }
 
 function detectPlayerEnemyCollisions(state: GameState): void {
@@ -54,6 +55,24 @@ function detectProjectileEnemyCollisions(state: GameState): void {
           }
           break; // One projectile hits one enemy
         }
+      }
+    }
+  }
+}
+
+function detectEnemyProjectilePlayerCollisions(state: GameState): void {
+  for (const proj of state.projectiles) {
+    if (!proj.isActive || proj.hasCollided) continue;
+    if (proj.owner.type !== 'enemy') continue;
+
+    for (const player of state.players) {
+      if (!player.isAlive || player.isInvulnerable) continue;
+      const dist = distance(proj.position, player.position);
+      if (dist < proj.collisionRadius + PLAYER_COLLISION_RADIUS) {
+        proj.hasCollided = true;
+        proj.isActive = false;
+        damagePlayer(player, proj.damage);
+        break; // One projectile hits one player
       }
     }
   }

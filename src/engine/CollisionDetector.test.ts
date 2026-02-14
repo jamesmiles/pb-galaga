@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { detectCollisions } from './CollisionDetector';
 import { createInitialState, createPlayer } from './StateManager';
 import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
-import { createLaser } from '../objects/projectiles/laser/code/Laser';
+import { createLaser, createEnemyLaser } from '../objects/projectiles/laser/code/Laser';
+import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
 
 describe('CollisionDetector', () => {
   describe('player-enemy collisions', () => {
@@ -98,6 +99,109 @@ describe('CollisionDetector', () => {
 
       const deadCount = state.enemies.filter(e => !e.isAlive).length;
       expect(deadCount).toBe(1);
+    });
+  });
+
+  describe('enemy projectile-player collisions', () => {
+    it('enemy laser damages player and deactivates projectile', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 200, y: 500 };
+      state.players = [player];
+
+      const enemyLaser = createEnemyLaser({ x: 200, y: 500 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [enemyLaser];
+
+      detectCollisions(state);
+
+      expect(player.health).toBe(player.maxHealth - enemyLaser.damage);
+      expect(enemyLaser.hasCollided).toBe(true);
+      expect(enemyLaser.isActive).toBe(false);
+    });
+
+    it('enemy bullet damages player and deactivates projectile', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 200, y: 500 };
+      state.players = [player];
+
+      const bullet = createBullet({ x: 200, y: 500 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [bullet];
+
+      detectCollisions(state);
+
+      expect(player.health).toBe(player.maxHealth - bullet.damage);
+      expect(bullet.hasCollided).toBe(true);
+      expect(bullet.isActive).toBe(false);
+    });
+
+    it('enemy projectile kills player when health is low', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.health = 30; // Less than laser damage (50)
+      player.position = { x: 200, y: 500 };
+      state.players = [player];
+
+      const enemyLaser = createEnemyLaser({ x: 200, y: 500 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [enemyLaser];
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(false);
+      expect(player.health).toBe(0);
+    });
+
+    it('does not damage invulnerable player', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = true;
+      player.position = { x: 200, y: 500 };
+      state.players = [player];
+
+      const enemyLaser = createEnemyLaser({ x: 200, y: 500 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [enemyLaser];
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(true);
+      expect(player.health).toBe(player.maxHealth);
+      expect(enemyLaser.isActive).toBe(true);
+    });
+
+    it('does not hit when far apart', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 100, y: 100 };
+      state.players = [player];
+
+      const enemyLaser = createEnemyLaser({ x: 500, y: 500 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [enemyLaser];
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(true);
+      expect(enemyLaser.isActive).toBe(true);
+    });
+
+    it('player projectiles do not hit players', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 200, y: 500 };
+      state.players = [player];
+
+      const playerLaser = createLaser({ x: 200, y: 500 }, { type: 'player', id: 'player1' });
+      state.projectiles = [playerLaser];
+      state.enemies = []; // No enemies to hit
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(true);
+      expect(playerLaser.isActive).toBe(true);
     });
   });
 });
