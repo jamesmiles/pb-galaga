@@ -1,25 +1,27 @@
 ---
 id: T-0020
-title: "Implement player death sequence"
+title: Implement player death sequence
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - animation
-depends_on: [T-0018]
-parallel_with: [T-0021]
+- gameplay
+- animation
+depends_on:
+- T-0018
+parallel_with:
+- T-0021
 parent_epic: E-0002
 acceptance:
-  - Player death triggers a 2-second explosion sequence before respawn or gameover
-  - During death sequence player ship is invisible and no input is processed
-  - Multi-frame explosion animation plays at death position
-  - After sequence with lives remaining, player respawns with invulnerability
-  - After sequence with 0 lives, game transitions to gameover
-  - Death sequence state tracked in Player type (deathSequence field)
-  - GameScene renders the extended death explosion animation
-  - Unit tests verify death timing, state transitions, and respawn delay
+- Player death triggers a 2-second explosion sequence before respawn or gameover
+- During death sequence player ship is invisible and no input is processed
+- Multi-frame explosion animation plays at death position
+- After sequence with lives remaining, player respawns with invulnerability
+- After sequence with 0 lives, game transitions to gameover
+- Death sequence state tracked in Player type (deathSequence field)
+- GameScene renders the extended death explosion animation
+- Unit tests verify death timing, state transitions, and respawn delay
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
