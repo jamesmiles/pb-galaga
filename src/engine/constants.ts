@@ -4,12 +4,12 @@ export const MAX_ACCUMULATED = 250; // Spiral-of-death guard (ms)
 
 // Game bounds (pixels)
 export const GAME_WIDTH = 800;
-export const GAME_HEIGHT = 600;
+export const GAME_HEIGHT = 900;
 export const GAME_BOUNDS = {
   minX: 0,
   maxX: 800,
   minY: 0,
-  maxY: 600,
+  maxY: 900,
 } as const;
 
 // Player defaults
