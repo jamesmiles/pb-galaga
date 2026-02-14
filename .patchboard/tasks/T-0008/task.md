@@ -1,29 +1,30 @@
 ---
 id: T-0008
-title: "Implement Enemy Type A destruction sequence and test harness"
+title: Implement Enemy Type A destruction sequence and test harness
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-  - testing
-depends_on: [T-0007]
+- gameplay
+- enemy
+- testing
+depends_on:
+- T-0007
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - Enemy destruction sequence triggers properly on death
-  - Score properly awarded to player on enemy destruction
-  - Destroyed enemies removed from game state
-  - EnemyHarness allows isolated testing of Enemy Type A
-  - Harness runs in both rendered and headless modes
-  - Harness test menu lets developer test all enemy behaviors
-  - Harness can simulate destruction scenarios
-  - Unit tests verify destruction logic
-  - Integration tests verify score awarding
+- Enemy destruction sequence triggers properly on death
+- Score properly awarded to player on enemy destruction
+- Destroyed enemies removed from game state
+- EnemyHarness allows isolated testing of Enemy Type A
+- Harness runs in both rendered and headless modes
+- Harness test menu lets developer test all enemy behaviors
+- Harness can simulate destruction scenarios
+- Unit tests verify destruction logic
+- Integration tests verify score awarding
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
