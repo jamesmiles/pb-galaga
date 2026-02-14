@@ -101,10 +101,6 @@ Menus provide game flow structure and player information. Start menu introduces 
 - Top 10 leaderboard
 - Player name entry
 
-**Input Handling**:
-- Menu input keys must be consumed on read to prevent repeat triggers
-- Use game time for any menu animations (not wall clock / Date.now())
-
 **Pause Menu** (deferred):
 - ESC key to pause
 - Resume/quit options

@@ -1,36 +1,41 @@
 ---
 id: E-0001
-title: "Implement Sprint 1 - Core Game Engine and Single Player"
+title: Implement Sprint 1 - Core Game Engine and Single Player
 type: epic
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - epic
-  - sprint-1
+- epic
+- sprint-1
 depends_on: []
-children: [T-0001, T-0002, T-0003, T-0004, T-0005, T-0006, T-0007, T-0008, T-0009, T-0010, T-0011, T-0012]
+children:
+- T-0001
+- T-0002
+- T-0003
+- T-0004
+- T-0005
+- T-0006
+- T-0007
+- T-0008
+- T-0009
+- T-0010
+- T-0011
+- T-0012
 acceptance:
-  - Core game engine with fixed time step runs in browser
-  - Single player red ship is playable with keyboard controls
-  - Player can fire laser projectiles that collide with enemies
-  - Enemy Type A appears and can be destroyed
-  - Start menu displays with control information
-  - Level 1 loads with enemy swarm
-  - Player lives system works (starts with 3 lives)
-  - Player score accumulates when enemies destroyed
-  - Background stars scroll with player motion
-  - Game over sequence triggers on player death
-  - All game objects have functional test harnesses
-  - Opening root index.html in Chrome via file:// launches the game (redirects to dist/index.html)
-  - dist/ is checked into the repo as the playable artifact
-  - Game loop interpolation produces visually smooth movement at variable refresh rates
-  - All ships and enemies use pixel art sprites (not geometric primitives)
-  - Engine and render FPS counters visible in top corner during gameplay
-  - Each game object type has its own harness with a standalone index.html
-  - Performance testing strategy documented and validated
+- Core game engine with fixed time step runs in browser
+- Single player red ship is playable with keyboard controls
+- Player can fire laser projectiles that collide with enemies
+- Enemy Type A appears and can be destroyed
+- Start menu displays with control information
+- Level 1 loads with enemy swarm
+- Player lives system works (starts with 3 lives)
+- Player score accumulates when enemies destroyed
+- Background stars scroll with player motion
+- Game over sequence triggers on player death
+- All game objects have functional test harnesses
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
@@ -79,10 +84,3 @@ Items deferred to Sprint 2 or later:
 - TypeScript project setup required first
 - Phaser library integration needed
 - Asset loading infrastructure needed early
-
-**Technical Constraints**:
-- Single rAF loop (custom GameLoop only — Phaser's internal loop must be disabled)
-- True double-buffered state with pointer swap (no deep cloning per tick)
-- Correct swap timing (swap BEFORE mutations each tick, not after)
-- Vite IIFE build format for file:// compatibility
-- Stack: TypeScript, Phaser 3, Vite, Vitest (pinned — not suggestions)

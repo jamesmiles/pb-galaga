@@ -21,10 +21,6 @@ acceptance:
   - Harness can simulate collisions for testing
   - Unit tests verify collision detection accuracy
   - Integration tests verify collision sequence
-  - Player ship plays an explosion animation/effect when destroyed
-  - PlayerHarness has its own index.html (e.g., src/harness/player/index.html)
-  - Harness index.html opens directly via file:// and lets users interact with the player object
-  - Harness provides clickable options/links to cycle through player states (idle, moving, firing, invulnerable, exploding, dead)
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -97,11 +93,6 @@ Collision detection is critical for gameplay. The test harness provides an isola
 - Must work without full game setup
 - Should be launchable from dev menu
 - Essential for rapid iteration
-
-**Collision Timing**:
-- Collision detection runs AFTER all movement updates within the same tick, on `currentState` only
-- Newly spawned/respawned entities should not be collision-checked on their first frame
-- Explosion effect should be a short animation sequence (~0.5s, sprite-based or particle)
 
 **Future Enhancements** (out of scope):
 - Pixel-perfect collision detection

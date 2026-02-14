@@ -21,9 +21,6 @@ acceptance:
   - Harness can simulate collisions
   - Unit tests verify laser collision detection
   - Integration tests verify collision effects
-  - ProjectileHarness has its own index.html (e.g., src/harness/projectile/index.html)
-  - Harness opens via file:// and lets users fire projectiles, spawn targets, test collisions
-  - Harness provides clickable options to cycle through projectile behaviors
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---

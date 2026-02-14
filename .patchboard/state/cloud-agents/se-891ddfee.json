@@ -1,0 +1,28 @@
+{
+  "session_id": "se-891ddfee",
+  "provider": "self_hosted",
+  "task_ids": [
+    "E-0001"
+  ],
+  "prompt": "---\ntitle: Claim & implement task or epic\n---\n\nPlease claim & implement E-0001 including any child tasks.\n\nPlease assume the role of engineer (read .patchboard/agents/engineer/index.md)",
+  "model": "default",
+  "status": "failed",
+  "started_at": "2026-02-13T12:47:02.717013Z",
+  "updated_at": "2026-02-13T12:47:42Z",
+  "completed_at": "2026-02-13T12:47:42Z",
+  "provider_session_id": null,
+  "provider_run_id": null,
+  "error_message": "non-zero exit",
+  "workspace_id": "engineer",
+  "context_type": "backlog_item",
+  "context_id": "E-0001",
+  "claimed_by": "DESKTOP-C94BI4G",
+  "claimed_at": "2026-02-13T12:47:40Z",
+  "last_heartbeat": null,
+  "config": {
+    "base_branch": "main",
+    "conversation_id": "a1d6c154-6d3d-4a6e-94c0-f1cac61b918a",
+    "diagnostic_pr_url": "https://github.com/jamesmiles/pb-galaga/pull/6"
+  },
+  "task_id": "E-0001"
+}

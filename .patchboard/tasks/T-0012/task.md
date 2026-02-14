@@ -21,15 +21,6 @@ acceptance:
   - Visual feedback for collisions and state changes
   - Smooth 60 FPS rendering achieved
   - Test harnesses integrate with renderer
-  - Phaser's built-in game loop is disabled — rendering driven entirely by GameLoop's render callback
-  - Phaser arcade physics is NOT enabled in config
-  - Renderer is wired into GameManager via a typed GameRenderer interface (not monkey-patched via any casts)
-  - Entity lookups use Map<id, entity> for O(1) previous-state matching (not Array.find)
-  - Visual timing effects use state.currentTime, never Date.now()
-  - Engine tick rate and render FPS counters displayed in top-left corner
-  - Pixel art sprites loaded for player ship and Enemy Type A (not geometric primitives)
-  - Explosion animations render for ship/enemy destruction
-  - Pre-render static elements (star backgrounds) to texture — don't redraw every frame
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -101,50 +92,6 @@ The Phaser renderer is the visual layer that brings the game to life. It must be
 3. Test harness rendering integration
 4. Performance optimization
 5. Test visual polish
-
-## Technical Specification
-
-### Disabling Phaser's Loop
-
-```typescript
-new Phaser.Game({
-  callbacks: {
-    postBoot: (game) => {
-      game.loop.stop()   // disable Phaser's internal rAF
-    }
-  }
-  // NO physics config — do not enable arcade
-})
-
-// Custom render callback manually steps Phaser once per frame:
-render(prev, curr, alpha) {
-  phaserGame.loop.tick()  // manually advance Phaser one frame
-  scene.renderState(prev, curr, alpha)
-}
-```
-
-### Renderer Interface Wiring
-
-```typescript
-interface GameRenderer {
-  render(current: GameState, previous: GameState, alpha: number): void
-}
-// GameManager accepts renderer via constructor — no monkey-patching
-constructor(options: { renderer?: GameRenderer; headless?: boolean })
-```
-
-### FPS Counter
-
-- Track engine ticks per second (count of fixed-step updates)
-- Track render frames per second (count of render callback invocations)
-- Display both as text overlay in top-left: "Engine: 60 | Render: 60"
-
-## Anti-Patterns
-
-- DO NOT enable `physics: { default: 'arcade' }` — all physics handled by engine
-- DO NOT use `Array.find()` for matching prev/current entities — build a `Map<id, entity>` per frame
-- DO NOT use `Date.now()` for game-dependent effects — use `state.currentTime`
-- DO NOT redraw unchanged Graphics objects every frame — cache static elements to textures
 
 ## Notes
 

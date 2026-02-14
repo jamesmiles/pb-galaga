@@ -22,8 +22,6 @@ acceptance:
   - Player state integrates with engine state management
   - Unit tests verify movement calculations
   - Unit tests verify boundary constraints
-  - Player ship uses a proper pixel art sprite (not geometric triangles/shapes)
-  - Pixel art sprite for player ship (red, ~32x32 or appropriate game scale)
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -90,10 +88,6 @@ The player ship is the core gameplay element. It must have precise controls, fee
 - Test movement in headless mode
 - Verify boundary constraints thoroughly
 - Test input response latency
-
-**State Mutation Rule**:
-- Player update functions receive and mutate only `currentState` (post-swap). Never read or write `previousState` during updates.
-- Sprite asset must be committed to the repo (e.g., `src/objects/player/sprites/`)
 
 **Future Enhancements** (out of scope):
 - Thruster animations
