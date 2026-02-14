@@ -20,6 +20,13 @@ acceptance:
   - Unit tests verify fixed time step accuracy
   - Unit tests verify state buffer swapping
   - Game loop maintains consistent 60 FPS update rate
+  - swapBuffers() is called BEFORE state mutations in each tick (not after)
+  - StateManager uses two pre-allocated GameState buffers with pointer swap — no structuredClone, no JSON.parse/stringify, no deep copy per tick
+  - GameLoop is the SOLE requestAnimationFrame consumer in the application
+  - InputHandler stores bound listener references and removeEventListener correctly removes them
+  - InputHandler calls preventDefault() for game-relevant keys (arrows, space)
+  - Engine tick rate counter tracks actual fixed-step update frequency
+  - Headless tickHeadless(n) correctly advances n ticks with proper swap semantics
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -72,6 +79,74 @@ The core engine is the heart of PB-Galaga. It must implement a fixed time step g
 2. Create headless test mode
 3. Verify 60 FPS consistency
 4. Document API
+
+## Technical Specification
+
+### Buffer Swap Pattern
+
+Two pre-allocated buffers: bufferA, bufferB. Pointers: `previousState` → one buffer, `currentState` → the other.
+
+```
+swapBuffers():
+  temp = previousState
+  previousState = currentState     // previous now points to last frame's final state
+  currentState = temp              // current reuses the old previous buffer
+  copyStateInto(currentState, previousState)  // shallow-copy previousState into currentState as starting point for mutations
+```
+
+### Tick Order (the correct sequence)
+
+```
+tick(timestamp):
+  elapsed = min(timestamp - lastTimestamp, MAX_ACCUMULATED)
+  accumulator += elapsed
+
+  while accumulator >= FIXED_TIMESTEP:
+    swapBuffers()                          // ← BEFORE mutations
+    processInput(currentState)
+    updateGameState(currentState, dt)
+    detectCollisions(currentState)
+    handleStateTransitions(currentState)
+    accumulator -= FIXED_TIMESTEP
+
+  alpha = accumulator / FIXED_TIMESTEP
+  render(previousState, currentState, alpha)
+```
+
+### InputHandler Listener Pattern
+
+```
+// Class properties with arrow functions for stable references
+private handleKeyDown = (e: KeyboardEvent) => { ... e.preventDefault() for game keys ... }
+private handleKeyUp = (e: KeyboardEvent) => { ... }
+
+// addEventListener and removeEventListener use the SAME references
+constructor() {
+  window.addEventListener('keydown', this.handleKeyDown)
+  window.addEventListener('keyup', this.handleKeyUp)
+}
+destroy() {
+  window.removeEventListener('keydown', this.handleKeyDown)
+  window.removeEventListener('keyup', this.handleKeyUp)
+}
+```
+
+## Performance Testing Strategy
+
+- Measure engine tick consistency over 10,000+ ticks — standard deviation of tick intervals should be < 1ms
+- Measure `swapBuffers()` cost — must be < 0.5ms (no deep clone)
+- Measure full update cycle time — must fit within 16.67ms budget at max entity count
+- Measure GC pauses — no per-tick allocations that create GC pressure
+- Headless stress test: run 10,000 ticks with max entities, measure total time and memory
+- These tests run via `npm run test` (Vitest)
+
+## Anti-Patterns
+
+- DO NOT use `structuredClone()` or any deep-clone per tick
+- DO NOT call `swapBuffers()` at the end of update — must be at the start
+- DO NOT use `any` casts to wire components — use typed interfaces
+- DO NOT use anonymous arrow wrappers in addEventListener without storing the reference
+- DO NOT put heavyweight cosmetic state (e.g. 200 stars) in the double-buffered game state
 
 ## Notes
 

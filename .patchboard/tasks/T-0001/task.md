@@ -13,12 +13,15 @@ parallel_with: []
 parent_epic: E-0001
 acceptance:
   - TypeScript project initialized with proper tsconfig.json
-  - Package.json includes Phaser, TypeScript, and build tools
+  - Package.json includes Phaser, TypeScript, Vite, and Vitest
   - Build command successfully compiles TypeScript to JavaScript
   - Development server runs and serves the game
   - Source directory structure matches architecture (/src/engine, /src/objects, /src/levels, /src/renderer, /src/harness)
-  - Basic index.html entry point exists
+  - Root index.html exists as a simple redirect/loader to dist/index.html
   - Assets directory structure created
+  - npm run build produces dist/ that opens directly via file:// in Chrome
+  - Vite config uses build.rollupOptions.output.format 'iife' and base './'
+  - dist/ directory is NOT in .gitignore — it is committed as the playable game
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -32,11 +35,11 @@ This is the foundational task that sets up the development environment for PB-Ga
 ## Plan
 
 1. Initialize npm project with package.json
-2. Install dependencies:
+2. Install dependencies (pinned — not suggestions):
    - TypeScript (latest)
    - Phaser (latest v3.x)
-   - Build tool (Vite recommended for simplicity)
-   - Testing framework (Jest or Vitest)
+   - Vite (required build tool)
+   - Vitest (required test framework)
 3. Configure tsconfig.json with:
    - Target: ES2020 or later
    - Module: ESNext
@@ -57,8 +60,10 @@ This is the foundational task that sets up the development environment for PB-Ga
      animations/
    public/
    ```
-5. Create basic index.html with canvas element
-6. Create minimal main.ts entry point
+5. Create root index.html that redirects to dist/index.html
+6. Create Vite entry point index.html (in src/ or project root for Vite) with canvas element
+7. Configure Vite for IIFE output format (build.rollupOptions.output.format: 'iife')
+8. Create minimal main.ts entry point
 7. Add build and dev scripts to package.json
 8. Test build and dev server
 
@@ -68,3 +73,6 @@ This is the foundational task that sets up the development environment for PB-Ga
 - Ensure source maps work for debugging
 - Keep dependencies minimal - only what's needed for Sprint 1
 - Document build commands in README
+- Do NOT enable Phaser arcade physics anywhere in the project
+- Do NOT hardcode localhost URLs in source code (only in dev/test configs)
+- Verify the built dist/index.html works when opened from filesystem (file:// protocol) before considering this task complete

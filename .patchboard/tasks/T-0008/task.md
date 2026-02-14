@@ -22,6 +22,11 @@ acceptance:
   - Harness can simulate destruction scenarios
   - Unit tests verify destruction logic
   - Integration tests verify score awarding
+  - Enemy plays explosion animation when destroyed (not just removed from state)
+  - Explosion animation lasts ~0.5s before entity is fully removed
+  - EnemyHarness has its own index.html (e.g., src/harness/enemy/index.html)
+  - Harness opens via file:// and lets users spawn enemies, test formations, trigger destruction
+  - Harness provides clickable options to cycle through enemy states (alive, damaged, exploding, dead)
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---

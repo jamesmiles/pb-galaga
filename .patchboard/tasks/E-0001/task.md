@@ -22,6 +22,13 @@ acceptance:
   - Background stars scroll with player motion
   - Game over sequence triggers on player death
   - All game objects have functional test harnesses
+  - Opening root index.html in Chrome via file:// launches the game (redirects to dist/index.html)
+  - dist/ is checked into the repo as the playable artifact
+  - Game loop interpolation produces visually smooth movement at variable refresh rates
+  - All ships and enemies use pixel art sprites (not geometric primitives)
+  - Engine and render FPS counters visible in top corner during gameplay
+  - Each game object type has its own harness with a standalone index.html
+  - Performance testing strategy documented and validated
 created_at: '2026-02-13'
 updated_at: '2026-02-13'
 ---
@@ -72,3 +79,10 @@ Items deferred to Sprint 2 or later:
 - TypeScript project setup required first
 - Phaser library integration needed
 - Asset loading infrastructure needed early
+
+**Technical Constraints**:
+- Single rAF loop (custom GameLoop only — Phaser's internal loop must be disabled)
+- True double-buffered state with pointer swap (no deep cloning per tick)
+- Correct swap timing (swap BEFORE mutations each tick, not after)
+- Vite IIFE build format for file:// compatibility
+- Stack: TypeScript, Phaser 3, Vite, Vitest (pinned — not suggestions)

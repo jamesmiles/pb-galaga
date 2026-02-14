@@ -58,20 +58,17 @@ Level 1 is the first playable level, featuring a simple swarm of Enemy Type A. I
    - Level number: 1
    - Name: "First Contact"
    - Single wave configuration:
-     - Wave 1: Enemy Type A swarm
-     - Count: 10-15 enemies
-     - Formation: swarm pattern
-     - Flight paths: various arcing paths
-     - Spawn staggered over ~3 seconds
-2. Define flight paths for swarm
-3. Configure enemy properties
+     - Wave 1: Enemy Type A block formation
+     - Formation: 5 rows × 8 columns (40 enemies)
+     - Formation enters from top of screen, then begins classic left-right-descend movement
+     - Uses FormationManager from T-0007
+2. Configure enemy properties (health, score value)
 
 ### Phase 4: Wave Spawning
 1. Implement wave spawning in LevelManager:
-   - Spawn enemies according to configuration
-   - Apply formation positioning
-   - Assign flight paths
-   - Stagger spawns based on delay
+   - Spawn formation of enemies according to level config
+   - Initialize FormationManager with grid dimensions
+   - Formation enters screen from above before beginning movement pattern
 2. Track active wave
 3. Add spawn timing tests
 
@@ -92,17 +89,11 @@ Level 1 is the first playable level, featuring a simple swarm of Enemy Type A. I
 - Teaches player basic mechanics
 - Satisfying to complete
 
-**Swarm Formation**:
-- Enemies enter from top of screen
-- Loose, organic formation
-- Individual flight paths
-- Some enemies dive toward player
-
-**Flight Path Design**:
-- Mix of straight and curved paths
-- Some enemies loop back
-- Paths should feel dynamic
-- Avoid predictability
+**Block Formation**:
+- Enemies enter from top of screen as a complete formation grid
+- Formation uses classic block movement (left-right-descend) from FormationManager (T-0007)
+- Individual flight paths are NOT used for Type A — they move as a formation unit
+- Formation stands off at one ship-height from player
 
 **Wave Timing**:
 - ~3 second spawn duration

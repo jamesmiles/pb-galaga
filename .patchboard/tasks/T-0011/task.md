@@ -104,3 +104,7 @@ The scrolling star field provides visual context for player movement and adds de
 - Background renders first (behind everything)
 - Simple points or small sprites
 - Alpha blending for brightness
+
+**State Management Note**:
+- Stars are cosmetic. Keep star data outside the double-buffered GameState (e.g., in a separate cosmetic state managed by the renderer) OR ensure star objects are minimal and bounded in count
+- Stars that don't change appearance should be pre-rendered to a texture/cache — not redrawn via fillCircle() every frame
