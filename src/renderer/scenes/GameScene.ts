@@ -5,7 +5,7 @@ import { lerpPosition } from '../InterpolationUtils';
 import { triggerParticleExplosion } from '../effects/ExplosionEffect';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
 
-const GAME_VERSION = '0.2.0';
+const GAME_VERSION = '0.2.5';
 
 /**
  * Main game scene — renders all game objects by reading state.
