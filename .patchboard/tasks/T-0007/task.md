@@ -1,27 +1,30 @@
 ---
 id: T-0007
-title: "Implement Enemy Type A (non-firing transport)"
+title: Implement Enemy Type A (non-firing transport)
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-depends_on: [T-0002]
-parallel_with: [T-0003, T-0005]
+- gameplay
+- enemy
+depends_on:
+- T-0002
+parallel_with:
+- T-0003
+- T-0005
 parent_epic: E-0001
 acceptance:
-  - Enemy class implements Enemy Type A state and behavior
-  - Type A enemies follow flight paths
-  - Type A enemies do not fire projectiles
-  - Enemies removed when health reaches 0
-  - Enemy state integrates with engine
-  - Unit tests verify enemy movement
-  - Unit tests verify path following
-  - Unit tests verify health/damage system
+- Enemy class implements Enemy Type A state and behavior
+- Type A enemies follow flight paths
+- Type A enemies do not fire projectiles
+- Enemies removed when health reaches 0
+- Enemy state integrates with engine
+- Unit tests verify enemy movement
+- Unit tests verify path following
+- Unit tests verify health/damage system
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
