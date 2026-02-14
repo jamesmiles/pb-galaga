@@ -2,9 +2,9 @@
 id: T-0001
 title: "Set up TypeScript project with build infrastructure"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - infrastructure
   - setup
