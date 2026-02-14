@@ -38,6 +38,7 @@ export class GameScene extends Phaser.Scene {
   private livesText!: Phaser.GameObjects.Text;
   private p2ScoreText!: Phaser.GameObjects.Text;
   private p2LivesText!: Phaser.GameObjects.Text;
+  private waveText!: Phaser.GameObjects.Text;
   private fpsText!: Phaser.GameObjects.Text;
 
   // Menu elements
@@ -72,6 +73,12 @@ export class GameScene extends Phaser.Scene {
       fontSize: '16px',
       color: '#4488ff',
     }).setOrigin(1, 0).setDepth(100).setVisible(false);
+
+    this.waveText = this.add.text(GAME_WIDTH / 2, 10, 'Wave 1', {
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      color: '#aaaaaa',
+    }).setOrigin(0.5, 0).setDepth(100).setVisible(false);
 
     this.p2LivesText = this.add.text(GAME_WIDTH - 10, 74, 'P2 Lives: 3', {
       fontFamily: 'monospace',
@@ -325,6 +332,10 @@ export class GameScene extends Phaser.Scene {
       this.p2LivesText.setVisible(false);
     }
 
+    // Wave indicator
+    this.waveText.setText(`Wave ${state.currentWave}`);
+    this.waveText.setVisible(true);
+
     this.fpsText.setText(`Engine: ${engineFps} | Render: ${renderFps}`);
     this.fpsText.setVisible(true);
   }
@@ -452,6 +463,7 @@ export class GameScene extends Phaser.Scene {
     this.livesText.setVisible(false);
     this.p2ScoreText.setVisible(false);
     this.p2LivesText.setVisible(false);
+    this.waveText.setVisible(false);
     if (this.starGraphics) {
       this.starGraphics.setVisible(false);
     }
