@@ -20,7 +20,7 @@ acceptance:
   - Maximum 2 simultaneous divers
   - Minimum 3-second cooldown between new dives
   - Diving enemies can still fire (if they have fireMode)
-  - Dive speed varies by enemy type (A: 1.0x, B: 0.7x, C: 1.5x)
+  - "Dive speed varies by enemy type (A: 1.0x, B: 0.7x, C: 1.5x)"
   - Wired into GameManager.updatePlaying()
   - Unit tests verify dive selection, path calculation, and re-entry
 created_at: '2026-02-14'

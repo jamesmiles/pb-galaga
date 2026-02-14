@@ -13,9 +13,9 @@ depends_on: [T-0023]
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - "WAVE COMPLETE" text displays between waves with score bonus
+  - '"WAVE COMPLETE" text displays between waves with score bonus'
   - 3-second pause before next wave spawns
-  - "LEVEL COMPLETE" displays after final wave (wave 5)
+  - '"LEVEL COMPLETE" displays after final wave (wave 5)'
   - Level complete screen shows total score
   - Options to return to menu after level complete
   - State transition from playing → levelcomplete works
