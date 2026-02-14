@@ -11,9 +11,11 @@ import { detectCollisions } from './CollisionDetector';
 import { LevelManager } from './LevelManager';
 import { EnemyFiringManager } from './EnemyFiringManager';
 import { DiveManager } from './DiveManager';
+import { updateFlightPaths } from './FlightPathManager';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
 import { level1 } from '../levels/level1';
+import { level2 } from '../levels/level2';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -45,6 +47,7 @@ export class GameManager {
     );
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
+    this.levelManager.registerLevel(level2);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
 
@@ -206,6 +209,9 @@ export class GameManager {
       updateFormation(state, dtSeconds);
     }
 
+    // 4b. Update flight path entry animations
+    updateFlightPaths(state, dtSeconds);
+
     // 5. Dive attacks
     this.diveManager.update(state, dtSeconds);
 
@@ -238,23 +244,29 @@ export class GameManager {
         state.gameStatus = 'levelcomplete';
         MusicManager.stop();
         const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+        const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
         state.menu = {
           type: 'levelcomplete',
           selectedOption: 0,
-          options: ['Main Menu'],
-          data: { finalScore: totalScore, wave: state.currentWave },
+          options: hasNextLevel ? ['Next Level', 'Main Menu'] : ['Main Menu'],
+          data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
         };
         return;
       }
     }
 
-    // 9. Collision detection — track deaths for sound
-    const aliveEnemiesBefore = state.enemies.filter(e => e.isAlive).length;
+    // 9. Collision detection — track deaths for type-specific sounds
+    const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type }]));
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
-    const aliveEnemiesAfter = state.enemies.filter(e => e.isAlive).length;
+    for (const enemy of state.enemies) {
+      const before = enemyAliveMap.get(enemy.id);
+      if (before?.alive && !enemy.isAlive) {
+        const hitSound = `hit${enemy.type}` as import('../audio/SoundManager').SoundEffect;
+        SoundManager.play(hitSound);
+      }
+    }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
-    if (aliveEnemiesAfter < aliveEnemiesBefore) SoundManager.play('explosion');
     if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
 
     // 10. Handle death sequences and delayed respawn
@@ -346,10 +358,33 @@ export class GameManager {
     const menuInput = this.inputHandler.getMenuInput();
     if (!state.menu) return;
 
+    if (menuInput.down) {
+      state.menu = {
+        ...state.menu,
+        selectedOption: Math.min(state.menu.selectedOption + 1, state.menu.options.length - 1),
+      };
+    }
+    if (menuInput.up) {
+      state.menu = {
+        ...state.menu,
+        selectedOption: Math.max(state.menu.selectedOption - 1, 0),
+      };
+    }
     if (menuInput.confirm) {
       SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
-      if (selected === 'Main Menu') {
+      if (selected === 'Next Level') {
+        // Advance to next level — keep player scores and lives
+        const nextLevel = state.currentLevel + 1;
+        state.enemies = [];
+        state.projectiles = [];
+        state.gameStatus = 'playing';
+        state.menu = null;
+        this.enemyFiringManager.reset();
+        this.diveManager.reset();
+        MusicManager.play('gameplay');
+        this.levelManager.startLevel(state, nextLevel);
+      } else if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
         MusicManager.play('menu');

@@ -25,5 +25,6 @@ export function createEnemyB(row: number, col: number): Enemy {
     formationRow: row,
     formationCol: col,
     diveState: null,
+    flightPathState: null,
   };
 }

@@ -37,7 +37,7 @@ export function drawHUD(
   ctx.font = '14px monospace';
   ctx.fillStyle = '#aaaaaa';
   ctx.textAlign = 'center';
-  ctx.fillText(`Wave ${state.currentWave}`, GAME_WIDTH / 2, 24);
+  ctx.fillText(`Level ${state.currentLevel} - Wave ${state.currentWave}`, GAME_WIDTH / 2, 24);
 
   // FPS counters (top-left, green)
   ctx.font = '12px monospace';

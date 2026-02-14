@@ -90,6 +90,7 @@ export function updateEnemyPositions(state: GameState): void {
   for (const enemy of state.enemies) {
     if (!enemy.isAlive) continue;
     if (enemy.diveState) continue; // Diving enemies control their own position
+    if (enemy.flightPathState) continue; // Flight path enemies are still entering
     enemy.position.x = formation.offsetX + (enemy.formationCol + 0.5) * formation.cellWidth;
     enemy.position.y = formation.offsetY + (enemy.formationRow + 0.5) * formation.cellHeight;
   }

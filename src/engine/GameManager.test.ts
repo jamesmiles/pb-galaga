@@ -457,11 +457,37 @@ describe('GameManager', () => {
 
       expect(gm.getState().gameStatus).toBe('levelcomplete');
 
-      // Select "Main Menu"
+      // Navigate down to "Main Menu" (first option is now "Next Level")
+      gm.inputHandler.injectMenuInput({ down: true });
+      gm.tickHeadless(1);
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
 
       expect(gm.getState().gameStatus).toBe('menu');
+      gm.destroy();
+    });
+
+    it('level complete advances to next level', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      // Clear all 5 waves of level 1
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        if (wave < 4) gm.tickHeadless(200);
+      }
+
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+      expect(gm.getState().currentLevel).toBe(1);
+
+      // Select "Next Level"
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      expect(gm.getState().gameStatus).toBe('playing');
+      expect(gm.getState().currentLevel).toBe(2);
+      expect(gm.getState().enemies.length).toBeGreaterThan(0);
       gm.destroy();
     });
   });

@@ -1,4 +1,6 @@
-/** Canvas 2D particle explosion system with alpha fade and neon glow. */
+/** Canvas 2D particle explosion system with alpha fade, neon glow, and light flashes. */
+
+import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
 
 interface Particle {
   x: number;
@@ -11,6 +13,16 @@ interface Particle {
   size: number;
 }
 
+interface Flash {
+  x: number;
+  y: number;
+  radius: number;
+  color: string;
+  life: number;
+  maxLife: number;
+  isScreenFlash: boolean;
+}
+
 /** Color presets per entity type for explosion particles. */
 const EXPLOSION_COLORS: Record<string, string[]> = {
   A: ['#00ff44', '#66ff88', '#ffffff'],
@@ -20,9 +32,20 @@ const EXPLOSION_COLORS: Record<string, string[]> = {
   default: ['#ffcc00', '#ff5500', '#ffffff'],
 };
 
+/** Primary glow color per entity type for screen flashes. */
+const FLASH_COLORS: Record<string, string> = {
+  A: '#00ff44',
+  B: '#00ccff',
+  C: '#ff5500',
+  player: '#ff3344',
+  default: '#ffcc00',
+};
+
 export class ParticleSystem {
   private particles: Particle[] = [];
+  private flashes: Flash[] = [];
   private explodedEntities: Set<string> = new Set();
+  private impactedProjectiles: Set<string> = new Set();
 
   // Screen shake state
   shakeOffsetX = 0;
@@ -70,7 +93,25 @@ export class ParticleSystem {
     }
   }
 
-  /** Update particle positions, lifetimes, and screen shake. */
+  /**
+   * Emit a localized impact flash at a collision point.
+   * Deduplicates by projectile ID.
+   */
+  emitImpactFlash(x: number, y: number, projectileId: string, color: string = '#ffffff'): void {
+    if (this.impactedProjectiles.has(projectileId)) return;
+    this.impactedProjectiles.add(projectileId);
+
+    this.flashes.push({
+      x, y,
+      radius: 20,
+      color,
+      life: 60,
+      maxLife: 60,
+      isScreenFlash: false,
+    });
+  }
+
+  /** Update particle positions, lifetimes, flashes, and screen shake. */
   update(dt: number): void {
     // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
@@ -90,6 +131,14 @@ export class ParticleSystem {
       }
     }
 
+    // Update flashes
+    for (let i = this.flashes.length - 1; i >= 0; i--) {
+      this.flashes[i].life -= dt;
+      if (this.flashes[i].life <= 0) {
+        this.flashes.splice(i, 1);
+      }
+    }
+
     // Update screen shake
     if (this.shakeTimer < this.shakeDuration) {
       this.shakeTimer += dt;
@@ -102,8 +151,39 @@ export class ParticleSystem {
     }
   }
 
-  /** Draw all active particles with alpha fade and glow. */
+  /** Draw all active particles and flashes with alpha fade and glow. */
   draw(ctx: CanvasRenderingContext2D): void {
+    // Draw flashes first (behind particles)
+    for (const flash of this.flashes) {
+      const alpha = Math.max(0, flash.life / flash.maxLife);
+      ctx.save();
+
+      if (flash.isScreenFlash) {
+        // Full-screen additive flash
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = alpha * 0.12;
+        ctx.fillStyle = flash.color;
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      } else {
+        // Localized impact flash with radial gradient
+        ctx.globalCompositeOperation = 'lighter';
+        const gradient = ctx.createRadialGradient(
+          flash.x, flash.y, 0,
+          flash.x, flash.y, flash.radius,
+        );
+        gradient.addColorStop(0, flash.color);
+        gradient.addColorStop(1, 'transparent');
+        ctx.globalAlpha = alpha * 0.6;
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(flash.x, flash.y, flash.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // Draw particles
     for (const p of this.particles) {
       const alpha = Math.max(0, p.life / p.maxLife);
 
@@ -131,7 +211,9 @@ export class ParticleSystem {
   /** Clear explosion tracking (call on game restart). */
   clearTracking(): void {
     this.explodedEntities.clear();
+    this.impactedProjectiles.clear();
     this.particles = [];
+    this.flashes = [];
     this.shakeTimer = 0;
     this.shakeDuration = 0;
     this.shakeOffsetX = 0;
@@ -140,5 +222,9 @@ export class ParticleSystem {
 
   get activeCount(): number {
     return this.particles.length;
+  }
+
+  get flashCount(): number {
+    return this.flashes.length;
   }
 }

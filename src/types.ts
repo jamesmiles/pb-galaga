@@ -74,6 +74,13 @@ export interface DiveState {
   startPos: Vector2D;
 }
 
+export interface FlightPathState {
+  progress: number;           // 0..1 along the bezier curve
+  controlPoints: Vector2D[];  // Bezier control points for entry path
+  targetSlot: Vector2D;       // Final formation position
+  speed: number;              // Entry speed in pixels/sec
+}
+
 export interface Enemy {
   id: string;
   type: 'A' | 'B' | 'C';
@@ -95,6 +102,7 @@ export interface Enemy {
   formationRow: number;
   formationCol: number;
   diveState: DiveState | null;
+  flightPathState: FlightPathState | null;
 }
 
 // --- Projectile ---
@@ -201,7 +209,7 @@ export interface GameState {
 
 // --- Level Config ---
 
-export type FormationType = 'line' | 'v-formation' | 'swarm' | 'grid';
+export type FormationType = 'line' | 'v-formation' | 'swarm' | 'grid' | 'w-curve' | 'chiral' | 'diagonal' | 'side-wave' | 'm-shape' | 'inverted-v';
 
 export interface LevelConfig {
   levelNumber: number;
@@ -209,10 +217,18 @@ export interface LevelConfig {
   waves: WaveConfig[];
 }
 
+export interface WaveSlot {
+  type: 'A' | 'B' | 'C';
+  row: number;
+  col: number;
+}
+
 export interface WaveConfig {
   waveNumber: number;
   enemies: EnemySpawnConfig[];
   delay: number;
+  formation?: FormationType;  // Wave-level formation type (used with slots)
+  slots?: WaveSlot[];         // Explicit enemy placement; overrides enemies array
 }
 
 export interface EnemySpawnConfig {
