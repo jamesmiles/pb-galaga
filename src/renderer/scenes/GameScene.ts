@@ -4,7 +4,7 @@ import { registerTextures } from '../SpriteManager';
 import { lerpPosition } from '../InterpolationUtils';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
 
-const GAME_VERSION = '0.1.2';
+const GAME_VERSION = '0.2.0';
 const EXPLOSION_DURATION = 400; // ms per explosion
 const EXPLOSION_FRAMES = 4;
 
