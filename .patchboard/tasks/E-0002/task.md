@@ -1,31 +1,45 @@
 ---
 id: E-0002
-title: "Implement Sprint 2 - Enhanced Gameplay"
+title: Implement Sprint 2 - Enhanced Gameplay
 type: epic
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - epic
-  - sprint-2
-depends_on: [E-0001]
-children: [T-0013, T-0014, T-0015, T-0016, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0023, T-0024, T-0025]
+- epic
+- sprint-2
+depends_on:
+- E-0001
+children:
+- T-0013
+- T-0014
+- T-0015
+- T-0016
+- T-0017
+- T-0018
+- T-0019
+- T-0020
+- T-0021
+- T-0022
+- T-0023
+- T-0024
+- T-0025
 acceptance:
-  - Game canvas resized to 800x900 for better vertical real-estate
-  - Bullet projectile system implemented (distinct from laser)
-  - Enemy Type B implemented (slow fighter, 2 HP, fires lasers)
-  - Enemy Type C implemented (fast fighter, 1 HP, fires bullets)
-  - Enemy firing system with front-row targeting and configurable rates
-  - Enemy projectiles damage the player (respects invulnerability)
-  - ZzFX sound effects for fire, explosion, menu, death
-  - Player death sequence with 2-second explosion before respawn/gameover
-  - Dive attack behavior for front-line enemies
-  - Two player co-op mode with blue ship (WASD + Q)
-  - Level 1 expanded to 5 waves with escalating difficulty
-  - Level complete sequence with score bonus between waves
-  - ZzFXM background music with menu and gameplay tracks
-  - All features have comprehensive unit tests
-  - Playwright visual tests pass at new resolution
+- Game canvas resized to 800x900 for better vertical real-estate
+- Bullet projectile system implemented (distinct from laser)
+- Enemy Type B implemented (slow fighter, 2 HP, fires lasers)
+- Enemy Type C implemented (fast fighter, 1 HP, fires bullets)
+- Enemy firing system with front-row targeting and configurable rates
+- Enemy projectiles damage the player (respects invulnerability)
+- ZzFX sound effects for fire, explosion, menu, death
+- Player death sequence with 2-second explosion before respawn/gameover
+- Dive attack behavior for front-line enemies
+- Two player co-op mode with blue ship (WASD + Q)
+- Level 1 expanded to 5 waves with escalating difficulty
+- Level complete sequence with score bonus between waves
+- ZzFXM background music with menu and gameplay tracks
+- All features have comprehensive unit tests
+- Playwright visual tests pass at new resolution
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
