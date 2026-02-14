@@ -2,9 +2,9 @@
 id: T-0017
 title: "Implement enemy firing system"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - enemy

@@ -2,9 +2,9 @@
 id: T-0018
 title: "Implement enemy projectile-player collision"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - collision

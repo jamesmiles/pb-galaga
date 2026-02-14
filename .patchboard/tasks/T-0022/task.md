@@ -2,9 +2,9 @@
 id: T-0022
 title: "Implement two-player co-op mode"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - multiplayer

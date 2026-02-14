@@ -2,9 +2,9 @@
 id: T-0013
 title: "Resize game canvas from 800x600 to 800x900"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - infrastructure
   - rendering

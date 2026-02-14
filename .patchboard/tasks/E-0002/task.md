@@ -2,9 +2,9 @@
 id: E-0002
 title: "Implement Sprint 2 - Enhanced Gameplay"
 type: epic
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - epic
   - sprint-2

@@ -2,9 +2,9 @@
 id: T-0023
 title: "Expand Level 1 with 5 enemy waves"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - level

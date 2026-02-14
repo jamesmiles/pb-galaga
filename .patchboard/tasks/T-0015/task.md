@@ -2,9 +2,9 @@
 id: T-0015
 title: "Implement Enemy Type B (slow fighter with laser)"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - enemy
