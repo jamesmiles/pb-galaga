@@ -107,7 +107,8 @@ export class GameScene extends Phaser.Scene {
     this.lastGameStatus = current.gameStatus;
 
     if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete') {
-      this.renderMenu(current);
+      // Menus rendered by CSS MenuOverlay — just hide game elements
+      this.hideMenu();
       this.hideGameElements();
       this.fpsText.setText(`Engine: ${engineFps} | Render: ${renderFps}`);
       return;

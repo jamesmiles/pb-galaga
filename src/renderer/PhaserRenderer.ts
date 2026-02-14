@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { GameState, GameRenderer } from '../types';
 import { GameScene } from './scenes/GameScene';
+import { MenuOverlay } from './MenuOverlay';
 import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
 
 /**
@@ -14,6 +15,7 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
 export class PhaserRenderer implements GameRenderer {
   private game: Phaser.Game;
   private gameScene: GameScene | null = null;
+  private menuOverlay: MenuOverlay | null = null;
   private ready = false;
 
   // FPS counters passed from GameLoop
@@ -53,6 +55,11 @@ export class PhaserRenderer implements GameRenderer {
     // Wait for scene to be ready
     this.game.events.on('ready', () => {
       this.gameScene = this.game.scene.getScene('GameScene') as GameScene;
+      // Create CSS menu overlay on top of the Phaser canvas
+      const parent = document.getElementById(containerId);
+      if (parent) {
+        this.menuOverlay = new MenuOverlay(parent);
+      }
       this.ready = true;
     });
   }
@@ -69,6 +76,11 @@ export class PhaserRenderer implements GameRenderer {
     // Update scene state from game state
     this.gameScene.renderState(current, previous, alpha, this.engineFps, this.renderFps);
 
+    // Update CSS menu overlay
+    if (this.menuOverlay) {
+      this.menuOverlay.update(current);
+    }
+
     // Flush to canvas — game.step() runs scene update + Phaser renderer
     // without Phaser's own rAF loop (which we stopped)
     const now = performance.now();
@@ -76,6 +88,9 @@ export class PhaserRenderer implements GameRenderer {
   }
 
   destroy(): void {
+    if (this.menuOverlay) {
+      this.menuOverlay.destroy();
+    }
     this.game.destroy(true);
   }
 }
