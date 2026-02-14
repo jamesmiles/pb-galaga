@@ -2,7 +2,13 @@ import type { GameState, GameRenderer, Player } from '../types';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer } from './StateManager';
 import { InputHandler } from './InputHandler';
-import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_INVULNERABILITY_DURATION, PLAYER_FIRE_COOLDOWN } from './constants';
+import { updatePlayerShip, respawnPlayer } from '../objects/player/code/PlayerShip';
+import { spawnPlayerLasers, updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
+import { updateFormation } from './FormationManager';
+import { createBackground, updateBackground } from '../objects/environment/Background';
+import { detectCollisions } from './CollisionDetector';
+import { LevelManager } from './LevelManager';
+import { level1 } from '../levels/level1';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -19,6 +25,7 @@ export class GameManager {
   readonly inputHandler: InputHandler;
   private renderer: GameRenderer | null;
   private headless: boolean;
+  private levelManager: LevelManager;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -29,6 +36,11 @@ export class GameManager {
       (dt) => this.update(dt),
       (alpha) => this.render(alpha),
     );
+    this.levelManager = new LevelManager();
+    this.levelManager.registerLevel(level1);
+
+    // Initialize background
+    this.stateManager.currentState.background = createBackground();
   }
 
   start(): void {
@@ -113,9 +125,8 @@ export class GameManager {
     state.gameStatus = 'playing';
     state.menu = null;
     state.players = [createPlayer('player1')];
-    state.currentLevel = 1;
-    state.currentWave = 1;
-    state.waveStatus = 'transition';
+    state.projectiles = [];
+    this.levelManager.startLevel(state, 1);
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
@@ -128,64 +139,38 @@ export class GameManager {
 
     // 2. Update players
     for (const player of state.players) {
-      if (player.isAlive) {
-        this.updatePlayer(player, dtSeconds);
+      updatePlayerShip(player, dtSeconds);
+    }
+
+    // 3. Spawn & update projectiles
+    spawnPlayerLasers(state);
+    updateAllProjectiles(state, dtSeconds);
+
+    // 4. Update enemy formation
+    if (state.formation && state.enemies.length > 0) {
+      updateFormation(state, dtSeconds);
+    }
+
+    // 5. Update background
+    if (state.background) {
+      updateBackground(state.background, dtSeconds);
+    }
+
+    // 6. Level/wave progression
+    this.levelManager.update(state);
+
+    // 7. Collision detection
+    detectCollisions(state);
+
+    // 8. Respawn dead players with remaining lives
+    for (const player of state.players) {
+      if (!player.isAlive && player.lives > 0) {
+        respawnPlayer(player);
       }
     }
 
-    // 3. Update projectiles (implemented in T-0005)
-
-    // 4. Update enemies (implemented in T-0007)
-
-    // 5. Update background (implemented in T-0011)
-
-    // 6. Update level/waves (implemented in T-0010)
-
-    // 7. Collision detection (implemented in T-0004/T-0006)
-
-    // 8. Check game over
+    // 9. Check game over
     this.checkGameOver(state);
-  }
-
-  private updatePlayer(player: Player, dtSeconds: number): void {
-    // Movement
-    const speed = PLAYER_SPEED * dtSeconds;
-    if (player.input.left) player.velocity.x = -speed;
-    else if (player.input.right) player.velocity.x = speed;
-    else player.velocity.x = 0;
-
-    if (player.input.up) player.velocity.y = -speed;
-    else if (player.input.down) player.velocity.y = speed;
-    else player.velocity.y = 0;
-
-    player.position.x += player.velocity.x;
-    player.position.y += player.velocity.y;
-
-    // Boundary clamping
-    player.position.x = Math.max(20, Math.min(GAME_WIDTH - 20, player.position.x));
-    player.position.y = Math.max(20, Math.min(GAME_HEIGHT - 20, player.position.y));
-
-    player.isThrusting = player.velocity.x !== 0 || player.velocity.y !== 0;
-
-    // Invulnerability timer
-    if (player.isInvulnerable) {
-      player.invulnerabilityTimer -= dtSeconds * 1000;
-      if (player.invulnerabilityTimer <= 0) {
-        player.isInvulnerable = false;
-        player.invulnerabilityTimer = 0;
-      }
-    }
-
-    // Fire cooldown
-    if (player.fireCooldown > 0) {
-      player.fireCooldown -= dtSeconds * 1000;
-    }
-
-    // Firing (projectile spawning in T-0005)
-    player.isFiring = player.input.fire && player.fireCooldown <= 0;
-    if (player.isFiring) {
-      player.fireCooldown = PLAYER_FIRE_COOLDOWN;
-    }
   }
 
   private updatePaused(state: GameState): void {
@@ -216,9 +201,11 @@ export class GameManager {
       const selected = state.menu.options[state.menu.selectedOption];
       if (selected === 'Restart') {
         this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
         this.startGame(this.stateManager.currentState);
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
       }
     }
   }

@@ -111,8 +111,8 @@ describe('GameManager', () => {
       gm.tickHeadless(600);
 
       const pos = gm.getState().players[0].position;
-      expect(pos.x).toBeLessThanOrEqual(780);
-      expect(pos.x).toBeGreaterThanOrEqual(20);
+      expect(pos.x).toBeLessThanOrEqual(784); // GAME_WIDTH - PLAYER_HALF_SIZE (800 - 16)
+      expect(pos.x).toBeGreaterThanOrEqual(16); // PLAYER_HALF_SIZE
       gm.destroy();
     });
   });
