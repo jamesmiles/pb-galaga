@@ -1,26 +1,29 @@
 ---
 id: T-0019
-title: "Implement ZzFX sound effects"
+title: Implement ZzFX sound effects
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - audio
-  - gameplay
-depends_on: [T-0013]
-parallel_with: [T-0017, T-0018]
+- audio
+- gameplay
+depends_on:
+- T-0013
+parallel_with:
+- T-0017
+- T-0018
 parent_epic: E-0002
 acceptance:
-  - ZzFX library vendored into src/audio/zzfx.ts (MIT license, <1KB)
-  - SoundManager created in src/audio/SoundManager.ts
-  - Sound effects play for player fire (pew), enemy fire (lower pew), explosion (boom)
-  - Sound effect plays for player death (longer explosion)
-  - Sound effect plays for menu select (blip)
-  - Mute toggle works via M key
-  - Mute state stored in game state and persisted across game restarts
-  - SoundManager API tested with mocked ZzFX (headless-safe)
-  - No npm dependencies added (ZzFX vendored as source)
+- ZzFX library vendored into src/audio/zzfx.ts (MIT license, <1KB)
+- SoundManager created in src/audio/SoundManager.ts
+- Sound effects play for player fire (pew), enemy fire (lower pew), explosion (boom)
+- Sound effect plays for player death (longer explosion)
+- Sound effect plays for menu select (blip)
+- Mute toggle works via M key
+- Mute state stored in game state and persisted across game restarts
+- SoundManager API tested with mocked ZzFX (headless-safe)
+- No npm dependencies added (ZzFX vendored as source)
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
