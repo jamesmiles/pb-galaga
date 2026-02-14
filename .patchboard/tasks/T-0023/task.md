@@ -1,28 +1,31 @@
 ---
 id: T-0023
-title: "Expand Level 1 with 5 enemy waves"
+title: Expand Level 1 with 5 enemy waves
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - level
-depends_on: [T-0015, T-0016]
-parallel_with: [T-0022]
+- gameplay
+- level
+depends_on:
+- T-0015
+- T-0016
+parallel_with:
+- T-0022
 parent_epic: E-0002
 acceptance:
-  - Level 1 has 5 distinct waves with escalating difficulty
-  - "Wave 1: 5x4 Type A only (easy intro)"
-  - "Wave 2: 4x4 Type A + 1x4 Type B (introduce B)"
-  - "Wave 3: 3x4 Type A + 1x4 Type B + 1x4 Type C (introduce C)"
-  - "Wave 4: 2x4 Type A + 2x4 Type B + 1x4 Type C (harder mix)"
-  - "Wave 5: 1x4 Type A + 2x4 Type B + 2x4 Type C (boss wave)"
-  - Waves progress automatically after all enemies in wave destroyed
-  - Brief transition pause between waves (~3 seconds)
-  - Wave indicator displayed in HUD ("Wave 3/5")
-  - LevelManager handles wave transitions
-  - Unit tests verify wave configurations and progression
+- Level 1 has 5 distinct waves with escalating difficulty
+- 'Wave 1: 5x4 Type A only (easy intro)'
+- 'Wave 2: 4x4 Type A + 1x4 Type B (introduce B)'
+- 'Wave 3: 3x4 Type A + 1x4 Type B + 1x4 Type C (introduce C)'
+- 'Wave 4: 2x4 Type A + 2x4 Type B + 1x4 Type C (harder mix)'
+- 'Wave 5: 1x4 Type A + 2x4 Type B + 2x4 Type C (boss wave)'
+- Waves progress automatically after all enemies in wave destroyed
+- Brief transition pause between waves (~3 seconds)
+- Wave indicator displayed in HUD ("Wave 3/5")
+- LevelManager handles wave transitions
+- Unit tests verify wave configurations and progression
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
