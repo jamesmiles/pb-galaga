@@ -133,12 +133,12 @@ describe('GameManager', () => {
   });
 
   describe('game over', () => {
-    it('triggers game over when player has 0 lives and is dead', () => {
+    it('triggers game over when player has 0 lives and no active death sequence', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
 
-      // Manually set player state to dead with 0 lives
+      // Manually set player state to dead with 0 lives (no death sequence)
       const player = gm.getState().players[0];
       player.lives = 0;
       player.isAlive = false;
@@ -146,6 +146,90 @@ describe('GameManager', () => {
       gm.tickHeadless(1);
       expect(gm.getState().gameStatus).toBe('gameover');
       expect(gm.getState().menu?.type).toBe('gameover');
+      gm.destroy();
+    });
+
+    it('delays game over during active death sequence', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      const player = gm.getState().players[0];
+      player.lives = 0;
+      player.isAlive = false;
+      player.deathSequence = {
+        active: true,
+        startTime: gm.getState().currentTime,
+        duration: 2000,
+        position: { x: 400, y: 840 },
+      };
+
+      // Tick a few frames — should NOT be gameover yet
+      gm.tickHeadless(10);
+      expect(gm.getState().gameStatus).toBe('playing');
+
+      // Tick past the 2-second death sequence (~120 ticks)
+      gm.tickHeadless(130);
+      expect(gm.getState().gameStatus).toBe('gameover');
+      gm.destroy();
+    });
+  });
+
+  describe('death sequence', () => {
+    function startGame(gm: GameManager): void {
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+    }
+
+    it('respawns player after death sequence with lives remaining', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      const player = gm.getState().players[0];
+      player.lives = 2;
+      player.isAlive = false;
+      player.health = 0;
+      player.deathSequence = {
+        active: true,
+        startTime: gm.getState().currentTime,
+        duration: 2000,
+        position: { x: 400, y: 840 },
+      };
+
+      // Tick a few frames — should NOT respawn yet
+      gm.tickHeadless(10);
+      expect(player.isAlive).toBe(false);
+
+      // Tick past 2 seconds
+      gm.tickHeadless(130);
+      expect(player.isAlive).toBe(true);
+      expect(player.isInvulnerable).toBe(true);
+      expect(player.deathSequence).toBe(null);
+      gm.destroy();
+    });
+
+    it('does not process input during death sequence', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      const player = gm.getState().players[0];
+      const startX = player.position.x;
+      player.lives = 2;
+      player.isAlive = false;
+      player.health = 0;
+      player.deathSequence = {
+        active: true,
+        startTime: gm.getState().currentTime,
+        duration: 2000,
+        position: { x: startX, y: 840 },
+      };
+
+      gm.inputHandler.injectPlayerInput({ right: true });
+      gm.tickHeadless(10);
+
+      // Position should not change during death sequence
+      // (player is dead so updatePlayerShip is skipped)
+      expect(player.position.x).toBe(startX);
       gm.destroy();
     });
   });

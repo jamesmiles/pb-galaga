@@ -2,6 +2,7 @@ import type { Player, PlayerInput, Vector2D } from '../../../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN,
   PLAYER_INVULNERABILITY_DURATION, PLAYER_COLLISION_RADIUS,
+  DEATH_SEQUENCE_DURATION,
 } from '../../../engine/constants';
 
 /** Player ship half-size for boundary clamping. */
@@ -84,10 +85,14 @@ export function respawnPlayer(player: Player): void {
   player.isInvulnerable = true;
   player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
   player.collisionState = 'none';
+  player.deathSequence = null;
 }
 
-/** Apply damage to a player. Returns true if player died. */
-export function damagePlayer(player: Player, damage: number): boolean {
+/**
+ * Apply damage to a player. Returns true if player died.
+ * When killed, initiates a death sequence (delayed respawn/gameover).
+ */
+export function damagePlayer(player: Player, damage: number, currentTime: number = 0): boolean {
   if (player.isInvulnerable || !player.isAlive) return false;
   player.health -= damage;
   if (player.health <= 0) {
@@ -95,6 +100,12 @@ export function damagePlayer(player: Player, damage: number): boolean {
     player.isAlive = false;
     player.lives--;
     player.collisionState = 'destroyed';
+    player.deathSequence = {
+      active: true,
+      startTime: currentTime,
+      duration: DEATH_SEQUENCE_DURATION,
+      position: { x: player.position.x, y: player.position.y },
+    };
     return true;
   }
   player.collisionState = 'colliding';

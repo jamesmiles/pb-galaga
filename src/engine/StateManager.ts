@@ -136,5 +136,6 @@ export function createPlayer(id: 'player1' | 'player2'): Player {
     isFiring: false,
     collisionState: 'none',
     input: { left: false, right: false, up: false, down: false, fire: false },
+    deathSequence: null,
   };
 }

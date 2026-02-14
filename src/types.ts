@@ -36,6 +36,13 @@ export interface MenuInput {
 
 // --- Player ---
 
+export interface DeathSequence {
+  active: boolean;
+  startTime: number;
+  duration: number;
+  position: Vector2D;
+}
+
 export interface Player {
   id: 'player1' | 'player2';
   shipColor: 'red' | 'blue';
@@ -55,6 +62,7 @@ export interface Player {
   isFiring: boolean;
   collisionState: 'none' | 'colliding' | 'destroyed';
   input: PlayerInput;
+  deathSequence: DeathSequence | null;
 }
 
 // --- Enemy ---

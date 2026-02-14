@@ -141,15 +141,17 @@ export class GameManager {
       SoundManager.toggleMute();
     }
 
-    // 1. Process input
+    // 1. Process input (skip players in death sequence)
     for (const player of state.players) {
+      if (player.deathSequence?.active) continue;
       if (player.id === 'player1') {
         player.input = this.inputHandler.getPlayerInput();
       }
     }
 
-    // 2. Update players
+    // 2. Update players (skip players in death sequence)
     for (const player of state.players) {
+      if (player.deathSequence?.active) continue;
       updatePlayerShip(player, dtSeconds);
     }
 
@@ -187,14 +189,20 @@ export class GameManager {
     if (aliveEnemiesAfter < aliveEnemiesBefore) SoundManager.play('explosion');
     if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
 
-    // 9. Respawn dead players with remaining lives
+    // 9. Handle death sequences and delayed respawn
     for (const player of state.players) {
-      if (!player.isAlive && player.lives > 0) {
-        respawnPlayer(player);
+      if (player.deathSequence?.active) {
+        const elapsed = state.currentTime - player.deathSequence.startTime;
+        if (elapsed >= player.deathSequence.duration) {
+          player.deathSequence.active = false;
+          if (player.lives > 0) {
+            respawnPlayer(player);
+          }
+        }
       }
     }
 
-    // 10. Check game over
+    // 10. Check game over (only after all death sequences complete)
     this.checkGameOver(state);
   }
 
@@ -237,6 +245,10 @@ export class GameManager {
   }
 
   private checkGameOver(state: GameState): void {
+    // Don't trigger gameover while any death sequence is still active
+    const anyDeathSequenceActive = state.players.some(p => p.deathSequence?.active);
+    if (anyDeathSequenceActive) return;
+
     const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
     if (state.players.length > 0 && alivePlayers.length === 0) {
       state.gameStatus = 'gameover';

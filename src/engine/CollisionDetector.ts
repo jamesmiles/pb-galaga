@@ -27,7 +27,7 @@ function detectPlayerEnemyCollisions(state: GameState): void {
       const dist = distance(player.position, enemy.position);
       if (dist < PLAYER_COLLISION_RADIUS + enemy.collisionRadius) {
         // Both take damage
-        const playerDied = damagePlayer(player, player.maxHealth); // instant kill
+        damagePlayer(player, player.maxHealth, state.currentTime); // instant kill
         damageEnemy(enemy, enemy.maxHealth); // instant kill
       }
     }
@@ -71,7 +71,7 @@ function detectEnemyProjectilePlayerCollisions(state: GameState): void {
       if (dist < proj.collisionRadius + PLAYER_COLLISION_RADIUS) {
         proj.hasCollided = true;
         proj.isActive = false;
-        damagePlayer(player, proj.damage);
+        damagePlayer(player, proj.damage, state.currentTime);
         break; // One projectile hits one player
       }
     }
