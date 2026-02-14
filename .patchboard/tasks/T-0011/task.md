@@ -1,27 +1,31 @@
 ---
 id: T-0011
-title: "Implement background stars with parallax scrolling"
+title: Implement background stars with parallax scrolling
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - visual
-  - environment
-depends_on: [T-0002]
-parallel_with: [T-0003, T-0005, T-0007]
+- visual
+- environment
+depends_on:
+- T-0002
+parallel_with:
+- T-0003
+- T-0005
+- T-0007
 parent_epic: E-0001
 acceptance:
-  - Background star field generated procedurally
-  - Stars scroll downward simulating player forward motion
-  - Parallax effect with multiple depth layers
-  - Stars wrap around screen edges for infinite scrolling
-  - Star density and distribution feel natural
-  - Background integrates with game state
-  - Performance impact is minimal
-  - Unit tests verify parallax calculations
+- Background star field generated procedurally
+- Stars scroll downward simulating player forward motion
+- Parallax effect with multiple depth layers
+- Stars wrap around screen edges for infinite scrolling
+- Star density and distribution feel natural
+- Background integrates with game state
+- Performance impact is minimal
+- Unit tests verify parallax calculations
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context

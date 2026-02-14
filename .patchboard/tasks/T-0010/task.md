@@ -1,28 +1,30 @@
 ---
 id: T-0010
-title: "Implement Level 1 with enemy swarm wave"
+title: Implement Level 1 with enemy swarm wave
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - level
-depends_on: [T-0007, T-0008]
+- gameplay
+- level
+depends_on:
+- T-0007
+- T-0008
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - Level 1 configuration defined with metadata
-  - Single enemy swarm wave of Type A enemies
-  - Enemy formation spawns correctly (swarm pattern)
-  - Enemies follow appropriate flight paths
-  - Wave completes when all enemies destroyed
-  - Level loading system implemented
-  - LevelManager integrates with game engine
-  - Unit tests verify level configuration loading
-  - Integration tests verify wave spawning and completion
+- Level 1 configuration defined with metadata
+- Single enemy swarm wave of Type A enemies
+- Enemy formation spawns correctly (swarm pattern)
+- Enemies follow appropriate flight paths
+- Wave completes when all enemies destroyed
+- Level loading system implemented
+- LevelManager integrates with game engine
+- Unit tests verify level configuration loading
+- Integration tests verify wave spawning and completion
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
