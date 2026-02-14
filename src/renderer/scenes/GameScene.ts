@@ -3,9 +3,7 @@ import type { GameState, Player, Enemy, Projectile, Star } from '../../types';
 import { registerTextures } from '../SpriteManager';
 import { lerpPosition } from '../InterpolationUtils';
 import { triggerParticleExplosion } from '../effects/ExplosionEffect';
-import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
-
-const GAME_VERSION = '0.2.6';
+import { GAME_WIDTH, GAME_HEIGHT, GAME_VERSION } from '../../engine/constants';
 
 /**
  * Main game scene — renders all game objects by reading state.

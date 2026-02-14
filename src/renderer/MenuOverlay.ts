@@ -1,5 +1,5 @@
 import type { GameState } from '../types';
-import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
+import { GAME_WIDTH, GAME_HEIGHT, GAME_VERSION } from '../engine/constants';
 
 const MENU_STYLES = `
   .menu-overlay {
@@ -123,7 +123,7 @@ export class MenuOverlay {
   private lastMenuDataHash = '';
   private version: string;
 
-  constructor(parentElement: HTMLElement, version: string = '0.2.6') {
+  constructor(parentElement: HTMLElement, version: string = GAME_VERSION) {
     this.container = parentElement;
     this.version = version;
 
