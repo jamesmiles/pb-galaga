@@ -2,9 +2,9 @@
 id: T-0009
 title: "Implement start menu and game over sequences"
 type: task
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - ui
   - menu

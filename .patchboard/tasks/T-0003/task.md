@@ -2,7 +2,7 @@
 id: T-0003
 title: "Implement player ship with movement and controls"
 type: task
-status: in_progress
+status: review
 priority: P0
 owner: engineer
 labels:
