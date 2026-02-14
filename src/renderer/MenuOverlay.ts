@@ -29,30 +29,20 @@ const MENU_STYLES = `
     font-size: 52px;
     font-weight: bold;
     color: #ffff00;
-    text-shadow: 0 0 20px rgba(255, 255, 0, 0.8), 0 0 40px rgba(255, 255, 0, 0.4);
     margin-bottom: 12px;
-    animation: pulse 2s infinite;
   }
 
   .menu-title.gameover {
     color: #ff4444;
-    text-shadow: 0 0 20px rgba(255, 68, 68, 0.8), 0 0 40px rgba(255, 68, 68, 0.4);
   }
 
   .menu-title.levelcomplete {
     color: #44ff44;
-    text-shadow: 0 0 20px rgba(68, 255, 68, 0.8), 0 0 40px rgba(68, 255, 68, 0.4);
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.75; }
   }
 
   .menu-subtitle {
     font-size: 16px;
     color: #88aacc;
-    text-shadow: 0 0 8px rgba(136, 170, 204, 0.5);
     margin-bottom: 30px;
   }
 
@@ -69,14 +59,12 @@ const MENU_STYLES = `
   .menu-score {
     font-size: 24px;
     color: #fff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     margin-bottom: 8px;
   }
 
   .menu-p2score {
     font-size: 18px;
     color: #4488ff;
-    text-shadow: 0 0 10px rgba(68, 136, 255, 0.5);
     margin-bottom: 16px;
   }
 
@@ -90,12 +78,11 @@ const MENU_STYLES = `
     font-size: 22px;
     color: #666;
     padding: 6px 0;
-    transition: color 0.15s, text-shadow 0.15s;
+    transition: color 0.15s;
   }
 
   .menu-option.selected {
     color: #ffff00;
-    text-shadow: 0 0 12px rgba(255, 255, 0, 0.7);
   }
 
   .menu-option.selected::before {
