@@ -1,29 +1,30 @@
 ---
 id: T-0003
-title: "Implement player ship with movement and controls"
+title: Implement player ship with movement and controls
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - player
-depends_on: [T-0002]
+- gameplay
+- player
+depends_on:
+- T-0002
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - PlayerShip class implements player state and behavior
-  - Red ship (player 1) responds to arrow key controls
-  - Ship movement bounded within game area
-  - Ship movement physics feels responsive
-  - Player starts with 3 lives
-  - Lives decrease on collision (implementation in T-0004)
-  - Score tracking functional
-  - Player state integrates with engine state management
-  - Unit tests verify movement calculations
-  - Unit tests verify boundary constraints
+- PlayerShip class implements player state and behavior
+- Red ship (player 1) responds to arrow key controls
+- Ship movement bounded within game area
+- Ship movement physics feels responsive
+- Player starts with 3 lives
+- Lives decrease on collision (implementation in T-0004)
+- Score tracking functional
+- Player state integrates with engine state management
+- Unit tests verify movement calculations
+- Unit tests verify boundary constraints
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
