@@ -1,26 +1,27 @@
 ---
 id: T-0024
-title: "Implement level complete sequence"
+title: Implement level complete sequence
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - ui
-  - menu
-  - gameplay
-depends_on: [T-0023]
+- ui
+- menu
+- gameplay
+depends_on:
+- T-0023
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - '"WAVE COMPLETE" text displays between waves with score bonus'
-  - 3-second pause before next wave spawns
-  - '"LEVEL COMPLETE" displays after final wave (wave 5)'
-  - Level complete screen shows total score
-  - Options to return to menu after level complete
-  - State transition from playing → levelcomplete works
-  - GameScene renders wave complete and level complete overlays
-  - Unit tests verify status transitions, timing, and score bonus
+- '"WAVE COMPLETE" text displays between waves with score bonus'
+- 3-second pause before next wave spawns
+- '"LEVEL COMPLETE" displays after final wave (wave 5)'
+- Level complete screen shows total score
+- Options to return to menu after level complete
+- State transition from playing → levelcomplete works
+- GameScene renders wave complete and level complete overlays
+- Unit tests verify status transitions, timing, and score bonus
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
