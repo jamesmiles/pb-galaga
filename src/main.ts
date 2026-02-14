@@ -1,4 +1,22 @@
 // PB-Galaga Entry Point
-// Game initialization will be wired here in T-0002+
+import { GameManager } from './engine/GameManager';
+import { PhaserRenderer } from './renderer/PhaserRenderer';
 
-console.log('PB-Galaga initializing...');
+// Create renderer
+const renderer = new PhaserRenderer('game-container');
+
+// Create game manager with renderer
+const gameManager = new GameManager({ renderer });
+
+// Pass FPS counters from GameLoop to renderer on each frame
+const originalRender = renderer.render.bind(renderer);
+renderer.render = (current, previous, alpha) => {
+  renderer.setFpsCounters(gameManager.gameLoop.engineFps, gameManager.gameLoop.renderFps);
+  originalRender(current, previous, alpha);
+};
+
+// Start the game
+gameManager.start();
+
+// Expose for debugging
+(window as any).__game = gameManager;
