@@ -9,6 +9,7 @@ import { createBackground, updateBackground } from '../objects/environment/Backg
 import { detectCollisions } from './CollisionDetector';
 import { LevelManager } from './LevelManager';
 import { EnemyFiringManager } from './EnemyFiringManager';
+import { SoundManager } from '../audio/SoundManager';
 import { level1 } from '../levels/level1';
 
 export interface GameManagerOptions {
@@ -117,6 +118,7 @@ export class GameManager {
       };
     }
     if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
       if (selected === 'Start Game') {
         this.startGame(state);
@@ -134,6 +136,11 @@ export class GameManager {
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
+    // Check mute toggle
+    if (this.inputHandler.getMuteToggle()) {
+      SoundManager.toggleMute();
+    }
+
     // 1. Process input
     for (const player of state.players) {
       if (player.id === 'player1') {
@@ -147,7 +154,10 @@ export class GameManager {
     }
 
     // 3. Spawn & update projectiles
+    const projCountBefore = state.projectiles.length;
     spawnPlayerLasers(state);
+    const playerProjAdded = state.projectiles.length - projCountBefore;
+    if (playerProjAdded > 0) SoundManager.play('playerFire');
     updateAllProjectiles(state, dtSeconds);
 
     // 4. Update enemy formation
@@ -156,7 +166,9 @@ export class GameManager {
     }
 
     // 5. Enemy firing
+    const projCountBeforeEnemy = state.projectiles.length;
     this.enemyFiringManager.update(state, dtSeconds);
+    if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
 
     // 6. Update background
     if (state.background) {
@@ -166,8 +178,14 @@ export class GameManager {
     // 7. Level/wave progression
     this.levelManager.update(state);
 
-    // 8. Collision detection
+    // 8. Collision detection — track deaths for sound
+    const aliveEnemiesBefore = state.enemies.filter(e => e.isAlive).length;
+    const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
+    const aliveEnemiesAfter = state.enemies.filter(e => e.isAlive).length;
+    const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
+    if (aliveEnemiesAfter < aliveEnemiesBefore) SoundManager.play('explosion');
+    if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
 
     // 9. Respawn dead players with remaining lives
     for (const player of state.players) {
@@ -205,6 +223,7 @@ export class GameManager {
       };
     }
     if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
       if (selected === 'Restart') {
         this.stateManager.reset();

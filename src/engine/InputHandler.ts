@@ -4,6 +4,7 @@ const GAME_KEYS = new Set([
   'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
   'Space', 'Enter', 'Escape',
   'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ',
+  'KeyM',
 ]);
 
 /**
@@ -78,6 +79,13 @@ export class InputHandler {
     }
     if (input.back) this.keyState['Escape'] = false;
     return input;
+  }
+
+  /** Poll mute toggle (consumed on read to prevent repeat). */
+  getMuteToggle(): boolean {
+    const pressed = !!this.keyState['KeyM'];
+    if (pressed) this.keyState['KeyM'] = false;
+    return pressed;
   }
 
   /** Inject player input programmatically (for headless testing). */
