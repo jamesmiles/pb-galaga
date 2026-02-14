@@ -15,7 +15,7 @@ export function createPlayerShipCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Main body (red)
-  ctx.fillStyle = '#ff2222';
+  ctx.fillStyle = '#ff3344';
   // Nose
   ctx.fillRect(15, 2, 2, 4);
   // Upper fuselage
@@ -36,7 +36,7 @@ export function createPlayerShipCanvas(): HTMLCanvasElement {
   ctx.fillRect(14, 8, 4, 4);
 
   // Highlights (brighter red/orange)
-  ctx.fillStyle = '#ff6644';
+  ctx.fillStyle = '#ff7755';
   ctx.fillRect(15, 4, 2, 2);
   ctx.fillRect(13, 12, 2, 2);
   ctx.fillRect(17, 12, 2, 2);
@@ -60,7 +60,7 @@ export function createPlayerShipBlueCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Main body (blue)
-  ctx.fillStyle = '#2266ff';
+  ctx.fillStyle = '#0099ff';
   ctx.fillRect(15, 2, 2, 4);
   ctx.fillRect(13, 6, 6, 4);
   ctx.fillRect(11, 10, 10, 6);
@@ -75,13 +75,13 @@ export function createPlayerShipBlueCanvas(): HTMLCanvasElement {
   ctx.fillRect(14, 8, 4, 4);
 
   // Highlights (brighter blue/cyan)
-  ctx.fillStyle = '#44aaff';
+  ctx.fillStyle = '#55ccff';
   ctx.fillRect(15, 4, 2, 2);
   ctx.fillRect(13, 12, 2, 2);
   ctx.fillRect(17, 12, 2, 2);
 
   // Engine glow (cyan/white)
-  ctx.fillStyle = '#22ccff';
+  ctx.fillStyle = '#00ddff';
   ctx.fillRect(12, 28, 2, 2);
   ctx.fillRect(18, 28, 2, 2);
   ctx.fillStyle = '#aaffff';
@@ -99,7 +99,7 @@ export function createEnemyACanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Main body (green)
-  ctx.fillStyle = '#22cc44';
+  ctx.fillStyle = '#00ff44';
   // Top dome
   ctx.fillRect(10, 2, 8, 4);
   ctx.fillRect(8, 6, 12, 4);
@@ -124,12 +124,12 @@ export function createEnemyACanvas(): HTMLCanvasElement {
   ctx.fillRect(17, 9, 1, 1);
 
   // Body highlights (lighter green)
-  ctx.fillStyle = '#44ee66';
+  ctx.fillStyle = '#66ff88';
   ctx.fillRect(12, 4, 4, 2);
   ctx.fillRect(10, 12, 8, 2);
 
   // Dark accents
-  ctx.fillStyle = '#118833';
+  ctx.fillStyle = '#009933';
   ctx.fillRect(6, 14, 2, 2);
   ctx.fillRect(20, 14, 2, 2);
 
@@ -144,7 +144,7 @@ export function createEnemyBCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Main body (blue/teal)
-  ctx.fillStyle = '#2288cc';
+  ctx.fillStyle = '#00ccff';
   // Top dome (wider/tougher looking)
   ctx.fillRect(8, 2, 16, 4);
   ctx.fillRect(6, 6, 20, 4);
@@ -158,7 +158,7 @@ export function createEnemyBCanvas(): HTMLCanvasElement {
   ctx.fillRect(24, 22, 6, 4);
 
   // Armor plates (darker blue)
-  ctx.fillStyle = '#115588';
+  ctx.fillStyle = '#0088aa';
   ctx.fillRect(6, 12, 4, 4);
   ctx.fillRect(22, 12, 4, 4);
   ctx.fillRect(12, 8, 8, 2);
@@ -174,7 +174,7 @@ export function createEnemyBCanvas(): HTMLCanvasElement {
   ctx.fillRect(20, 8, 2, 1);
 
   // Body highlights (lighter cyan)
-  ctx.fillStyle = '#44bbee';
+  ctx.fillStyle = '#55ddff';
   ctx.fillRect(14, 4, 4, 2);
   ctx.fillRect(10, 14, 12, 2);
 
@@ -189,7 +189,7 @@ export function createEnemyCCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Main body (red/orange - aggressive)
-  ctx.fillStyle = '#dd4422';
+  ctx.fillStyle = '#ff5500';
   // Pointed nose
   ctx.fillRect(12, 2, 4, 4);
   // Upper body (sleek)
@@ -204,7 +204,7 @@ export function createEnemyCCanvas(): HTMLCanvasElement {
   ctx.fillRect(16, 22, 4, 4);
 
   // Wing tips (orange)
-  ctx.fillStyle = '#ff8822';
+  ctx.fillStyle = '#ff9933';
   ctx.fillRect(2, 16, 4, 2);
   ctx.fillRect(22, 16, 4, 2);
 
@@ -214,7 +214,7 @@ export function createEnemyCCanvas(): HTMLCanvasElement {
   ctx.fillRect(15, 8, 3, 2);
 
   // Nose highlight
-  ctx.fillStyle = '#ff6644';
+  ctx.fillStyle = '#ff7744';
   ctx.fillRect(13, 3, 2, 2);
 
   // Engine glow
@@ -228,7 +228,7 @@ export function createEnemyCCanvas(): HTMLCanvasElement {
 // Explosion animation frames (4 frames of expanding debris)
 export function createExplosionFrames(): HTMLCanvasElement[] {
   const frames: HTMLCanvasElement[] = [];
-  const colors = ['#ffff44', '#ff8822', '#ff4422', '#882222'];
+  const colors = ['#ffffff', '#ffcc00', '#ff5500', '#ff2200'];
   const sizes = [8, 16, 24, 28];
 
   for (let f = 0; f < 4; f++) {
@@ -274,12 +274,12 @@ export function createBulletCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Outer glow (orange)
-  ctx.fillStyle = '#ffaa22';
+  ctx.fillStyle = '#ff8800';
   ctx.fillRect(1, 0, 4, 6);
   ctx.fillRect(0, 1, 6, 4);
 
   // Inner core (yellow)
-  ctx.fillStyle = '#ffff44';
+  ctx.fillStyle = '#ffff00';
   ctx.fillRect(2, 1, 2, 4);
   ctx.fillRect(1, 2, 4, 2);
 
@@ -294,7 +294,7 @@ export function createLaserCanvas(): HTMLCanvasElement {
   const ctx = canvas.getContext('2d')!;
 
   // Glow
-  ctx.fillStyle = '#44ccff';
+  ctx.fillStyle = '#00ffff';
   ctx.fillRect(0, 0, 4, 12);
 
   // Core
