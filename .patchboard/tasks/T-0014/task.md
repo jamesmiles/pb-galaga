@@ -1,24 +1,26 @@
 ---
 id: T-0014
-title: "Implement bullet projectile type"
+title: Implement bullet projectile type
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - projectile
-depends_on: [T-0013]
-parallel_with: [T-0015]
+- gameplay
+- projectile
+depends_on:
+- T-0013
+parallel_with:
+- T-0015
 parent_epic: E-0002
 acceptance:
-  - Bullet projectile class implemented in src/objects/projectiles/bullet/code/Bullet.ts
-  - Bullets differ from lasers (slower speed, lower damage, smaller visual)
-  - ProjectileManager handles both laser and bullet types
-  - Bullet sprite added to SpriteManager (small yellow/orange circle)
-  - Bullet rendered correctly in GameScene
-  - Unit tests verify bullet movement, lifetime, and damage values
-  - Bullet collision detection works (reuses existing collision system)
+- Bullet projectile class implemented in src/objects/projectiles/bullet/code/Bullet.ts
+- Bullets differ from lasers (slower speed, lower damage, smaller visual)
+- ProjectileManager handles both laser and bullet types
+- Bullet sprite added to SpriteManager (small yellow/orange circle)
+- Bullet rendered correctly in GameScene
+- Unit tests verify bullet movement, lifetime, and damage values
+- Bullet collision detection works (reuses existing collision system)
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
