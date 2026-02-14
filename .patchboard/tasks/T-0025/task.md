@@ -1,24 +1,26 @@
 ---
 id: T-0025
-title: "Implement ZzFXM background music"
+title: Implement ZzFXM background music
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - audio
-depends_on: [T-0019]
-parallel_with: [T-0024]
+- audio
+depends_on:
+- T-0019
+parallel_with:
+- T-0024
 parent_epic: E-0002
 acceptance:
-  - ZzFXM library vendored into src/audio/zzfxm.ts (MIT license, ~442 bytes)
-  - MusicManager created in src/audio/MusicManager.ts
-  - Menu theme plays on loop during start/gameover menus
-  - Gameplay theme plays on loop during gameplay
-  - Music switches tracks on game state transitions
-  - Music respects mute toggle from T-0019
-  - No npm dependencies added (ZzFXM vendored as source)
-  - MusicManager API tested (mock audio in headless tests)
+- ZzFXM library vendored into src/audio/zzfxm.ts (MIT license, ~442 bytes)
+- MusicManager created in src/audio/MusicManager.ts
+- Menu theme plays on loop during start/gameover menus
+- Gameplay theme plays on loop during gameplay
+- Music switches tracks on game state transitions
+- Music respects mute toggle from T-0019
+- No npm dependencies added (ZzFXM vendored as source)
+- MusicManager API tested (mock audio in headless tests)
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
