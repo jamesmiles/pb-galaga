@@ -1,28 +1,29 @@
 ---
 id: T-0004
-title: "Implement player collision detection and test harness"
+title: Implement player collision detection and test harness
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - player
-  - testing
-depends_on: [T-0003]
+- gameplay
+- player
+- testing
+depends_on:
+- T-0003
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - Collision detection system detects player-enemy collisions
-  - Player collision sequence implemented (damage, invulnerability, death)
-  - PlayerHarness allows isolated testing of player ship
-  - Harness runs in both rendered and headless modes
-  - Harness test menu lets developer trigger all player states
-  - Harness can simulate collisions for testing
-  - Unit tests verify collision detection accuracy
-  - Integration tests verify collision sequence
+- Collision detection system detects player-enemy collisions
+- Player collision sequence implemented (damage, invulnerability, death)
+- PlayerHarness allows isolated testing of player ship
+- Harness runs in both rendered and headless modes
+- Harness test menu lets developer trigger all player states
+- Harness can simulate collisions for testing
+- Unit tests verify collision detection accuracy
+- Integration tests verify collision sequence
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
