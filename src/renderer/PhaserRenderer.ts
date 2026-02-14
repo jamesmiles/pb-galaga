@@ -33,12 +33,8 @@ export class PhaserRenderer implements GameRenderer {
         pixelArt: true,
         antialias: false,
       },
-      // Disable Phaser's built-in loop
-      callbacks: {
-        postBoot: (game) => {
-          game.loop.stop();
-        },
-      },
+      // Let Phaser run its own render loop — we just update scene state
+      // from our GameLoop's render callback
       // Disable Phaser's input — we handle our own
       input: {
         keyboard: false,
@@ -66,10 +62,7 @@ export class PhaserRenderer implements GameRenderer {
   render(current: GameState, previous: GameState, alpha: number): void {
     if (!this.ready || !this.gameScene) return;
 
-    // Manually step Phaser's renderer one frame
-    this.game.loop.tick();
-
-    // Render game state
+    // Update scene state — Phaser's own loop handles the actual canvas draw
     this.gameScene.renderState(current, previous, alpha, this.engineFps, this.renderFps);
   }
 

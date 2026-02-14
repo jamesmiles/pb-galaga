@@ -27,6 +27,10 @@ export class GameScene extends Phaser.Scene {
 
   // Explosions
   private explosions: ExplosionEntry[] = [];
+  private explodedEntities: Set<string> = new Set();
+
+  // Track game status transitions for cleanup
+  private lastGameStatus: string = '';
 
   // UI text
   private scoreText!: Phaser.GameObjects.Text;
@@ -77,6 +81,12 @@ export class GameScene extends Phaser.Scene {
     engineFps: number,
     renderFps: number,
   ): void {
+    // Clear explosion tracking on game (re)start
+    if (current.gameStatus === 'playing' && this.lastGameStatus !== 'playing') {
+      this.explodedEntities.clear();
+    }
+    this.lastGameStatus = current.gameStatus;
+
     if (current.gameStatus === 'menu' || current.gameStatus === 'gameover') {
       this.renderMenu(current);
       this.hideGameElements();
@@ -133,7 +143,7 @@ export class GameScene extends Phaser.Scene {
     for (const player of players) {
       if (!player.isAlive) {
         // Trigger explosion if just died
-        this.triggerExplosion(player.position.x, player.position.y, currentTime, player.id);
+        this.triggerExplosion(player.position.x, player.position.y, player.id);
         continue;
       }
 
@@ -178,9 +188,8 @@ export class GameScene extends Phaser.Scene {
 
     for (const enemy of enemies) {
       if (!enemy.isAlive) {
-        // Trigger explosion
         if (enemy.collisionState === 'destroyed') {
-          this.triggerExplosion(enemy.position.x, enemy.position.y, 0, enemy.id);
+          this.triggerExplosion(enemy.position.x, enemy.position.y, enemy.id);
         }
         continue;
       }
@@ -241,17 +250,15 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private triggerExplosion(x: number, y: number, currentTime: number, entityId: string): void {
+  private triggerExplosion(x: number, y: number, entityId: string): void {
     // Prevent duplicate explosions for the same entity
-    const existing = this.explosions.find(e =>
-      Math.abs(e.sprite.x - x) < 2 && Math.abs(e.sprite.y - y) < 2
-    );
-    if (existing) return;
+    if (this.explodedEntities.has(entityId)) return;
+    this.explodedEntities.add(entityId);
 
     const sprite = this.add.image(x, y, 'explosion-0').setDepth(20);
     this.explosions.push({
       sprite,
-      startTime: Date.now(), // Use wall clock for visual-only effect timing
+      startTime: Date.now(),
       frameIndex: 0,
     });
   }
