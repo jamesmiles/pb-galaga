@@ -9,6 +9,8 @@ const ENTRY_SPEED_MULTIPLIER: Record<string, number> = {
   A: 1.0,
   B: 0.8,
   C: 1.3,
+  D: 1.1,
+  E: 0.6,
 };
 
 /**

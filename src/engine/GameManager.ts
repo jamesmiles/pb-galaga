@@ -16,6 +16,8 @@ import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
 import { level1 } from '../levels/level1';
 import { level2 } from '../levels/level2';
+import { level3 } from '../levels/level3';
+import { level4 } from '../levels/level4';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -48,6 +50,8 @@ export class GameManager {
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
     this.levelManager.registerLevel(level2);
+    this.levelManager.registerLevel(level3);
+    this.levelManager.registerLevel(level4);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
 

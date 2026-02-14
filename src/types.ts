@@ -83,14 +83,14 @@ export interface FlightPathState {
 
 export interface Enemy {
   id: string;
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   position: Vector2D;
   velocity: Vector2D;
   rotation: number;
   isAlive: boolean;
   health: number;
   maxHealth: number;
-  fireMode: 'none' | 'laser' | 'bullet';
+  fireMode: 'none' | 'laser' | 'bullet' | 'plasma' | 'spread';
   fireCooldown: number;
   fireRate: number;
   isThrusting: boolean;
@@ -218,7 +218,7 @@ export interface LevelConfig {
 }
 
 export interface WaveSlot {
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   row: number;
   col: number;
 }
@@ -232,7 +232,7 @@ export interface WaveConfig {
 }
 
 export interface EnemySpawnConfig {
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   count: number;
   formation: FormationType;
   rows: number;

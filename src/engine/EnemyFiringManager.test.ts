@@ -4,6 +4,8 @@ import { createInitialState } from './StateManager';
 import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
 import { createEnemyB } from '../objects/enemies/enemyB/code/EnemyB';
 import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
+import { createEnemyD } from '../objects/enemies/enemyD/code/EnemyD';
+import { createEnemyE } from '../objects/enemies/enemyE/code/EnemyE';
 import type { GameState } from '../types';
 
 describe('EnemyFiringManager', () => {
@@ -108,6 +110,65 @@ describe('EnemyFiringManager', () => {
 
       expect(state.projectiles[0].position.x).toBe(150);
       expect(state.projectiles[0].position.y).toBe(266); // y + 16
+    });
+
+    it('fires a plasma projectile for Type D enemies', () => {
+      const enemy = createEnemyD(0, 0);
+      enemy.position = { x: 100, y: 200 };
+      state.enemies = [enemy];
+
+      // Advance enough time to exhaust any cooldown (max ~2900ms)
+      manager.update(state, 3);
+
+      expect(state.projectiles.length).toBe(1);
+      expect(state.projectiles[0].type).toBe('plasma');
+      expect(state.projectiles[0].owner.type).toBe('enemy');
+      expect(state.projectiles[0].velocity.y).toBeGreaterThan(0);
+    });
+
+    it('fires a 4-bullet spread for Type E enemies', () => {
+      const enemy = createEnemyE(0, 0);
+      enemy.position = { x: 100, y: 200 };
+      state.enemies = [enemy];
+
+      // Advance enough time to exhaust any cooldown (max ~4600ms)
+      manager.update(state, 5);
+
+      expect(state.projectiles.length).toBe(4);
+      for (const proj of state.projectiles) {
+        expect(proj.type).toBe('bullet');
+        expect(proj.owner.type).toBe('enemy');
+      }
+    });
+
+    it('spread shot bullets have different x velocities forming a fan', () => {
+      const enemy = createEnemyE(0, 0);
+      enemy.position = { x: 100, y: 200 };
+      state.enemies = [enemy];
+
+      manager.update(state, 5);
+
+      const vxs = state.projectiles.map(p => p.velocity.x);
+      // Should have negative and positive x velocities (fan pattern)
+      expect(vxs.some(vx => vx < 0)).toBe(true);
+      expect(vxs.some(vx => vx > 0)).toBe(true);
+      // All should move downward
+      for (const proj of state.projectiles) {
+        expect(proj.velocity.y).toBeGreaterThan(0);
+      }
+    });
+
+    it('spread shot fires 4 bullets at correct angles', () => {
+      const enemy = createEnemyE(0, 0);
+      enemy.position = { x: 100, y: 200 };
+      state.enemies = [enemy];
+
+      manager.update(state, 5);
+
+      // Angles should be symmetric: -12, -4, +4, +12 degrees
+      const vxs = state.projectiles.map(p => p.velocity.x).sort((a, b) => a - b);
+      expect(vxs[0]).toBeCloseTo(-vxs[3], 5); // -12° mirrors +12°
+      expect(vxs[1]).toBeCloseTo(-vxs[2], 5); // -4° mirrors +4°
     });
   });
 

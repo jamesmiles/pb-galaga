@@ -2,6 +2,8 @@ import type { GameState, LevelConfig, WaveConfig, Enemy } from '../types';
 import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
 import { createEnemyB } from '../objects/enemies/enemyB/code/EnemyB';
 import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
+import { createEnemyD } from '../objects/enemies/enemyD/code/EnemyD';
+import { createEnemyE } from '../objects/enemies/enemyE/code/EnemyE';
 import { initFormation } from './FormationManager';
 import { generateFlightPaths } from './FlightPathManager';
 
@@ -13,6 +15,8 @@ const ENEMY_FACTORY: Record<string, (row: number, col: number) => Enemy> = {
   A: createEnemyA,
   B: createEnemyB,
   C: createEnemyC,
+  D: createEnemyD,
+  E: createEnemyE,
 };
 
 /**

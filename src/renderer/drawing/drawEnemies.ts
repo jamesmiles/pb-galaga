@@ -6,6 +6,8 @@ const ENEMY_COLORS: Record<string, { fill: string; glow: string; accent: string 
   A: { fill: '#00ff44', glow: '#00ff44', accent: '#44ee66' },
   B: { fill: '#00ccff', glow: '#00ccff', accent: '#44bbee' },
   C: { fill: '#ff5500', glow: '#ff5500', accent: '#ff8822' },
+  D: { fill: '#ff00ff', glow: '#ff00ff', accent: '#ff66ff' },
+  E: { fill: '#ffff00', glow: '#ffff00', accent: '#ffff66' },
 };
 
 /**
@@ -33,8 +35,12 @@ export function drawEnemies(
       drawEnemyA(ctx, pos.x, pos.y, colors);
     } else if (enemy.type === 'B') {
       drawEnemyB(ctx, pos.x, pos.y, colors);
-    } else {
+    } else if (enemy.type === 'C') {
       drawEnemyC(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'D') {
+      drawEnemyD(ctx, pos.x, pos.y, colors);
+    } else {
+      drawEnemyE(ctx, pos.x, pos.y, colors);
     }
 
     ctx.restore();
@@ -150,4 +156,74 @@ function drawEnemyC(
   ctx.fillStyle = '#44ff44';
   ctx.fillRect(x - 4, y - 2, 3, 2);
   ctx.fillRect(x + 1, y - 2, 3, 2);
+}
+
+/** Type D: Curved Fighter — crescent/bracket shape, concave side facing down */
+function drawEnemyD(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Crescent body — outer arc
+  ctx.beginPath();
+  ctx.arc(x, y + 4, 12, Math.PI * 1.15, Math.PI * 1.85);
+  ctx.lineTo(x + 8, y - 8);
+  ctx.arc(x, y + 4, 8, Math.PI * 1.85, Math.PI * 1.15, true);
+  ctx.closePath();
+  ctx.fill();
+
+  // Left horn tip
+  ctx.fillRect(x - 13, y - 8, 4, 6);
+  // Right horn tip
+  ctx.fillRect(x + 9, y - 8, 4, 6);
+
+  // Central cannon mount
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 3, y + 8, 6, 5);
+
+  // Eye (inner glow)
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x - 2, y - 2, 4, 3);
+  ctx.fillStyle = '#ff00ff';
+  ctx.fillRect(x - 1, y - 1, 2, 1);
+}
+
+/** Type E: Strategic Bomber — wide flying wing / stealth bomber shape */
+function drawEnemyE(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Flying wing — main chevron body
+  ctx.beginPath();
+  ctx.moveTo(x, y - 8);           // Nose
+  ctx.lineTo(x - 18, y + 6);      // Left wingtip
+  ctx.lineTo(x - 14, y + 10);     // Left wing trailing
+  ctx.lineTo(x - 4, y + 2);       // Left inner
+  ctx.lineTo(x, y + 6);           // Center notch
+  ctx.lineTo(x + 4, y + 2);       // Right inner
+  ctx.lineTo(x + 14, y + 10);     // Right wing trailing
+  ctx.lineTo(x + 18, y + 6);      // Right wingtip
+  ctx.closePath();
+  ctx.fill();
+
+  // Engine vents (accent)
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 8, y + 2, 3, 3);
+  ctx.fillRect(x + 5, y + 2, 3, 3);
+
+  // Cockpit slit
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff4444';
+  ctx.fillRect(x - 3, y - 4, 6, 2);
+
+  // Wingtip accents
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 17, y + 6, 3, 2);
+  ctx.fillRect(x + 14, y + 6, 3, 2);
 }
