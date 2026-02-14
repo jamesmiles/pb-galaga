@@ -2,9 +2,9 @@
 id: T-0016
 title: "Implement Enemy Type C (fast fighter with bullets)"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - enemy

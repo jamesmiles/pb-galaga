@@ -52,6 +52,45 @@ export function createPlayerShipCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
+// 32x32 pixel art player ship (blue) - same shape, blue color scheme
+export function createPlayerShipBlueCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (blue)
+  ctx.fillStyle = '#2266ff';
+  ctx.fillRect(15, 2, 2, 4);
+  ctx.fillRect(13, 6, 6, 4);
+  ctx.fillRect(11, 10, 10, 6);
+  ctx.fillRect(9, 16, 14, 4);
+  ctx.fillRect(3, 20, 26, 4);
+  ctx.fillRect(1, 24, 30, 2);
+  ctx.fillRect(11, 26, 4, 4);
+  ctx.fillRect(17, 26, 4, 4);
+
+  // Cockpit (dark red)
+  ctx.fillStyle = '#aa2244';
+  ctx.fillRect(14, 8, 4, 4);
+
+  // Highlights (brighter blue/cyan)
+  ctx.fillStyle = '#44aaff';
+  ctx.fillRect(15, 4, 2, 2);
+  ctx.fillRect(13, 12, 2, 2);
+  ctx.fillRect(17, 12, 2, 2);
+
+  // Engine glow (cyan/white)
+  ctx.fillStyle = '#22ccff';
+  ctx.fillRect(12, 28, 2, 2);
+  ctx.fillRect(18, 28, 2, 2);
+  ctx.fillStyle = '#aaffff';
+  ctx.fillRect(12, 30, 2, 2);
+  ctx.fillRect(18, 30, 2, 2);
+
+  return canvas;
+}
+
 // 24x24 pixel art enemy Type A - alien transport shape
 export function createEnemyACanvas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
@@ -97,6 +136,95 @@ export function createEnemyACanvas(): HTMLCanvasElement {
   return canvas;
 }
 
+// 28x28 pixel art enemy Type B - armored slow fighter (blue/green)
+export function createEnemyBCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (blue/teal)
+  ctx.fillStyle = '#2288cc';
+  // Top dome (wider/tougher looking)
+  ctx.fillRect(8, 2, 16, 4);
+  ctx.fillRect(6, 6, 20, 4);
+  // Mid body (armored)
+  ctx.fillRect(4, 10, 24, 8);
+  // Lower body
+  ctx.fillRect(6, 18, 20, 4);
+  // Legs/stabilizers
+  ctx.fillRect(2, 22, 6, 4);
+  ctx.fillRect(12, 22, 8, 4);
+  ctx.fillRect(24, 22, 6, 4);
+
+  // Armor plates (darker blue)
+  ctx.fillStyle = '#115588';
+  ctx.fillRect(6, 12, 4, 4);
+  ctx.fillRect(22, 12, 4, 4);
+  ctx.fillRect(12, 8, 8, 2);
+
+  // Eyes (yellow/orange - menacing)
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(9, 7, 4, 3);
+  ctx.fillRect(19, 7, 4, 3);
+
+  // Eye cores
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(10, 8, 2, 1);
+  ctx.fillRect(20, 8, 2, 1);
+
+  // Body highlights (lighter cyan)
+  ctx.fillStyle = '#44bbee';
+  ctx.fillRect(14, 4, 4, 2);
+  ctx.fillRect(10, 14, 12, 2);
+
+  return canvas;
+}
+
+// 28x28 pixel art enemy Type C - fast aggressive fighter (red/orange)
+export function createEnemyCCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 28;
+  canvas.height = 28;
+  const ctx = canvas.getContext('2d')!;
+
+  // Main body (red/orange - aggressive)
+  ctx.fillStyle = '#dd4422';
+  // Pointed nose
+  ctx.fillRect(12, 2, 4, 4);
+  // Upper body (sleek)
+  ctx.fillRect(10, 6, 8, 4);
+  // Mid body
+  ctx.fillRect(6, 10, 16, 4);
+  // Wings (swept back)
+  ctx.fillRect(2, 14, 24, 4);
+  // Tail
+  ctx.fillRect(10, 18, 8, 4);
+  ctx.fillRect(8, 22, 4, 4);
+  ctx.fillRect(16, 22, 4, 4);
+
+  // Wing tips (orange)
+  ctx.fillStyle = '#ff8822';
+  ctx.fillRect(2, 16, 4, 2);
+  ctx.fillRect(22, 16, 4, 2);
+
+  // Eyes (green - alien)
+  ctx.fillStyle = '#44ff44';
+  ctx.fillRect(10, 8, 3, 2);
+  ctx.fillRect(15, 8, 3, 2);
+
+  // Nose highlight
+  ctx.fillStyle = '#ff6644';
+  ctx.fillRect(13, 3, 2, 2);
+
+  // Engine glow
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(9, 24, 2, 2);
+  ctx.fillRect(17, 24, 2, 2);
+
+  return canvas;
+}
+
 // Explosion animation frames (4 frames of expanding debris)
 export function createExplosionFrames(): HTMLCanvasElement[] {
   const frames: HTMLCanvasElement[] = [];
@@ -136,6 +264,26 @@ export function createExplosionFrames(): HTMLCanvasElement[] {
   }
 
   return frames;
+}
+
+// Bullet projectile (small yellow/orange circle)
+export function createBulletCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 6;
+  canvas.height = 6;
+  const ctx = canvas.getContext('2d')!;
+
+  // Outer glow (orange)
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(1, 0, 4, 6);
+  ctx.fillRect(0, 1, 6, 4);
+
+  // Inner core (yellow)
+  ctx.fillStyle = '#ffff44';
+  ctx.fillRect(2, 1, 2, 4);
+  ctx.fillRect(1, 2, 4, 2);
+
+  return canvas;
 }
 
 // Laser projectile (small bright cyan bar)

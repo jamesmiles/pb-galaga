@@ -2,9 +2,9 @@
 id: T-0020
 title: "Implement player death sequence"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - animation

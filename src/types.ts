@@ -36,6 +36,13 @@ export interface MenuInput {
 
 // --- Player ---
 
+export interface DeathSequence {
+  active: boolean;
+  startTime: number;
+  duration: number;
+  position: Vector2D;
+}
+
 export interface Player {
   id: 'player1' | 'player2';
   shipColor: 'red' | 'blue';
@@ -55,9 +62,17 @@ export interface Player {
   isFiring: boolean;
   collisionState: 'none' | 'colliding' | 'destroyed';
   input: PlayerInput;
+  deathSequence: DeathSequence | null;
 }
 
 // --- Enemy ---
+
+export interface DiveState {
+  phase: 'break' | 'approach' | 'sweep';
+  progress: number;
+  targetX: number;
+  startPos: Vector2D;
+}
 
 export interface Enemy {
   id: string;
@@ -75,9 +90,11 @@ export interface Enemy {
   isFiring: boolean;
   collisionState: 'none' | 'colliding' | 'destroyed';
   scoreValue: number;
+  collisionRadius: number;
   // Formation slot (for Type A block formation)
   formationRow: number;
   formationCol: number;
+  diveState: DiveState | null;
 }
 
 // --- Projectile ---
@@ -139,6 +156,7 @@ export interface MenuState {
   options: string[];
   data?: {
     finalScore?: number;
+    p2Score?: number;
     level?: number;
     wave?: number;
   };

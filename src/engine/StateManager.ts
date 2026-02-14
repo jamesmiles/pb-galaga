@@ -68,7 +68,7 @@ export function createInitialState(): GameState {
     menu: {
       type: 'start',
       selectedOption: 0,
-      options: ['Start Game', 'Quit'],
+      options: ['1 Player', '2 Players'],
     },
   };
 }
@@ -136,5 +136,6 @@ export function createPlayer(id: 'player1' | 'player2'): Player {
     isFiring: false,
     collisionState: 'none',
     input: { left: false, right: false, up: false, down: false, fire: false },
+    deathSequence: null,
   };
 }

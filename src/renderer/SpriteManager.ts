@@ -1,9 +1,13 @@
 import Phaser from 'phaser';
 import {
   createPlayerShipCanvas,
+  createPlayerShipBlueCanvas,
   createEnemyACanvas,
+  createEnemyBCanvas,
+  createEnemyCCanvas,
   createExplosionFrames,
   createLaserCanvas,
+  createBulletCanvas,
 } from '../assets/sprites';
 
 /**
@@ -19,16 +23,40 @@ export function registerTextures(scene: Phaser.Scene): void {
     textures.addCanvas('player-ship', shipCanvas);
   }
 
+  // Player ship (blue)
+  if (!textures.exists('player-ship-blue')) {
+    const blueShipCanvas = createPlayerShipBlueCanvas();
+    textures.addCanvas('player-ship-blue', blueShipCanvas);
+  }
+
   // Enemy Type A
   if (!textures.exists('enemy-a')) {
     const enemyCanvas = createEnemyACanvas();
     textures.addCanvas('enemy-a', enemyCanvas);
   }
 
+  // Enemy Type B
+  if (!textures.exists('enemy-b')) {
+    const enemyBCanvas = createEnemyBCanvas();
+    textures.addCanvas('enemy-b', enemyBCanvas);
+  }
+
+  // Enemy Type C
+  if (!textures.exists('enemy-c')) {
+    const enemyCCanvas = createEnemyCCanvas();
+    textures.addCanvas('enemy-c', enemyCCanvas);
+  }
+
   // Laser projectile
   if (!textures.exists('laser')) {
     const laserCanvas = createLaserCanvas();
     textures.addCanvas('laser', laserCanvas);
+  }
+
+  // Bullet projectile
+  if (!textures.exists('bullet')) {
+    const bulletCanvas = createBulletCanvas();
+    textures.addCanvas('bullet', bulletCanvas);
   }
 
   // Explosion frames

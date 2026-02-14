@@ -2,9 +2,9 @@
 id: T-0024
 title: "Implement level complete sequence"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - ui
   - menu

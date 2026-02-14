@@ -2,9 +2,9 @@
 id: T-0021
 title: "Implement dive attack behavior"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - gameplay
   - enemy

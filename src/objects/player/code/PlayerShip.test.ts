@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { updatePlayerShip, respawnPlayer, damagePlayer } from './PlayerShip';
 import { createPlayer } from '../../../engine/StateManager';
-import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN } from '../../../engine/constants';
+import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN, DEATH_SEQUENCE_DURATION } from '../../../engine/constants';
 
 function makeDt(ms: number = 16.667) {
   return ms / 1000;
@@ -154,6 +154,43 @@ describe('PlayerShip', () => {
       player.lives = 0;
       respawnPlayer(player);
       expect(player.isAlive).toBe(false);
+    });
+
+    it('clears death sequence on respawn', () => {
+      const player = createPlayer('player1');
+      player.isAlive = false;
+      player.health = 0;
+      player.deathSequence = { active: true, startTime: 0, duration: 2000, position: { x: 100, y: 100 } };
+      respawnPlayer(player);
+      expect(player.deathSequence).toBe(null);
+    });
+  });
+
+  describe('death sequence', () => {
+    it('sets deathSequence when player is killed', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 200, y: 500 };
+      damagePlayer(player, 100, 5000);
+      expect(player.deathSequence).not.toBe(null);
+      expect(player.deathSequence!.active).toBe(true);
+      expect(player.deathSequence!.startTime).toBe(5000);
+      expect(player.deathSequence!.duration).toBe(DEATH_SEQUENCE_DURATION);
+    });
+
+    it('records death position', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 250, y: 600 };
+      damagePlayer(player, 100, 1000);
+      expect(player.deathSequence!.position).toEqual({ x: 250, y: 600 });
+    });
+
+    it('does not set deathSequence on non-lethal damage', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      damagePlayer(player, 30, 1000);
+      expect(player.deathSequence).toBe(null);
     });
   });
 });

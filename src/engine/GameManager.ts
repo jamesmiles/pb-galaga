@@ -1,4 +1,5 @@
-import type { GameState, GameRenderer, Player } from '../types';
+import type { GameState, GameRenderer } from '../types';
+import { GAME_WIDTH, WAVE_COMPLETE_BONUS } from './constants';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer } from './StateManager';
 import { InputHandler } from './InputHandler';
@@ -8,6 +9,10 @@ import { updateFormation } from './FormationManager';
 import { createBackground, updateBackground } from '../objects/environment/Background';
 import { detectCollisions } from './CollisionDetector';
 import { LevelManager } from './LevelManager';
+import { EnemyFiringManager } from './EnemyFiringManager';
+import { DiveManager } from './DiveManager';
+import { SoundManager } from '../audio/SoundManager';
+import { MusicManager } from '../audio/MusicManager';
 import { level1 } from '../levels/level1';
 
 export interface GameManagerOptions {
@@ -26,6 +31,8 @@ export class GameManager {
   private renderer: GameRenderer | null;
   private headless: boolean;
   private levelManager: LevelManager;
+  private enemyFiringManager: EnemyFiringManager;
+  private diveManager: DiveManager;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -38,9 +45,14 @@ export class GameManager {
     );
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
+    this.enemyFiringManager = new EnemyFiringManager();
+    this.diveManager = new DiveManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
+
+    // Start menu music
+    MusicManager.play('menu');
   }
 
   start(): void {
@@ -93,6 +105,7 @@ export class GameManager {
         this.updateGameOver(state);
         break;
       case 'levelcomplete':
+        this.updateLevelComplete(state);
         break;
     }
   }
@@ -114,8 +127,13 @@ export class GameManager {
       };
     }
     if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
-      if (selected === 'Start Game') {
+      if (selected === '1 Player') {
+        state.gameMode = 'single';
+        this.startGame(state);
+      } else if (selected === '2 Players') {
+        state.gameMode = 'co-op';
         this.startGame(state);
       }
     }
@@ -124,26 +142,52 @@ export class GameManager {
   private startGame(state: GameState): void {
     state.gameStatus = 'playing';
     state.menu = null;
-    state.players = [createPlayer('player1')];
     state.projectiles = [];
+    MusicManager.play('gameplay');
+
+    if (state.gameMode === 'co-op') {
+      const p1 = createPlayer('player1');
+      p1.position.x = GAME_WIDTH * 0.33;
+      const p2 = createPlayer('player2');
+      p2.position.x = GAME_WIDTH * 0.66;
+      state.players = [p1, p2];
+    } else {
+      state.players = [createPlayer('player1')];
+    }
+
+    this.enemyFiringManager.reset();
+    this.diveManager.reset();
     this.levelManager.startLevel(state, 1);
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
-    // 1. Process input
+    // Check mute toggle
+    if (this.inputHandler.getMuteToggle()) {
+      const muted = SoundManager.toggleMute();
+      MusicManager.onMuteChanged(muted);
+    }
+
+    // 1. Process input (skip players in death sequence)
     for (const player of state.players) {
+      if (player.deathSequence?.active) continue;
       if (player.id === 'player1') {
         player.input = this.inputHandler.getPlayerInput();
+      } else if (player.id === 'player2') {
+        player.input = this.inputHandler.getPlayer2Input();
       }
     }
 
-    // 2. Update players
+    // 2. Update players (skip players in death sequence)
     for (const player of state.players) {
+      if (player.deathSequence?.active) continue;
       updatePlayerShip(player, dtSeconds);
     }
 
     // 3. Spawn & update projectiles
+    const projCountBefore = state.projectiles.length;
     spawnPlayerLasers(state);
+    const playerProjAdded = state.projectiles.length - projCountBefore;
+    if (playerProjAdded > 0) SoundManager.play('playerFire');
     updateAllProjectiles(state, dtSeconds);
 
     // 4. Update enemy formation
@@ -151,25 +195,71 @@ export class GameManager {
       updateFormation(state, dtSeconds);
     }
 
-    // 5. Update background
+    // 5. Dive attacks
+    this.diveManager.update(state, dtSeconds);
+
+    // 6. Enemy firing
+    const projCountBeforeEnemy = state.projectiles.length;
+    this.enemyFiringManager.update(state, dtSeconds);
+    if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
+
+    // 7. Update background
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
 
-    // 6. Level/wave progression
+    // 8. Level/wave progression
+    const waveBefore = state.currentWave;
+    const waveStatusBefore = state.waveStatus;
     this.levelManager.update(state);
 
-    // 7. Collision detection
-    detectCollisions(state);
+    // Detect wave completion
+    if (waveStatusBefore === 'active' && state.waveStatus !== 'active') {
+      // Award wave bonus to alive players
+      for (const player of state.players) {
+        if (player.isAlive) {
+          player.score += WAVE_COMPLETE_BONUS;
+        }
+      }
 
-    // 8. Respawn dead players with remaining lives
-    for (const player of state.players) {
-      if (!player.isAlive && player.lives > 0) {
-        respawnPlayer(player);
+      // If waveStatus is 'complete' (no more waves), transition to level complete
+      if (state.waveStatus === 'complete') {
+        state.gameStatus = 'levelcomplete';
+        MusicManager.stop();
+        const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+        state.menu = {
+          type: 'levelcomplete',
+          selectedOption: 0,
+          options: ['Main Menu'],
+          data: { finalScore: totalScore, wave: state.currentWave },
+        };
+        return;
       }
     }
 
-    // 9. Check game over
+    // 9. Collision detection — track deaths for sound
+    const aliveEnemiesBefore = state.enemies.filter(e => e.isAlive).length;
+    const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
+    detectCollisions(state);
+    const aliveEnemiesAfter = state.enemies.filter(e => e.isAlive).length;
+    const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
+    if (aliveEnemiesAfter < aliveEnemiesBefore) SoundManager.play('explosion');
+    if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
+
+    // 10. Handle death sequences and delayed respawn
+    for (const player of state.players) {
+      if (player.deathSequence?.active) {
+        const elapsed = state.currentTime - player.deathSequence.startTime;
+        if (elapsed >= player.deathSequence.duration) {
+          player.deathSequence.active = false;
+          if (player.lives > 0) {
+            respawnPlayer(player);
+          }
+        }
+      }
+    }
+
+    // 11. Check game over (only after all death sequences complete)
     this.checkGameOver(state);
   }
 
@@ -198,6 +288,7 @@ export class GameManager {
       };
     }
     if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
       if (selected === 'Restart') {
         this.stateManager.reset();
@@ -206,20 +297,46 @@ export class GameManager {
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
+      }
+    }
+  }
+
+  private updateLevelComplete(state: GameState): void {
+    const menuInput = this.inputHandler.getMenuInput();
+    if (!state.menu) return;
+
+    if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
+      const selected = state.menu.options[state.menu.selectedOption];
+      if (selected === 'Main Menu') {
+        this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
       }
     }
   }
 
   private checkGameOver(state: GameState): void {
+    // Don't trigger gameover while any death sequence is still active
+    const anyDeathSequenceActive = state.players.some(p => p.deathSequence?.active);
+    if (anyDeathSequenceActive) return;
+
     const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
     if (state.players.length > 0 && alivePlayers.length === 0) {
       state.gameStatus = 'gameover';
-      const finalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+      MusicManager.play('menu');
+      const p1 = state.players.find(p => p.id === 'player1');
+      const p2 = state.players.find(p => p.id === 'player2');
+      const finalScore = p1?.score ?? 0;
       state.menu = {
         type: 'gameover',
         selectedOption: 0,
         options: ['Restart', 'Main Menu'],
-        data: { finalScore },
+        data: {
+          finalScore,
+          ...(p2 ? { p2Score: p2.score } : {}),
+        },
       };
     }
   }
@@ -238,6 +355,7 @@ export class GameManager {
 
   destroy(): void {
     this.stop();
+    MusicManager.stop();
     this.inputHandler.destroy();
     if (this.renderer) {
       this.renderer.destroy();

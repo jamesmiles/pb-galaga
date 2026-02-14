@@ -4,12 +4,12 @@ export const MAX_ACCUMULATED = 250; // Spiral-of-death guard (ms)
 
 // Game bounds (pixels)
 export const GAME_WIDTH = 800;
-export const GAME_HEIGHT = 600;
+export const GAME_HEIGHT = 800;
 export const GAME_BOUNDS = {
   minX: 0,
   maxX: 800,
   minY: 0,
-  maxY: 600,
+  maxY: 800,
 } as const;
 
 // Player defaults
@@ -31,12 +31,34 @@ export const ENEMY_A_HEALTH = 50;
 export const ENEMY_A_SCORE_VALUE = 100;
 export const ENEMY_A_COLLISION_RADIUS = 14;
 
+// Enemy Type B defaults
+export const ENEMY_B_HEALTH = 100;
+export const ENEMY_B_SCORE_VALUE = 200;
+export const ENEMY_B_COLLISION_RADIUS = 16;
+
+// Enemy Type C defaults
+export const ENEMY_C_HEALTH = 50;
+export const ENEMY_C_SCORE_VALUE = 150;
+export const ENEMY_C_COLLISION_RADIUS = 12;
+
 // Formation defaults
 export const FORMATION_BASE_SPEED = 60; // pixels per second
 export const FORMATION_CELL_WIDTH = 48;
 export const FORMATION_CELL_HEIGHT = 40;
 export const FORMATION_SPEED_INCREASE = 1.5; // multiplier when enemies destroyed
 export const FORMATION_STEP_DOWN = 20; // pixels to descend on direction change
+
+// Bullet defaults
+export const BULLET_SPEED = 200; // pixels per second
+export const BULLET_DAMAGE = 50;
+export const BULLET_MAX_LIFETIME = 3000; // ms
+export const BULLET_COLLISION_RADIUS = 3;
+
+// Score
+export const WAVE_COMPLETE_BONUS = 500;
+
+// Death sequence
+export const DEATH_SEQUENCE_DURATION = 2000; // ms
 
 // Background
 export const STAR_COUNT = 100;

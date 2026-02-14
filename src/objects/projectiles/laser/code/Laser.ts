@@ -22,6 +22,25 @@ export function createLaser(position: Vector2D, owner: ProjectileOwner): Project
   };
 }
 
+/** Create a laser projectile fired downward from an enemy position. */
+export function createEnemyLaser(position: Vector2D, owner: ProjectileOwner): Projectile {
+  return {
+    id: `laser-${nextProjectileId++}`,
+    type: 'laser',
+    owner,
+    position: { x: position.x, y: position.y },
+    velocity: { x: 0, y: LASER_SPEED }, // Moves downward (toward player)
+    rotation: Math.PI,
+    speed: LASER_SPEED,
+    damage: LASER_DAMAGE,
+    isActive: true,
+    lifetime: 0,
+    maxLifetime: LASER_MAX_LIFETIME,
+    collisionRadius: LASER_COLLISION_RADIUS,
+    hasCollided: false,
+  };
+}
+
 /** Update a single projectile for one tick. */
 export function updateProjectile(proj: Projectile, dtSeconds: number): void {
   if (!proj.isActive) return;
