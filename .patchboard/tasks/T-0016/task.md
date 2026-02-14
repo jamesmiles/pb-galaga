@@ -1,25 +1,28 @@
 ---
 id: T-0016
-title: "Implement Enemy Type C (fast fighter with bullets)"
+title: Implement Enemy Type C (fast fighter with bullets)
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-depends_on: [T-0013, T-0014]
-parallel_with: [T-0015]
+- gameplay
+- enemy
+depends_on:
+- T-0013
+- T-0014
+parallel_with:
+- T-0015
 parent_epic: E-0002
 acceptance:
-  - Enemy Type C class implemented in src/objects/enemies/enemyC/code/EnemyC.ts
-  - Type C has 1 HP (one laser hit to destroy)
-  - Type C has fireMode 'bullet' configured
-  - Type C has distinct red/orange pixel art sprite
-  - Type C awards 150 points on destruction
-  - Type C works in existing formation system
-  - GameScene renders Type C with correct sprite
-  - Unit tests verify Type C properties
+- Enemy Type C class implemented in src/objects/enemies/enemyC/code/EnemyC.ts
+- Type C has 1 HP (one laser hit to destroy)
+- Type C has fireMode 'bullet' configured
+- Type C has distinct red/orange pixel art sprite
+- Type C awards 150 points on destruction
+- Type C works in existing formation system
+- GameScene renders Type C with correct sprite
+- Unit tests verify Type C properties
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---

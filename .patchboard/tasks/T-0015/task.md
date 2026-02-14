@@ -1,25 +1,27 @@
 ---
 id: T-0015
-title: "Implement Enemy Type B (slow fighter with laser)"
+title: Implement Enemy Type B (slow fighter with laser)
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-depends_on: [T-0013]
-parallel_with: [T-0014]
+- gameplay
+- enemy
+depends_on:
+- T-0013
+parallel_with:
+- T-0014
 parent_epic: E-0002
 acceptance:
-  - Enemy Type B class implemented in src/objects/enemies/enemyB/code/EnemyB.ts
-  - Type B has 2 HP (takes 2 laser hits to destroy)
-  - Type B has fireMode 'laser' configured
-  - Type B has distinct blue/green pixel art sprite
-  - Type B awards 200 points on destruction
-  - Type B works in existing formation system (type field selects behavior)
-  - GameScene selects correct sprite based on enemy type
-  - Unit tests verify Type B HP, score value, and properties
+- Enemy Type B class implemented in src/objects/enemies/enemyB/code/EnemyB.ts
+- Type B has 2 HP (takes 2 laser hits to destroy)
+- Type B has fireMode 'laser' configured
+- Type B has distinct blue/green pixel art sprite
+- Type B awards 200 points on destruction
+- Type B works in existing formation system (type field selects behavior)
+- GameScene selects correct sprite based on enemy type
+- Unit tests verify Type B HP, score value, and properties
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
