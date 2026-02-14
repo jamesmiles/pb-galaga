@@ -1,27 +1,28 @@
 ---
 id: T-0002
-title: "Implement core game engine with fixed time step"
+title: Implement core game engine with fixed time step
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - engine
-  - core
-depends_on: [T-0001]
+- engine
+- core
+depends_on:
+- T-0001
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - GameLoop.ts implements fixed time step with synchronization
-  - StateManager.ts manages double-buffered state (current/previous)
-  - GameManager.ts orchestrates game lifecycle and state transitions
-  - InputHandler.ts processes keyboard input for single player
-  - Engine runs in headless mode without rendering
-  - Unit tests verify fixed time step accuracy
-  - Unit tests verify state buffer swapping
-  - Game loop maintains consistent 60 FPS update rate
+- GameLoop.ts implements fixed time step with synchronization
+- StateManager.ts manages double-buffered state (current/previous)
+- GameManager.ts orchestrates game lifecycle and state transitions
+- InputHandler.ts processes keyboard input for single player
+- Engine runs in headless mode without rendering
+- Unit tests verify fixed time step accuracy
+- Unit tests verify state buffer swapping
+- Game loop maintains consistent 60 FPS update rate
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context

@@ -1,26 +1,27 @@
 ---
 id: T-0001
-title: "Set up TypeScript project with build infrastructure"
+title: Set up TypeScript project with build infrastructure
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - infrastructure
-  - setup
+- infrastructure
+- setup
 depends_on: []
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - TypeScript project initialized with proper tsconfig.json
-  - Package.json includes Phaser, TypeScript, and build tools
-  - Build command successfully compiles TypeScript to JavaScript
-  - Development server runs and serves the game
-  - Source directory structure matches architecture (/src/engine, /src/objects, /src/levels, /src/renderer, /src/harness)
-  - Basic index.html entry point exists
-  - Assets directory structure created
+- TypeScript project initialized with proper tsconfig.json
+- Package.json includes Phaser, TypeScript, and build tools
+- Build command successfully compiles TypeScript to JavaScript
+- Development server runs and serves the game
+- Source directory structure matches architecture (/src/engine, /src/objects, /src/levels,
+  /src/renderer, /src/harness)
+- Basic index.html entry point exists
+- Assets directory structure created
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
