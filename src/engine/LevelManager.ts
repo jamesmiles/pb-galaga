@@ -125,6 +125,9 @@ export class LevelManager {
     // Apply flight path entry animations for non-grid formations
     const waveFormation = wave.formation ?? wave.enemies[0]?.formation ?? 'grid';
     if (waveFormation !== 'grid') {
+      // Place formation at its visible resting position so flight paths
+      // target on-screen slots (grid formations descend from above instead)
+      state.formation.offsetY = 40;
       generateFlightPaths(waveFormation, state.enemies, state.formation);
     }
   }

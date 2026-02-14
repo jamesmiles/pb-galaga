@@ -107,10 +107,11 @@ export function updateFlightPaths(state: GameState, dtSeconds: number): void {
     enemy.position.x = pos.x;
     enemy.position.y = pos.y;
 
-    // Settlement: snap to formation slot when complete
+    // Settlement: snap to current formation position when complete
     if (fp.progress >= 1) {
-      enemy.position.x = fp.targetSlot.x;
-      enemy.position.y = fp.targetSlot.y;
+      const f = state.formation;
+      enemy.position.x = f.offsetX + (enemy.formationCol + 0.5) * f.cellWidth;
+      enemy.position.y = f.offsetY + (enemy.formationRow + 0.5) * f.cellHeight;
       enemy.flightPathState = null;
     }
   }

@@ -43,6 +43,13 @@ export function updateFormation(state: GameState, dtSeconds: number): void {
 
   if (aliveEnemies.length === 0) return;
 
+  // Hold formation stationary while enemies are still flying in
+  const hasFlying = state.enemies.some(e => e.isAlive && e.flightPathState);
+  if (hasFlying) {
+    updateEnemyPositions(state);
+    return;
+  }
+
   // Speed increases as enemies are destroyed
   const totalSlots = formation.rows * formation.cols;
   const aliveCount = aliveEnemies.length;
