@@ -1,25 +1,26 @@
 ---
 id: T-0018
-title: "Implement enemy projectile-player collision"
+title: Implement enemy projectile-player collision
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - collision
-  - combat
-depends_on: [T-0017]
+- gameplay
+- collision
+- combat
+depends_on:
+- T-0017
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - CollisionDetector extended for enemy-projectile vs player collision
-  - Enemy lasers and bullets damage the player on contact
-  - Player invulnerability frames prevent damage during invulnerability
-  - Enemy projectiles are deactivated on hit
-  - Player takes same damage/respawn sequence as player-enemy body collision
-  - Collision filtering prevents player's own projectiles from hitting player
-  - Unit tests verify enemy projectile collision, invulnerability, and filtering
+- CollisionDetector extended for enemy-projectile vs player collision
+- Enemy lasers and bullets damage the player on contact
+- Player invulnerability frames prevent damage during invulnerability
+- Enemy projectiles are deactivated on hit
+- Player takes same damage/respawn sequence as player-enemy body collision
+- Collision filtering prevents player's own projectiles from hitting player
+- Unit tests verify enemy projectile collision, invulnerability, and filtering
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
