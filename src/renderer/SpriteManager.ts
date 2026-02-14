@@ -8,6 +8,7 @@ import {
   createExplosionFrames,
   createLaserCanvas,
   createBulletCanvas,
+  createParticleCanvas,
 } from '../assets/sprites';
 
 /**
@@ -59,7 +60,13 @@ export function registerTextures(scene: Phaser.Scene): void {
     textures.addCanvas('bullet', bulletCanvas);
   }
 
-  // Explosion frames
+  // Particle (for explosion emitters)
+  if (!textures.exists('particle')) {
+    const particleCanvas = createParticleCanvas();
+    textures.addCanvas('particle', particleCanvas);
+  }
+
+  // Explosion frames (legacy, kept for compatibility)
   const explosionCanvases = createExplosionFrames();
   for (let i = 0; i < explosionCanvases.length; i++) {
     const key = `explosion-${i}`;

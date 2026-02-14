@@ -286,6 +286,21 @@ export function createBulletCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
+// Particle texture (4x4 bright white circle for particle emitters)
+export function createParticleCanvas(): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 4;
+  canvas.height = 4;
+  const ctx = canvas.getContext('2d')!;
+
+  // Soft circular particle
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(1, 0, 2, 4);
+  ctx.fillRect(0, 1, 4, 2);
+
+  return canvas;
+}
+
 // Laser projectile (small bright cyan bar)
 export function createLaserCanvas(): HTMLCanvasElement {
   const canvas = document.createElement('canvas');

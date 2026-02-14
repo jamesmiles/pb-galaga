@@ -2,17 +2,10 @@ import Phaser from 'phaser';
 import type { GameState, Player, Enemy, Projectile, Star } from '../../types';
 import { registerTextures } from '../SpriteManager';
 import { lerpPosition } from '../InterpolationUtils';
+import { triggerParticleExplosion } from '../effects/ExplosionEffect';
 import { GAME_WIDTH, GAME_HEIGHT } from '../../engine/constants';
 
 const GAME_VERSION = '0.2.0';
-const EXPLOSION_DURATION = 400; // ms per explosion
-const EXPLOSION_FRAMES = 4;
-
-interface ExplosionEntry {
-  sprite: Phaser.GameObjects.Image;
-  startTime: number;
-  frameIndex: number;
-}
 
 /**
  * Main game scene — renders all game objects by reading state.
@@ -26,8 +19,7 @@ export class GameScene extends Phaser.Scene {
   private starGraphics!: Phaser.GameObjects.Graphics;
   private starTexture: Phaser.GameObjects.RenderTexture | null = null;
 
-  // Explosions
-  private explosions: ExplosionEntry[] = [];
+  // Explosion deduplication
   private explodedEntities: Set<string> = new Set();
 
   // Track game status transitions for cleanup
@@ -134,7 +126,6 @@ export class GameScene extends Phaser.Scene {
     this.renderEnemies(current.enemies, prevEnemies, alpha);
     this.renderProjectiles(current.projectiles, prevProjectiles, alpha);
     this.renderPlayers(current.players, prevPlayers, alpha, current.currentTime);
-    this.updateExplosions(current.currentTime);
     this.renderUI(current, engineFps, renderFps);
   }
 
@@ -170,7 +161,7 @@ export class GameScene extends Phaser.Scene {
     for (const player of players) {
       if (!player.isAlive) {
         // Trigger explosion if just died
-        this.triggerExplosion(player.position.x, player.position.y, player.id);
+        this.triggerExplosion(player.position.x, player.position.y, player.id, 'player');
         continue;
       }
 
@@ -217,7 +208,7 @@ export class GameScene extends Phaser.Scene {
     for (const enemy of enemies) {
       if (!enemy.isAlive) {
         if (enemy.collisionState === 'destroyed') {
-          this.triggerExplosion(enemy.position.x, enemy.position.y, enemy.id);
+          this.triggerExplosion(enemy.position.x, enemy.position.y, enemy.id, enemy.type);
         }
         continue;
       }
@@ -281,39 +272,12 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private triggerExplosion(x: number, y: number, entityId: string): void {
+  private triggerExplosion(x: number, y: number, entityId: string, entityType: string = 'default'): void {
     // Prevent duplicate explosions for the same entity
     if (this.explodedEntities.has(entityId)) return;
     this.explodedEntities.add(entityId);
 
-    const sprite = this.add.image(x, y, 'explosion-0').setDepth(20);
-    this.explosions.push({
-      sprite,
-      startTime: Date.now(),
-      frameIndex: 0,
-    });
-  }
-
-  private updateExplosions(currentTime: number): void {
-    const now = Date.now();
-    const frameDuration = EXPLOSION_DURATION / EXPLOSION_FRAMES;
-
-    for (let i = this.explosions.length - 1; i >= 0; i--) {
-      const exp = this.explosions[i];
-      const elapsed = now - exp.startTime;
-      const frame = Math.floor(elapsed / frameDuration);
-
-      if (frame >= EXPLOSION_FRAMES) {
-        exp.sprite.destroy();
-        this.explosions.splice(i, 1);
-        continue;
-      }
-
-      if (frame !== exp.frameIndex) {
-        exp.frameIndex = frame;
-        exp.sprite.setTexture(`explosion-${frame}`);
-      }
-    }
+    triggerParticleExplosion(this, x, y, entityType);
   }
 
   private renderUI(state: GameState, engineFps: number, renderFps: number): void {
