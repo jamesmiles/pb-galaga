@@ -1,26 +1,27 @@
 ---
 id: T-0013
-title: "Resize game canvas from 800x600 to 800x900"
+title: Resize game canvas from 800x600 to 800x900
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - infrastructure
-  - rendering
-depends_on: [E-0001]
+- infrastructure
+- rendering
+depends_on:
+- E-0001
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - GAME_HEIGHT constant updated from 600 to 900
-  - Phaser canvas renders at 800x900
-  - Player starting Y position adjusted for taller canvas
-  - Formation standoff distance adjusted (enemies stay in upper portion)
-  - Menu layouts adjusted for new height (title, options, version)
-  - Background star generation uses new bounds
-  - All existing tests pass with updated height references
-  - Playwright visual tests pass at new resolution
-  - Game remains centered horizontally in browser
+- GAME_HEIGHT constant updated from 600 to 900
+- Phaser canvas renders at 800x900
+- Player starting Y position adjusted for taller canvas
+- Formation standoff distance adjusted (enemies stay in upper portion)
+- Menu layouts adjusted for new height (title, options, version)
+- Background star generation uses new bounds
+- All existing tests pass with updated height references
+- Playwright visual tests pass at new resolution
+- Game remains centered horizontally in browser
 created_at: '2026-02-13'
 updated_at: '2026-02-14'
 ---
