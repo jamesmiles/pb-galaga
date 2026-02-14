@@ -123,7 +123,7 @@ export class MenuOverlay {
   private lastMenuDataHash = '';
   private version: string;
 
-  constructor(parentElement: HTMLElement, version: string = '0.2.5') {
+  constructor(parentElement: HTMLElement, version: string = '0.2.6') {
     this.container = parentElement;
     this.version = version;
 
