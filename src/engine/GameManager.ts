@@ -12,6 +12,7 @@ import { LevelManager } from './LevelManager';
 import { EnemyFiringManager } from './EnemyFiringManager';
 import { DiveManager } from './DiveManager';
 import { SoundManager } from '../audio/SoundManager';
+import { MusicManager } from '../audio/MusicManager';
 import { level1 } from '../levels/level1';
 
 export interface GameManagerOptions {
@@ -49,6 +50,9 @@ export class GameManager {
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
+
+    // Start menu music
+    MusicManager.play('menu');
   }
 
   start(): void {
@@ -139,6 +143,7 @@ export class GameManager {
     state.gameStatus = 'playing';
     state.menu = null;
     state.projectiles = [];
+    MusicManager.play('gameplay');
 
     if (state.gameMode === 'co-op') {
       const p1 = createPlayer('player1');
@@ -158,7 +163,8 @@ export class GameManager {
   private updatePlaying(state: GameState, dtSeconds: number): void {
     // Check mute toggle
     if (this.inputHandler.getMuteToggle()) {
-      SoundManager.toggleMute();
+      const muted = SoundManager.toggleMute();
+      MusicManager.onMuteChanged(muted);
     }
 
     // 1. Process input (skip players in death sequence)
@@ -219,6 +225,7 @@ export class GameManager {
       // If waveStatus is 'complete' (no more waves), transition to level complete
       if (state.waveStatus === 'complete') {
         state.gameStatus = 'levelcomplete';
+        MusicManager.stop();
         const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
         state.menu = {
           type: 'levelcomplete',
@@ -290,6 +297,7 @@ export class GameManager {
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
       }
     }
   }
@@ -304,6 +312,7 @@ export class GameManager {
       if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
       }
     }
   }
@@ -316,6 +325,7 @@ export class GameManager {
     const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
     if (state.players.length > 0 && alivePlayers.length === 0) {
       state.gameStatus = 'gameover';
+      MusicManager.play('menu');
       const p1 = state.players.find(p => p.id === 'player1');
       const p2 = state.players.find(p => p.id === 'player2');
       const finalScore = p1?.score ?? 0;
@@ -345,6 +355,7 @@ export class GameManager {
 
   destroy(): void {
     this.stop();
+    MusicManager.stop();
     this.inputHandler.destroy();
     if (this.renderer) {
       this.renderer.destroy();
