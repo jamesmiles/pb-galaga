@@ -1,28 +1,30 @@
 ---
 id: T-0006
-title: "Implement laser collision detection and test harness"
+title: Implement laser collision detection and test harness
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - projectile
-  - testing
-depends_on: [T-0005, T-0007]
+- gameplay
+- projectile
+- testing
+depends_on:
+- T-0005
+- T-0007
 parallel_with: []
 parent_epic: E-0001
 acceptance:
-  - Collision detection between laser and enemies works
-  - Laser collision sequence implemented (damage enemy, remove laser)
-  - ProjectileHarness allows isolated testing of laser
-  - Harness runs in both rendered and headless modes
-  - Harness test menu lets developer test all projectile behaviors
-  - Harness can simulate collisions
-  - Unit tests verify laser collision detection
-  - Integration tests verify collision effects
+- Collision detection between laser and enemies works
+- Laser collision sequence implemented (damage enemy, remove laser)
+- ProjectileHarness allows isolated testing of laser
+- Harness runs in both rendered and headless modes
+- Harness test menu lets developer test all projectile behaviors
+- Harness can simulate collisions
+- Unit tests verify laser collision detection
+- Integration tests verify collision effects
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
