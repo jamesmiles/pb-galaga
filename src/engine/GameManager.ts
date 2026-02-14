@@ -161,6 +161,18 @@ export class GameManager {
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
+    // Check pause toggle (Escape key)
+    const menuInput = this.inputHandler.getMenuInput();
+    if (menuInput.back) {
+      state.gameStatus = 'paused';
+      state.menu = {
+        type: 'pause',
+        selectedOption: 0,
+        options: ['Resume', 'Main Menu'],
+      };
+      return;
+    }
+
     // Check mute toggle
     if (this.inputHandler.getMuteToggle()) {
       const muted = SoundManager.toggleMute();
@@ -265,9 +277,38 @@ export class GameManager {
 
   private updatePaused(state: GameState): void {
     const menuInput = this.inputHandler.getMenuInput();
+    if (!state.menu) return;
+
+    // Escape resumes
     if (menuInput.back) {
       state.gameStatus = 'playing';
       state.menu = null;
+      return;
+    }
+
+    if (menuInput.down) {
+      state.menu = {
+        ...state.menu,
+        selectedOption: Math.min(state.menu.selectedOption + 1, state.menu.options.length - 1),
+      };
+    }
+    if (menuInput.up) {
+      state.menu = {
+        ...state.menu,
+        selectedOption: Math.max(state.menu.selectedOption - 1, 0),
+      };
+    }
+    if (menuInput.confirm) {
+      SoundManager.play('menuSelect');
+      const selected = state.menu.options[state.menu.selectedOption];
+      if (selected === 'Resume') {
+        state.gameStatus = 'playing';
+        state.menu = null;
+      } else if (selected === 'Main Menu') {
+        this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
+      }
     }
   }
 

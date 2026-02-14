@@ -86,6 +86,24 @@ export class Canvas2DRenderer implements GameRenderer {
       return;
     }
 
+    if (current.gameStatus === 'paused') {
+      // Render the frozen game scene behind the pause overlay
+      const prevPlayers = new Map(previous.players.map(p => [p.id, p]));
+      const prevEnemies = new Map(previous.enemies.map(e => [e.id, e]));
+      const prevProjectiles = new Map(previous.projectiles.map(p => [p.id, p]));
+
+      if (current.background) {
+        drawStars(ctx, current.background.stars);
+      }
+      drawEnemies(ctx, current.enemies, prevEnemies, 1);
+      drawProjectiles(ctx, current.projectiles, prevProjectiles, 1);
+      drawPlayers(ctx, current.players, prevPlayers, 1, current.currentTime);
+      this.particleSystem.draw(ctx);
+      drawHUD(ctx, current, this.engineFps, this.renderFps);
+      this.menuOverlay.update(current);
+      return;
+    }
+
     // Apply screen shake offset
     ctx.save();
     ctx.translate(this.particleSystem.shakeOffsetX, this.particleSystem.shakeOffsetY);
