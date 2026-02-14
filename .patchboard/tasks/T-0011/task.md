@@ -2,9 +2,9 @@
 id: T-0011
 title: "Implement background stars with parallax scrolling"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - visual
   - environment

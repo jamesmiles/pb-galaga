@@ -2,9 +2,9 @@
 id: E-0001
 title: "Implement Sprint 1 - Core Game Engine and Single Player"
 type: epic
-status: todo
+status: review
 priority: P0
-owner: null
+owner: engineer
 labels:
   - epic
   - sprint-1
