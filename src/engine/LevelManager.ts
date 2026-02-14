@@ -3,6 +3,7 @@ import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
 import { createEnemyB } from '../objects/enemies/enemyB/code/EnemyB';
 import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
 import { initFormation } from './FormationManager';
+import { generateFlightPaths } from './FlightPathManager';
 
 /** Wave transition duration in ms. */
 const WAVE_TRANSITION_DURATION = 3000;
@@ -75,30 +76,56 @@ export class LevelManager {
     return config ? config.waves.length : 0;
   }
 
+  /** Check if a level is registered. */
+  hasLevel(levelNumber: number): boolean {
+    return this.levels.has(levelNumber);
+  }
+
   private spawnWave(state: GameState, wave: WaveConfig): void {
     state.enemies = [];
     state.projectiles = [];
 
-    // Calculate total grid dimensions from all spawn configs
-    let totalRows = 0;
-    let maxCols = 0;
-    for (const spawnConfig of wave.enemies) {
-      totalRows += spawnConfig.rows;
-      if (spawnConfig.cols > maxCols) maxCols = spawnConfig.cols;
+    if (wave.slots && wave.slots.length > 0) {
+      // Explicit slot placement — derive grid size from max row/col
+      let maxRow = 0;
+      let maxCol = 0;
+      for (const slot of wave.slots) {
+        if (slot.row > maxRow) maxRow = slot.row;
+        if (slot.col > maxCol) maxCol = slot.col;
+      }
+      state.formation = initFormation(maxRow + 1, maxCol + 1);
+
+      for (const slot of wave.slots) {
+        const factory = ENEMY_FACTORY[slot.type] ?? createEnemyA;
+        state.enemies.push(factory(slot.row, slot.col));
+      }
+    } else {
+      // Auto-fill rectangular block (existing behavior)
+      let totalRows = 0;
+      let maxCols = 0;
+      for (const spawnConfig of wave.enemies) {
+        totalRows += spawnConfig.rows;
+        if (spawnConfig.cols > maxCols) maxCols = spawnConfig.cols;
+      }
+
+      state.formation = initFormation(totalRows, maxCols);
+
+      let currentRow = 0;
+      for (const spawnConfig of wave.enemies) {
+        const factory = ENEMY_FACTORY[spawnConfig.type] ?? createEnemyA;
+        for (let r = 0; r < spawnConfig.rows; r++) {
+          for (let c = 0; c < spawnConfig.cols; c++) {
+            state.enemies.push(factory(currentRow + r, c));
+          }
+        }
+        currentRow += spawnConfig.rows;
+      }
     }
 
-    state.formation = initFormation(totalRows, maxCols);
-
-    // Spawn enemies row by row, stacking different types
-    let currentRow = 0;
-    for (const spawnConfig of wave.enemies) {
-      const factory = ENEMY_FACTORY[spawnConfig.type] ?? createEnemyA;
-      for (let r = 0; r < spawnConfig.rows; r++) {
-        for (let c = 0; c < spawnConfig.cols; c++) {
-          state.enemies.push(factory(currentRow + r, c));
-        }
-      }
-      currentRow += spawnConfig.rows;
+    // Apply flight path entry animations for non-grid formations
+    const waveFormation = wave.formation ?? wave.enemies[0]?.formation ?? 'grid';
+    if (waveFormation !== 'grid') {
+      generateFlightPaths(waveFormation, state.enemies, state.formation);
     }
   }
 }

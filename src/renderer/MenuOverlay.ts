@@ -192,8 +192,9 @@ export class MenuOverlay {
       if (data?.finalScore !== undefined) {
         scoreHtml += `<div class="menu-score">Total Score: ${data.finalScore}</div>`;
       }
+      const levelLabel = data?.level ? `LEVEL ${data.level} COMPLETE!` : 'LEVEL COMPLETE!';
       this.overlay.innerHTML = `
-        <div class="menu-title levelcomplete">LEVEL COMPLETE!</div>
+        <div class="menu-title levelcomplete">${levelLabel}</div>
         ${scoreHtml}
         ${this.buildOptions(options)}
       `;

@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -21,6 +21,12 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   playerDeath: [0.8, 0.05, 150, 0.01, 0.15, 0.4, 3, 1, -5, 0, 0, 0, 0, 1, 0, 0, 0.1, 0.2, 0.15, 0],
   // Quick menu blip
   menuSelect: [0.3, 0, 600, 0, 0.01, 0.02, 0, 1, 0, 0, 200, 0.01, 0, 0, 0, 0, 0, 0.8, 0, 0],
+  // Type A hit: quick crisp pop (weakest enemy)
+  hitA: [0.5, 0.02, 600, 0, 0.03, 0.06, 3, 1, 15, 0, 0, 0, 0, 0.3, 0, 0, 0, 0.4, 0.04, 0],
+  // Type B hit: heavy metallic crunch (armored)
+  hitB: [0.7, 0.04, 300, 0, 0.06, 0.15, 3, 1, -8, -2, 0, 0, 0, 0.8, 0, 0, 0, 0.3, 0.1, 0],
+  // Type C hit: sharp shattering crack (fast fighter)
+  hitC: [0.6, 0.03, 500, 0, 0.04, 0.08, 3, 1, 25, 3, 100, 0.02, 0, 0.5, 0, 0, 0, 0.4, 0.05, 0],
 };
 
 /**

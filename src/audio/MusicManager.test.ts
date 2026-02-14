@@ -109,4 +109,21 @@ describe('MusicManager', () => {
   it('isPlaying returns false initially', () => {
     expect(MusicManager.isPlaying()).toBe(false);
   });
+
+  it('gameplay track renders without error', () => {
+    MusicManager.play('gameplay');
+    expect(mockZzfxM).toHaveBeenCalledTimes(1);
+    // Verify song data was passed (array with instruments, patterns, sequence, BPM)
+    const songData = mockZzfxM.mock.calls[0][0];
+    expect(songData).toBeDefined();
+    expect(Array.isArray(songData)).toBe(true);
+  });
+
+  it('menu track renders without error', () => {
+    MusicManager.play('menu');
+    expect(mockZzfxM).toHaveBeenCalledTimes(1);
+    const songData = mockZzfxM.mock.calls[0][0];
+    expect(songData).toBeDefined();
+    expect(Array.isArray(songData)).toBe(true);
+  });
 });

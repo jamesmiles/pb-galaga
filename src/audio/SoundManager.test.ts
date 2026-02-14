@@ -76,7 +76,7 @@ describe('SoundManager', () => {
   });
 
   it('has presets for all sound effects', () => {
-    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect'];
+    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC'];
     for (const effect of effects) {
       const preset = SoundManager.getPreset(effect);
       expect(preset).toBeDefined();
@@ -85,10 +85,29 @@ describe('SoundManager', () => {
   });
 
   it('all effects call zzfx successfully', () => {
-    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect'];
+    const effects: SoundEffect[] = ['playerFire', 'enemyFire', 'explosion', 'playerDeath', 'menuSelect', 'hitA', 'hitB', 'hitC'];
     for (const effect of effects) {
       SoundManager.play(effect);
     }
-    expect(mockZzfx).toHaveBeenCalledTimes(5);
+    expect(mockZzfx).toHaveBeenCalledTimes(8);
+  });
+
+  it('hit sounds have distinct parameters per enemy type', () => {
+    const hitA = SoundManager.getPreset('hitA');
+    const hitB = SoundManager.getPreset('hitB');
+    const hitC = SoundManager.getPreset('hitC');
+    expect(hitA).toBeDefined();
+    expect(hitB).toBeDefined();
+    expect(hitC).toBeDefined();
+    // Each type should have different frequency (param index 2)
+    expect(hitA![2]).not.toBe(hitB![2]);
+    expect(hitB![2]).not.toBe(hitC![2]);
+  });
+
+  it('hitB is louder than hitA (armored enemy)', () => {
+    const hitA = SoundManager.getPreset('hitA')!;
+    const hitB = SoundManager.getPreset('hitB')!;
+    // Volume is param index 0
+    expect(hitB[0]).toBeGreaterThan(hitA[0] as number);
   });
 });

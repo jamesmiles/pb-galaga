@@ -48,38 +48,55 @@ const MENU_SONG: ZzFXMSong = [
   90, // BPM
 ];
 
-// Gameplay theme: fast, energetic, 2-channel, 140 BPM
+// Gameplay theme: airy space synth, 3-channel, 105 BPM
+// Pentatonic scale (C-D-E-G-A) for a dreamy, open feel
 const GAMEPLAY_SONG: ZzFXMSong = [
   // Instruments
   [
-    // 0: Lead (shaped sine, bright)
-    [0.3, 0, 440, 0, 0.1, 0.08, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.02, 0],
-    // 1: Bass (square, heavy)
-    [0.3, 0, 110, 0, 0.1, 0.06, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.02, 0],
+    // 0: Warm sine pad (slow attack, long sustain for atmospheric feel)
+    [0.25, 0, 220, 0.12, 0.35, 0.25, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.08, 0],
+    // 1: Deep sub-bass (sine, gentle pulse)
+    [0.2, 0, 55, 0.02, 0.2, 0.15, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.04, 0],
+    // 2: Soft arpeggiated shimmer (shaped sine, light tremolo)
+    [0.15, 0, 440, 0.01, 0.1, 0.12, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.4, 0.03, 0.3],
   ],
-  // Patterns
+  // Patterns — pentatonic MIDI: C=60, D=62, E=64, G=67, A=69
   [
-    // Pattern 0: Main riff
+    // Pattern 0: Floating pad + bass pulse
     [
-      // Channel 0: Fast lead
-      [72, 0, 0, 72, 0, 0, 74, 0, 0, 76, 0, 0, 79, 0, 0, 76, 0, 0, 74, 0, 0, 72, 0, 0],
-      // Channel 1: Driving bass
-      [48, 1, 0, 48, 1, 0, 48, 1, 0, 48, 1, 0, 50, 1, 0, 50, 1, 0, 52, 1, 0, 48, 1, 0],
+      // Channel 0: Pad (long notes with rests)
+      [60, 0, 0, 0, undefined, 0, 64, 0, 0, 0, undefined, 0, 67, 0, 0, 0, undefined, 0, 64, 0, 0, 0, undefined, 0],
+      // Channel 1: Sub-bass
+      [48, 1, 0, 0, undefined, 0, 48, 1, 0, 0, undefined, 0, 43, 1, 0, 0, undefined, 0, 45, 1, 0, 0, undefined, 0],
+      // Channel 2: Shimmer arpeggio
+      [72, 2, 0, 0, undefined, 0, 76, 2, 0, 0, undefined, 0, 79, 2, 0, 0, undefined, 0, 76, 2, 0, 0, undefined, 0],
     ],
-    // Pattern 1: Bridge
+    // Pattern 1: Rising variation
     [
-      // Channel 0: Bridge melody
-      [76, 0, 0, 79, 0, 0, 81, 0, 0, 79, 0, 0, 76, 0, 0, 74, 0, 0, 72, 0, 0, 74, 0, 0],
-      // Channel 1: Bridge bass
-      [53, 1, 0, 53, 1, 0, 55, 1, 0, 55, 1, 0, 50, 1, 0, 50, 1, 0, 48, 1, 0, 48, 1, 0],
+      // Channel 0: Higher pad melody
+      [64, 0, 0, 0, undefined, 0, 67, 0, 0, 0, undefined, 0, 69, 0, 0, 0, undefined, 0, 67, 0, 0, 0, undefined, 0],
+      // Channel 1: Walking bass
+      [45, 1, 0, 0, undefined, 0, 43, 1, 0, 0, undefined, 0, 48, 1, 0, 0, undefined, 0, 45, 1, 0, 0, undefined, 0],
+      // Channel 2: Shimmer variation
+      [79, 2, 0, 0, undefined, 0, 81, 2, 0, 0, undefined, 0, 84, 2, 0, 0, undefined, 0, 79, 2, 0, 0, undefined, 0],
+    ],
+    // Pattern 2: Sparse breathing room
+    [
+      // Channel 0: Minimal pad
+      [60, 0, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0, 62, 0, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0],
+      // Channel 1: Sub-bass octave
+      [36, 1, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0, 40, 1, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0],
+      // Channel 2: Gentle arpeggiation
+      [72, 2, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0, 74, 2, 0, 0, undefined, 0, 0, undefined, 0, 0, undefined, 0],
     ],
   ],
   // Sequence
   [
-    [0, 0, 1, 0], // Channel 0
-    [0, 0, 1, 0], // Channel 1
+    [0, 0, 1, 2, 0, 1], // Channel 0
+    [0, 0, 1, 2, 0, 1], // Channel 1
+    [0, 0, 1, 2, 0, 1], // Channel 2
   ],
-  140, // BPM
+  105, // BPM — spacious and airy
 ];
 
 const TRACKS: Record<MusicTrack, ZzFXMSong> = {

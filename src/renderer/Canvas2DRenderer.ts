@@ -162,6 +162,19 @@ export class Canvas2DRenderer implements GameRenderer {
         );
       }
     }
+
+    // Projectile impacts — emit localized flash at collision point
+    for (const proj of current.projectiles) {
+      if (proj.hasCollided && !proj.isActive) {
+        const color = proj.owner.type === 'player' ? '#00ffff' : '#ff8800';
+        this.particleSystem.emitImpactFlash(
+          proj.position.x,
+          proj.position.y,
+          proj.id,
+          color,
+        );
+      }
+    }
   }
 
   destroy(): void {
