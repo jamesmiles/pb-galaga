@@ -84,9 +84,9 @@ export class GameScene extends Phaser.Scene {
       color: '#88ff88',
     }).setOrigin(0, 0).setDepth(100);
 
-    // Neon bloom glow — subtle global bloom on all sprites
+    // Subtle bloom glow — low strength to avoid halos on sprites/stars
     if (this.cameras.main.postFX) {
-      this.cameras.main.postFX.addBloom(0xffffff, 1, 1, 1, 1.5);
+      this.cameras.main.postFX.addBloom(0xffffff, 0.5, 0.5, 0.5, 0.8);
     }
   }
 
