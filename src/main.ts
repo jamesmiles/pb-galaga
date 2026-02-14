@@ -1,9 +1,9 @@
 // PB-Galaga Entry Point
 import { GameManager } from './engine/GameManager';
-import { PhaserRenderer } from './renderer/PhaserRenderer';
+import { Canvas2DRenderer } from './renderer/Canvas2DRenderer';
 
 // Create renderer
-const renderer = new PhaserRenderer('game-container');
+const renderer = new Canvas2DRenderer('game-container');
 
 // Create game manager with renderer
 const gameManager = new GameManager({ renderer });
