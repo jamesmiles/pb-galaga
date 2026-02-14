@@ -1,5 +1,5 @@
-import type { GameState, GameRenderer } from '../types';
-import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
+import type { GameState, GameRenderer, WeaponPickup, Asteroid } from '../types';
+import { GAME_WIDTH, GAME_HEIGHT, SECONDARY_WEAPON_DURATION } from '../engine/constants';
 import { MenuOverlay } from './MenuOverlay';
 import { drawStars } from './drawing/drawStars';
 import { drawPlayers } from './drawing/drawPlayer';
@@ -111,6 +111,8 @@ export class Canvas2DRenderer implements GameRenderer {
       }
       drawEnemies(ctx, current.enemies, prevEnemies, 1);
       drawProjectiles(ctx, current.projectiles, prevProjectiles, 1);
+      this.drawAsteroids(ctx, current.asteroids);
+      this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
       drawPlayers(ctx, current.players, prevPlayers, 1, current.currentTime);
       this.particleSystem.draw(ctx);
       drawHUD(ctx, current, this.engineFps, this.renderFps);
@@ -136,6 +138,8 @@ export class Canvas2DRenderer implements GameRenderer {
     }
     drawEnemies(ctx, current.enemies, prevEnemies, alpha);
     drawProjectiles(ctx, current.projectiles, prevProjectiles, alpha);
+    this.drawAsteroids(ctx, current.asteroids);
+    this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
     drawPlayers(ctx, current.players, prevPlayers, alpha, current.currentTime);
     this.particleSystem.draw(ctx);
 
@@ -235,6 +239,84 @@ export class Canvas2DRenderer implements GameRenderer {
       ctx.save();
       ctx.globalAlpha = config.alpha;
       ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
+      ctx.restore();
+    }
+  }
+
+  /** Draw active weapon pickups as pulsing colored orbs. */
+  private drawWeaponPickups(ctx: CanvasRenderingContext2D, pickups: WeaponPickup[], time: number): void {
+    for (const pickup of pickups) {
+      if (!pickup.isActive) continue;
+
+      const colors: Record<string, string> = {
+        laser: '#4488ff',
+        bullet: '#ff4444',
+        rocket: '#aa44ff',
+        missile: '#44ff44',
+      };
+      const color = colors[pickup.currentWeapon] ?? '#ffffff';
+      const pulse = 0.7 + 0.3 * Math.sin(time * 0.005);
+      const radius = 10 * pulse;
+
+      ctx.save();
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = color;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(pickup.position.x, pickup.position.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // White center
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      ctx.arc(pickup.position.x, pickup.position.y, radius * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  /** Draw asteroids as rocky polygon shapes. */
+  private drawAsteroids(ctx: CanvasRenderingContext2D, asteroids: Asteroid[]): void {
+    for (const asteroid of asteroids) {
+      if (!asteroid.isAlive) continue;
+
+      const r = asteroid.collisionRadius;
+      const sides = asteroid.size === 'large' ? 8 : 6;
+      const color = asteroid.size === 'large' ? '#887766' : '#998877';
+
+      ctx.save();
+      ctx.translate(asteroid.position.x, asteroid.position.y);
+      ctx.rotate(asteroid.rotation);
+
+      // Rocky polygon outline
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = '#665544';
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for (let i = 0; i < sides; i++) {
+        const angle = (i / sides) * Math.PI * 2;
+        const wobble = 0.8 + 0.2 * Math.sin(i * 2.5);
+        const px = Math.cos(angle) * r * wobble;
+        const py = Math.sin(angle) * r * wobble;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Darker crater marks
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#554433';
+      ctx.beginPath();
+      ctx.arc(r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-r * 0.3, r * 0.1, r * 0.1, 0, Math.PI * 2);
+      ctx.fill();
+
       ctx.restore();
     }
   }

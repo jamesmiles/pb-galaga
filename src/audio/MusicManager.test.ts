@@ -53,8 +53,8 @@ describe('MusicManager', () => {
     MusicManager.play('menu');
     expect(MusicManager.getCurrentTrack()).toBe('menu');
 
-    MusicManager.play('gameplay');
-    expect(MusicManager.getCurrentTrack()).toBe('gameplay');
+    MusicManager.play('level1');
+    expect(MusicManager.getCurrentTrack()).toBe('level1');
     // Should have rendered two different songs
     expect(mockZzfxM).toHaveBeenCalledTimes(2);
   });
@@ -78,7 +78,7 @@ describe('MusicManager', () => {
 
   it('resumes audio when unmuted', () => {
     SoundManager.setMuted(true);
-    MusicManager.play('gameplay');
+    MusicManager.play('level1');
     expect(mockZzfxPlay).not.toHaveBeenCalled();
 
     // Unmute
@@ -96,7 +96,7 @@ describe('MusicManager', () => {
   });
 
   it('reset stops everything', () => {
-    MusicManager.play('gameplay');
+    MusicManager.play('level1');
     MusicManager.reset();
     expect(MusicManager.getCurrentTrack()).toBeNull();
     expect(MusicManager.isPlaying()).toBe(false);
@@ -111,7 +111,7 @@ describe('MusicManager', () => {
   });
 
   it('gameplay track renders without error', () => {
-    MusicManager.play('gameplay');
+    MusicManager.play('level1');
     expect(mockZzfxM).toHaveBeenCalledTimes(1);
     // Verify song data was passed (array with instruments, patterns, sequence, BPM)
     const songData = mockZzfxM.mock.calls[0][0];
@@ -121,6 +121,30 @@ describe('MusicManager', () => {
 
   it('menu track renders without error', () => {
     MusicManager.play('menu');
+    expect(mockZzfxM).toHaveBeenCalledTimes(1);
+    const songData = mockZzfxM.mock.calls[0][0];
+    expect(songData).toBeDefined();
+    expect(Array.isArray(songData)).toBe(true);
+  });
+
+  it('level2 track renders without error', () => {
+    MusicManager.play('level2');
+    expect(mockZzfxM).toHaveBeenCalledTimes(1);
+    const songData = mockZzfxM.mock.calls[0][0];
+    expect(songData).toBeDefined();
+    expect(Array.isArray(songData)).toBe(true);
+  });
+
+  it('level3 track renders without error', () => {
+    MusicManager.play('level3');
+    expect(mockZzfxM).toHaveBeenCalledTimes(1);
+    const songData = mockZzfxM.mock.calls[0][0];
+    expect(songData).toBeDefined();
+    expect(Array.isArray(songData)).toBe(true);
+  });
+
+  it('level4 track renders without error', () => {
+    MusicManager.play('level4');
     expect(mockZzfxM).toHaveBeenCalledTimes(1);
     const songData = mockZzfxM.mock.calls[0][0];
     expect(songData).toBeDefined();

@@ -1,5 +1,5 @@
 import type { GameState } from '../types';
-import { GAME_WIDTH } from '../engine/constants';
+import { GAME_WIDTH, SECONDARY_WEAPON_DURATION } from '../engine/constants';
 
 /**
  * Draw the HUD overlay (score, lives, wave, FPS) using Canvas 2D text.
@@ -44,6 +44,34 @@ export function drawHUD(
   ctx.fillStyle = '#88ff88';
   ctx.textAlign = 'left';
   ctx.fillText(`Engine: ${engineFps} | Render: ${renderFps}`, 10, 20);
+
+  // Secondary weapon timer (bottom-center bar)
+  if (p1?.secondaryWeapon) {
+    const barWidth = 100;
+    const barHeight = 6;
+    const barX = GAME_WIDTH / 2 - barWidth / 2;
+    const barY = 780;
+    const fill = Math.max(0, p1.secondaryTimer / SECONDARY_WEAPON_DURATION);
+    const weaponColors: Record<string, string> = {
+      rocket: '#aa44ff',
+      missile: '#44ff44',
+    };
+    const color = weaponColors[p1.secondaryWeapon] ?? '#ffffff';
+
+    // Background
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    // Fill
+    ctx.fillStyle = color;
+    ctx.fillRect(barX, barY, barWidth * fill, barHeight);
+
+    // Label
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.fillText(p1.secondaryWeapon.toUpperCase(), GAME_WIDTH / 2, barY - 4);
+  }
 
   ctx.restore();
 }

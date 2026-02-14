@@ -2,9 +2,9 @@
 id: T-0064
 title: "Version bump to 0.6.0 and sprint finalization"
 type: task
-status: todo
+status: review
 priority: P2
-owner: null
+owner: engineer
 labels: [sprint-6, release]
 depends_on: [T-0052, T-0053, T-0054, T-0055, T-0056, T-0057, T-0058, T-0059, T-0060, T-0061, T-0062, T-0063]
 parallel_with: []

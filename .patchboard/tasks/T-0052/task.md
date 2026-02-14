@@ -2,9 +2,9 @@
 id: T-0052
 title: "Add types, constants, and state model extensions for Sprint 6"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, foundation]
 depends_on: []
 parallel_with: []

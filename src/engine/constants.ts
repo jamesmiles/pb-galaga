@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.5.3';
+export const GAME_VERSION = '0.6.0';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -61,17 +61,69 @@ export const FORMATION_CELL_HEIGHT = 40;
 export const FORMATION_SPEED_INCREASE = 1.5; // multiplier when enemies destroyed
 export const FORMATION_STEP_DOWN = 20; // pixels to descend on direction change
 
-// Bullet defaults
-export const BULLET_SPEED = 200; // pixels per second
+// Bullet defaults (enemy)
+export const BULLET_SPEED = 260; // pixels per second (was 200, +30%)
 export const BULLET_DAMAGE = 50;
 export const BULLET_MAX_LIFETIME = 3000; // ms
 export const BULLET_COLLISION_RADIUS = 3;
+
+// Player bullet defaults
+export const PLAYER_BULLET_SPEED = 550; // pixels per second (fastest)
+export const PLAYER_BULLET_DAMAGE = 25; // least damage
 
 // Plasma defaults
 export const PLASMA_SPEED = 180; // pixels per second
 export const PLASMA_DAMAGE = 75;
 export const PLASMA_MAX_LIFETIME = 3000; // ms
-export const PLASMA_COLLISION_RADIUS = 6;
+export const PLASMA_COLLISION_RADIUS = 9; // was 6, +50% larger
+
+// Rocket defaults (player secondary)
+export const ROCKET_LAUNCH_SPEED = 200; // pixels per second (initial)
+export const ROCKET_MAX_SPEED = 420; // pixels per second (after acceleration)
+export const ROCKET_ACCELERATION = 400; // px/s²
+export const ROCKET_DAMAGE = 40;
+export const ROCKET_MAX_LIFETIME = 3000; // ms
+export const ROCKET_COLLISION_RADIUS = 5;
+export const ROCKET_FIRE_COOLDOWN = 500; // ms between secondary volleys
+
+// Homing missile defaults (player secondary)
+export const MISSILE_LAUNCH_SPEED = 150; // pixels per second (initial, slowest)
+export const MISSILE_MAX_SPEED = 350; // pixels per second (after acceleration)
+export const MISSILE_ACCELERATION = 350; // px/s²
+export const MISSILE_DAMAGE = 10; // per missile (3 per volley = 30 total)
+export const MISSILE_MAX_LIFETIME = 4000; // ms
+export const MISSILE_COLLISION_RADIUS = 3;
+export const MISSILE_TURN_RATE = 3.0; // rad/s
+export const MISSILE_FIRE_COOLDOWN = 800; // ms between secondary volleys
+export const MISSILE_HOMING_DELAY = 200; // ms before homing activates
+
+// Snake laser defaults (level-4 laser upgrade)
+export const SNAKE_SPEED = 400; // pixels per second
+export const SNAKE_DAMAGE = 75;
+export const SNAKE_MAX_LIFETIME = 3000; // ms
+export const SNAKE_COLLISION_RADIUS = 8;
+export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
+
+// Asteroid defaults (Level 4 foreground)
+export const ASTEROID_SMALL_HEALTH = 100;
+export const ASTEROID_LARGE_HEALTH = 300;
+export const ASTEROID_SMALL_RADIUS = 12;
+export const ASTEROID_LARGE_RADIUS = 24;
+export const ASTEROID_SMALL_SCORE = 50;
+export const ASTEROID_LARGE_SCORE = 150;
+export const ASTEROID_SPAWN_INTERVAL = 3000; // ms
+export const ASTEROID_SPAWN_JITTER = 1000; // ms
+export const ASTEROID_SPEED_MIN = 40; // px/s
+export const ASTEROID_SPEED_MAX = 80; // px/s
+export const ASTEROID_DAMAGE = 50;
+
+// Weapon pickup defaults
+export const WEAPON_PICKUP_DROP_CHANCE = 0.15; // 15% per enemy kill
+export const WEAPON_PICKUP_CYCLE_INTERVAL = 5000; // ms between type flips
+export const WEAPON_PICKUP_SPEED = 60; // px/s downward drift
+export const WEAPON_PICKUP_LIFETIME = 10000; // ms
+export const WEAPON_PICKUP_COLLISION_RADIUS = 12;
+export const SECONDARY_WEAPON_DURATION = 60000; // ms (60 seconds)
 
 // Score
 export const WAVE_COMPLETE_BONUS = 500;

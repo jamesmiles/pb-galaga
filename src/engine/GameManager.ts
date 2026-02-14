@@ -4,7 +4,7 @@ import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer } from './StateManager';
 import { InputHandler } from './InputHandler';
 import { updatePlayerShip, respawnPlayer } from '../objects/player/code/PlayerShip';
-import { spawnPlayerLasers, updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
+import { spawnPlayerProjectiles, updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
 import { updateFormation } from './FormationManager';
 import { createBackground, updateBackground } from '../objects/environment/Background';
 import { detectCollisions } from './CollisionDetector';
@@ -14,6 +14,9 @@ import { DiveManager } from './DiveManager';
 import { updateFlightPaths } from './FlightPathManager';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
+import { AsteroidManager } from './AsteroidManager';
+import { updateSecondaryTimer } from './WeaponManager';
+import { WeaponPickupManager } from './WeaponPickupManager';
 /** Intro text per level number. */
 const LEVEL_INTRO_TEXT: Record<number, string> = {
   1: '2029 AD, the invasion begins',
@@ -50,6 +53,8 @@ export class GameManager {
   private levelManager: LevelManager;
   private enemyFiringManager: EnemyFiringManager;
   private diveManager: DiveManager;
+  private asteroidManager: AsteroidManager;
+  private weaponPickupManager: WeaponPickupManager;
   private introTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
@@ -68,6 +73,8 @@ export class GameManager {
     this.levelManager.registerLevel(level4);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
+    this.asteroidManager = new AsteroidManager();
+    this.weaponPickupManager = new WeaponPickupManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
@@ -215,6 +222,7 @@ export class GameManager {
 
     this.enemyFiringManager.reset();
     this.diveManager.reset();
+    this.asteroidManager.reset();
     this.startLevelIntro(state, startLevel);
   }
 
@@ -280,9 +288,16 @@ export class GameManager {
       updatePlayerShip(player, dtSeconds);
     }
 
-    // 3. Spawn & update projectiles
+    // 3. Update weapon timers and spawn projectiles
+    for (const player of state.players) {
+      if (player.deathSequence?.active) continue;
+      updateSecondaryTimer(player, dtSeconds * 1000);
+      if (player.secondaryCooldown > 0) {
+        player.secondaryCooldown -= dtSeconds * 1000;
+      }
+    }
     const projCountBefore = state.projectiles.length;
-    spawnPlayerLasers(state);
+    spawnPlayerProjectiles(state);
     const playerProjAdded = state.projectiles.length - projCountBefore;
     if (playerProjAdded > 0) SoundManager.play('playerFire');
     updateAllProjectiles(state, dtSeconds);
@@ -303,10 +318,12 @@ export class GameManager {
     this.enemyFiringManager.update(state, dtSeconds);
     if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
 
-    // 7. Update background
+    // 7. Update background, asteroids, and weapon pickups
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
+    this.asteroidManager.update(state, dtSeconds * 1000);
+    this.weaponPickupManager.updatePickups(state, dtSeconds * 1000);
 
     // 8. Level/wave progression
     const waveBefore = state.currentWave;
@@ -347,6 +364,8 @@ export class GameManager {
       if (before?.alive && !enemy.isAlive) {
         const hitSound = `hit${enemy.type}` as import('../audio/SoundManager').SoundEffect;
         SoundManager.play(hitSound);
+        // Maybe spawn a weapon pickup
+        this.weaponPickupManager.maybeSpawnPickup(state, enemy.position);
       }
     }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
@@ -502,7 +521,7 @@ export class GameManager {
       if (this.introTimer >= holdStart + TYPING_HOLD_DURATION) {
         state.gameStatus = 'playing';
         state.menu = null;
-        MusicManager.play('gameplay');
+        MusicManager.play(('level' + (data.level ?? 1)) as import('../audio/MusicManager').MusicTrack);
         this.levelManager.startLevel(state, data.level ?? 1);
       }
     }

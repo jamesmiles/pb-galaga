@@ -2,9 +2,9 @@
 id: T-0057
 title: "Extend projectile update system with acceleration and homing"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, engine, projectile]
 depends_on: [T-0054, T-0055, T-0056]
 parallel_with: []

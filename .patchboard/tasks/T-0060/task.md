@@ -2,9 +2,9 @@
 id: T-0060
 title: "Integrate player weapon firing for all weapon types and levels"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, engine, weapon, firing]
 depends_on: [T-0054, T-0055, T-0056, T-0058]
 parallel_with: []

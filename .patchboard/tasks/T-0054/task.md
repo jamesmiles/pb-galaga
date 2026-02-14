@@ -2,9 +2,9 @@
 id: T-0054
 title: "Create rocket projectile factory"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, projectile, weapon]
 depends_on: [T-0052]
 parallel_with: [T-0055, T-0056]

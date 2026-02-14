@@ -204,4 +204,193 @@ describe('CollisionDetector', () => {
       expect(playerLaser.isActive).toBe(true);
     });
   });
+
+  describe('player-pickup collisions', () => {
+    it('collects pickup when player overlaps', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.position = { x: 200, y: 200 };
+      state.players = [player];
+
+      state.weaponPickups = [{
+        id: 'wp-1',
+        category: 'primary' as const,
+        currentWeapon: 'laser' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 60 },
+        isActive: true,
+        cycleTimer: 5000,
+        lifetime: 0,
+      }];
+
+      detectCollisions(state);
+
+      expect(state.weaponPickups[0].isActive).toBe(false);
+    });
+
+    it('does not collect when far apart', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.position = { x: 100, y: 100 };
+      state.players = [player];
+
+      state.weaponPickups = [{
+        id: 'wp-1',
+        category: 'primary' as const,
+        currentWeapon: 'laser' as const,
+        position: { x: 500, y: 500 },
+        velocity: { x: 0, y: 60 },
+        isActive: true,
+        cycleTimer: 5000,
+        lifetime: 0,
+      }];
+
+      detectCollisions(state);
+
+      expect(state.weaponPickups[0].isActive).toBe(true);
+    });
+  });
+
+  describe('player-asteroid collisions', () => {
+    it('damages player and destroys asteroid on collision', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.position = { x: 200, y: 200 };
+      state.players = [player];
+
+      state.asteroids = [{
+        id: 'ast-1',
+        size: 'small' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 50 },
+        rotation: 0,
+        rotationSpeed: 0.5,
+        health: 100,
+        maxHealth: 100,
+        collisionRadius: 12,
+        isAlive: true,
+        scoreValue: 50,
+      }];
+
+      const healthBefore = player.health;
+      detectCollisions(state);
+
+      expect(player.health).toBeLessThan(healthBefore);
+      expect(state.asteroids[0].isAlive).toBe(false);
+    });
+
+    it('does not damage invulnerable player', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = true;
+      player.position = { x: 200, y: 200 };
+      state.players = [player];
+
+      state.asteroids = [{
+        id: 'ast-1',
+        size: 'small' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 50 },
+        rotation: 0,
+        rotationSpeed: 0.5,
+        health: 100,
+        maxHealth: 100,
+        collisionRadius: 12,
+        isAlive: true,
+        scoreValue: 50,
+      }];
+
+      detectCollisions(state);
+
+      expect(player.health).toBe(player.maxHealth);
+    });
+  });
+
+  describe('projectile-asteroid collisions', () => {
+    it('player projectile damages asteroid', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      state.players = [player];
+
+      const laser = createLaser({ x: 200, y: 200 }, { type: 'player', id: 'player1' });
+      state.projectiles = [laser];
+
+      state.asteroids = [{
+        id: 'ast-1',
+        size: 'large' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 50 },
+        rotation: 0,
+        rotationSpeed: 0.5,
+        health: 300,
+        maxHealth: 300,
+        collisionRadius: 24,
+        isAlive: true,
+        scoreValue: 150,
+      }];
+
+      detectCollisions(state);
+
+      expect(laser.hasCollided).toBe(true);
+      expect(state.asteroids[0].health).toBeLessThan(300);
+      expect(state.asteroids[0].isAlive).toBe(true); // Not destroyed yet (300 - 50 = 250)
+    });
+
+    it('destroys asteroid at 0 HP and awards score', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      state.players = [player];
+
+      const laser = createLaser({ x: 200, y: 200 }, { type: 'player', id: 'player1' });
+      state.projectiles = [laser];
+
+      state.asteroids = [{
+        id: 'ast-1',
+        size: 'small' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 50 },
+        rotation: 0,
+        rotationSpeed: 0.5,
+        health: 30, // Less than laser damage (50)
+        maxHealth: 100,
+        collisionRadius: 12,
+        isAlive: true,
+        scoreValue: 50,
+      }];
+
+      detectCollisions(state);
+
+      expect(state.asteroids[0].isAlive).toBe(false);
+      expect(player.score).toBe(50); // Score awarded
+    });
+
+    it('enemy projectile passes through asteroid', () => {
+      const state = createInitialState();
+      state.players = [createPlayer('player1')];
+
+      const bullet = createBullet({ x: 200, y: 200 }, { type: 'enemy', id: 'enemy-1' });
+      state.projectiles = [bullet];
+
+      state.asteroids = [{
+        id: 'ast-1',
+        size: 'small' as const,
+        position: { x: 200, y: 200 },
+        velocity: { x: 0, y: 50 },
+        rotation: 0,
+        rotationSpeed: 0.5,
+        health: 100,
+        maxHealth: 100,
+        collisionRadius: 12,
+        isAlive: true,
+        scoreValue: 50,
+      }];
+
+      detectCollisions(state);
+
+      expect(bullet.isActive).toBe(true);
+      expect(bullet.hasCollided).toBe(false);
+      expect(state.asteroids[0].health).toBe(100);
+    });
+  });
 });
