@@ -1,100 +1,76 @@
 ---
 id: T-0013
-title: "Implement two player co-op with blue ship"
+title: "Resize game canvas from 800x600 to 800x900"
 type: task
 status: todo
 priority: P1
 owner: null
 labels:
-  - gameplay
-  - multiplayer
+  - infrastructure
+  - rendering
 depends_on: [E-0001]
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - Blue ship (player 2) implemented alongside red ship
-  - Player 2 controls work (WASD for movement, Q for fire)
-  - Both players can play simultaneously
-  - Player collision does not cause damage
-  - Separate score tracking for each player
-  - Lives system works for both players (separate or shared)
-  - Game over when both players have no lives
-  - Start menu updated with player 2 controls
-  - Renderer displays both ships correctly
-  - Test harness supports two player testing
+  - GAME_HEIGHT constant updated from 600 to 900
+  - Phaser canvas renders at 800x900
+  - Player starting Y position adjusted for taller canvas
+  - Formation standoff distance adjusted (enemies stay in upper portion)
+  - Menu layouts adjusted for new height (title, options, version)
+  - Background star generation uses new bounds
+  - All existing tests pass with updated height references
+  - Playwright visual tests pass at new resolution
+  - Game remains centered horizontally in browser
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
 
-Two player co-op mode is a core feature that significantly enhances gameplay. Players 1 and 2 cooperate to clear waves together.
+The current 800x600 canvas doesn't use vertical real-estate well, even on smaller laptop screens like a MacBook Pro. Increasing height to 900 gives more play area and better proportions for the shoot-em-up genre.
 
-**Data Model**: Player Schema supports both player1 and player2  
-**Architecture**: Multiplayer Ready principle
+This is the first Sprint 2 task because all subsequent tasks build on the new dimensions.
 
 ## Plan
 
-### Phase 1: Player 2 State
-1. Extend game state to support two players:
-   - Add player2 to players array
-   - Initialize blue ship for player 2
-   - Set player2 controls (WASD + Q)
-2. Update StateManager for two players
-3. Add unit tests
+### Phase 1: Constants and Config
+1. Update `src/engine/constants.ts`:
+   - Change `GAME_HEIGHT` from 600 to 900
+   - Adjust `FORMATION_STANDOFF_Y` if defined (enemies should stay in upper ~60% of screen)
+   - Adjust player start Y position constant
+2. Update `src/renderer/PhaserRenderer.ts` Phaser config height
 
-### Phase 2: Input Handling
-1. Extend InputHandler for two players:
-   - Player 1: Arrow keys + Spacebar
-   - Player 2: WASD + Q
-   - Simultaneous input support
-   - Independent input processing
-2. Add input tests
+### Phase 2: Game Object Adjustments
+1. Update `src/objects/player/code/PlayerShip.ts`:
+   - Adjust default spawn Y position (was near bottom of 600, now near bottom of 900)
+2. Update `src/objects/environment/Background.ts`:
+   - Star generation bounds use new GAME_HEIGHT
+   - Wrapping logic uses new height
+3. Update formation standoff in `src/engine/FormationManager.ts` if hardcoded
 
-### Phase 3: Co-op Mechanics
-1. Implement co-op rules:
-   - Players cannot damage each other
-   - Player-player collision: no damage
-   - Separate or shared lives (design decision)
-   - Separate score tracking
-   - Game over: both players at 0 lives
-2. Update collision detection
-3. Add co-op tests
+### Phase 3: Renderer Adjustments
+1. Update `src/renderer/scenes/GameScene.ts`:
+   - Menu layout positions (title, subtitle, controls, options, version)
+   - Adjust any hardcoded Y positions
+2. Verify canvas centering CSS still works in `src/index.html`
 
-### Phase 4: UI Updates
-1. Update start menu:
-   - Show player 1 and player 2 controls
-   - Mode selection (1P / 2P) or auto-detect
-2. Update in-game UI:
-   - P1 lives and score (left side)
-   - P2 lives and score (right side)
-3. Update game over to show both scores
+### Phase 4: Test Fixes
+1. Find and fix all tests with hardcoded 600 references
+2. Run full test suite: `npm run test`
+3. Update Playwright visual tests if needed
+4. Verify screenshots look correct at 900px height
 
-### Phase 5: Rendering
-1. Update renderer for two ships:
-   - Blue ship sprite for player 2
-   - Both ships visible simultaneously
-   - Separate visual indicators (colors)
-2. Add player 2 to test harnesses
+## Files to Modify
+- `src/engine/constants.ts`
+- `src/renderer/PhaserRenderer.ts`
+- `src/objects/player/code/PlayerShip.ts`
+- `src/objects/environment/Background.ts`
+- `src/engine/FormationManager.ts`
+- `src/renderer/scenes/GameScene.ts`
+- Various test files with hardcoded 600 references
 
 ## Notes
 
-**Lives System Decision**:
-- Option A: Shared lives pool (3 total)
-- Option B: Separate lives (3 each)
-- Recommendation: Separate for fairness
-
-**Score System**:
-- Individual scores preferred
-- Shows final scores on game over
-- Friendly competition
-
-**Design Considerations**:
-- Players should stay on screen together
-- Prevent players from blocking each other
-- Consider friendly fire (off for co-op)
-
-**Future Enhancements**:
-- Player revival mechanics
-- Team score/combo bonuses
-- Special two-player abilities
+- 800x900 fits well on 1080p (900px visible in browser after chrome/address bar)
+- MacBook Pro viewport is ~900px tall, so this fills the screen
+- Keep width at 800 — no change needed for horizontal layout

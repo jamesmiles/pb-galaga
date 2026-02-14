@@ -1,114 +1,72 @@
 ---
 id: T-0018
-title: "Implement level complete sequence"
+title: "Implement enemy projectile-player collision"
 type: task
 status: todo
 priority: P1
 owner: null
 labels:
-  - ui
-  - menu
+  - gameplay
+  - collision
+  - combat
 depends_on: [T-0017]
 parallel_with: []
 parent_epic: E-0002
 acceptance:
-  - Level complete sequence triggers after all waves cleared
-  - Level complete screen displays congratulations
-  - Shows final scores for all players
-  - Shows level statistics (enemies destroyed, accuracy, etc.)
-  - Options to continue to next level (future) or return to menu
-  - State transition from playing to levelcomplete works
-  - Level complete integrates with game flow
-  - Renderer displays level complete screen
-  - Unit tests verify level complete detection
+  - CollisionDetector extended for enemy-projectile vs player collision
+  - Enemy lasers and bullets damage the player on contact
+  - Player invulnerability frames prevent damage during invulnerability
+  - Enemy projectiles are deactivated on hit
+  - Player takes same damage/respawn sequence as player-enemy body collision
+  - Collision filtering prevents player's own projectiles from hitting player
+  - Unit tests verify enemy projectile collision, invulnerability, and filtering
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
 
-The level complete sequence provides closure and reward for completing all waves. It's a critical part of the game flow and player satisfaction.
-
-**Data Model**: MenuState with type: 'levelcomplete'  
-**Architecture**: Game Status includes 'levelcomplete' state
+With enemies firing projectiles (T-0017), those projectiles need to damage the player on contact. This extends the existing CollisionDetector to handle enemy-owned projectile vs player collision, using the same damage/invulnerability/respawn pipeline already built for player-enemy body collision.
 
 ## Plan
 
-### Phase 1: Level Complete Detection
-1. Extend LevelManager:
-   - Detect when all waves complete
-   - Trigger level complete state
-   - Calculate level statistics
-   - Prepare completion data
-2. Add level completion logic
-3. Add unit tests
+### Phase 1: Extend CollisionDetector
+1. Update `src/engine/CollisionDetector.ts`:
+   - Add `detectEnemyProjectilePlayerCollisions(state: GameState)` function
+   - For each active projectile where owner is not a player:
+     a. Check circle-circle collision with each alive, non-invulnerable player
+     b. On hit: call `damagePlayer()`, deactivate projectile
+   - Call from main `detectCollisions()` function
+2. Add unit tests
 
-### Phase 2: Level Complete Menu
-1. Create `src/engine/menus/LevelCompleteMenu.ts`:
-   - Extends MenuBase
-   - Display "LEVEL COMPLETE!"
-   - Show level number
-   - Show player scores
-   - Show statistics:
-     - Total enemies destroyed
-     - Accuracy (optional)
-     - Time to complete (optional)
-   - Options: "Next Level", "Main Menu"
-2. Add menu state management
+### Phase 2: Owner Filtering
+1. Ensure projectile owner field is used correctly:
+   - Player-owned projectiles (owner: 'player1', 'player2') should NOT hit the player
+   - Enemy-owned projectiles (owner: enemy ID) should hit the player
+   - Existing laser-enemy collision already filters by owner — mirror that logic
+2. Add filtering tests
 
-### Phase 3: State Transitions
-1. Implement level complete transitions:
-   - playing → levelcomplete (all waves done)
-   - levelcomplete → menu (main menu selected)
-   - levelcomplete → playing (next level - future)
-2. Wire transitions in GameManager
-3. Add transition tests
+### Phase 3: Damage Pipeline
+1. Verify enemy projectile damage uses same pipeline:
+   - `damagePlayer()` sets `isAlive = false`, decrements lives
+   - Invulnerability check (`isInvulnerable`) prevents damage
+   - Respawn logic triggers after death (or death sequence in T-0020)
+2. Add integration tests with full state
 
-### Phase 4: Statistics Tracking
-1. Implement statistics collection:
-   - Track enemies destroyed per wave
-   - Track total enemies destroyed
-   - Track shots fired vs hits (accuracy)
-   - Track time taken
-   - Store in level complete data
-2. Add statistics calculation
-3. Add unit tests
+### Phase 4: Tests
+1. Enemy bullet hits player → player damaged
+2. Enemy laser hits player → player damaged
+3. Player is invulnerable → no damage
+4. Player's own laser doesn't hit player
+5. Projectile deactivated after hitting player
+6. Multiple projectiles, only hitting ones deactivate
 
-### Phase 5: Rendering
-1. Update renderer for level complete:
-   - Level complete screen layout
-   - Statistics display
-   - Player score display
-   - Menu options
-   - Visual celebration (future: confetti, effects)
-2. Test visual appearance
+## Files to Modify
+- `src/engine/CollisionDetector.ts`
 
 ## Notes
 
-**Level Complete Flow**:
-1. Final enemy destroyed
-2. Brief delay (~1 second)
-3. Transition to level complete screen
-4. Display statistics
-5. Wait for player input
-6. Transition to menu or next level
-
-**Statistics Display**:
-- Keep it simple for Sprint 2
-- Focus on scores and enemies destroyed
-- Detailed stats can be added later
-- Consider A/B/C letter grades (future)
-
-**Future Enhancements**:
-- Level 2+ progression
-- Bonus points for fast completion
-- Perfect clear bonuses
-- Ranking system
-- Replay level option
-- Statistics persistence
-
-**Visual Polish**:
-- Victory animation
-- Confetti or particle effects
-- Victory music/sound
-- Smooth transitions
+- Reuses existing `damagePlayer()` from `PlayerShip.ts`
+- Reuses existing circle-circle collision from `checkCollision()`
+- The collision radius for bullets (3px) vs lasers (4px) creates slightly different dodge windows
+- T-0020 (Player Death Sequence) will later modify what happens after `damagePlayer()` is called
