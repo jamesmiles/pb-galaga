@@ -161,9 +161,8 @@ export class GameManager {
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
-    // Check pause toggle (Escape key)
-    const menuInput = this.inputHandler.getMenuInput();
-    if (menuInput.back) {
+    // Check pause toggle (Escape key only — must not consume Space/arrows)
+    if (this.inputHandler.getPauseToggle()) {
       state.gameStatus = 'paused';
       state.menu = {
         type: 'pause',
