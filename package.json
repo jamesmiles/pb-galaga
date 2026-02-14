@@ -1,6 +1,6 @@
 {
   "name": "pb-galaga",
-  "version": "0.4.0",
+  "version": "0.5.3",
   "description": "A modern browser-based arcade space shooter with pixel-art aesthetics, inspired by classic games like Galaga.",
   "type": "module",
   "scripts": {

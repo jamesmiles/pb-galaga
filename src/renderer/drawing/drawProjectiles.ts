@@ -32,6 +32,8 @@ export function drawProjectiles(
     // Draw trails (additive blending)
     if (proj.type === 'laser') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 4, 12);
+    } else if (proj.type === 'plasma') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff00ff', 6, 10);
     } else {
       const isPlayerBullet = proj.owner.type === 'player';
       const trailColor = isPlayerBullet ? '#00ffff' : '#ff8800';
@@ -52,6 +54,17 @@ export function drawProjectiles(
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(pos.x - 1, pos.y - 5, 2, 10);
+    } else if (proj.type === 'plasma') {
+      // Magenta plasma with heavy glow
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#ff00ff';
+      ctx.fillStyle = '#ff00ff';
+      ctx.fillRect(pos.x - 3, pos.y - 5, 6, 10);
+
+      // Bright white core
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(pos.x - 1, pos.y - 3, 2, 6);
     } else {
       // Bullet — color depends on owner
       const isPlayerBullet = proj.owner.type === 'player';

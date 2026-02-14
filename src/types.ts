@@ -83,14 +83,14 @@ export interface FlightPathState {
 
 export interface Enemy {
   id: string;
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   position: Vector2D;
   velocity: Vector2D;
   rotation: number;
   isAlive: boolean;
   health: number;
   maxHealth: number;
-  fireMode: 'none' | 'laser' | 'bullet';
+  fireMode: 'none' | 'laser' | 'bullet' | 'plasma' | 'spread';
   fireCooldown: number;
   fireRate: number;
   isThrusting: boolean;
@@ -159,7 +159,7 @@ export interface BackgroundState {
 // --- Menu ---
 
 export interface MenuState {
-  type: 'start' | 'pause' | 'gameover' | 'levelcomplete';
+  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro';
   selectedOption: number;
   options: string[];
   data?: {
@@ -167,6 +167,8 @@ export interface MenuState {
     p2Score?: number;
     level?: number;
     wave?: number;
+    introText?: string;
+    introChars?: number;
   };
 }
 
@@ -187,7 +189,7 @@ export interface FormationState {
 
 // --- Game State ---
 
-export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete';
+export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete' | 'levelintro';
 export type GameMode = 'single' | 'co-op';
 
 export interface GameState {
@@ -218,7 +220,7 @@ export interface LevelConfig {
 }
 
 export interface WaveSlot {
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   row: number;
   col: number;
 }
@@ -232,7 +234,7 @@ export interface WaveConfig {
 }
 
 export interface EnemySpawnConfig {
-  type: 'A' | 'B' | 'C';
+  type: 'A' | 'B' | 'C' | 'D' | 'E';
   count: number;
   formation: FormationType;
   rows: number;

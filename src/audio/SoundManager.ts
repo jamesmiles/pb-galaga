@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'typeKey';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -27,6 +27,12 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   hitB: [0.7, 0.04, 300, 0, 0.06, 0.15, 3, 1, -8, -2, 0, 0, 0, 0.8, 0, 0, 0, 0.3, 0.1, 0],
   // Type C hit: sharp shattering crack (fast fighter)
   hitC: [0.6, 0.03, 500, 0, 0.04, 0.08, 3, 1, 25, 3, 100, 0.02, 0, 0.5, 0, 0, 0, 0.4, 0.05, 0],
+  // Type D hit: resonant plasma thud (curved fighter)
+  hitD: [0.7, 0.03, 250, 0.01, 0.08, 0.18, 3, 1, -5, -1, 0, 0, 0, 0.6, 0, 0, 0, 0.3, 0.12, 0],
+  // Type E hit: deep heavy boom (strategic bomber)
+  hitE: [0.8, 0.05, 180, 0.01, 0.1, 0.25, 3, 1, -8, -2, 0, 0, 0, 0.9, 0, 0, 0, 0.2, 0.15, 0],
+  // Keyboard typing click
+  typeKey: [0.15, 0.01, 1200, 0, 0.005, 0.01, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8, 0.005, 0],
 };
 
 /**

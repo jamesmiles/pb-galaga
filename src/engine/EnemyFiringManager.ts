@@ -1,11 +1,15 @@
 import type { GameState, Enemy } from '../types';
 import { createEnemyLaser } from '../objects/projectiles/laser/code/Laser';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
+import { createPlasma } from '../objects/projectiles/plasma/code/Plasma';
+import { BULLET_SPEED } from './constants';
 
 /** Fire rate config per enemy fire mode (ms). */
 const FIRE_RATE_CONFIG: Record<string, { base: number; jitter: number }> = {
   laser: { base: 3000, jitter: 500 },
   bullet: { base: 2000, jitter: 500 },
+  plasma: { base: 2500, jitter: 400 },
+  spread: { base: 4000, jitter: 600 },
 };
 
 /**
@@ -69,9 +73,25 @@ export class EnemyFiringManager {
     const owner = { type: 'enemy' as const, id: enemy.id };
     const position = { x: enemy.position.x, y: enemy.position.y + 16 };
 
+    if (enemy.fireMode === 'spread') {
+      // 4-bullet fan pattern: -12°, -4°, +4°, +12° from vertical
+      const angles = [-12, -4, 4, 12];
+      const newProjectiles = angles.map(deg => {
+        const rad = (deg * Math.PI) / 180;
+        const bullet = createBullet(position, owner);
+        bullet.velocity.x = Math.sin(rad) * BULLET_SPEED;
+        bullet.velocity.y = Math.cos(rad) * BULLET_SPEED;
+        return bullet;
+      });
+      state.projectiles = [...state.projectiles, ...newProjectiles];
+      return;
+    }
+
     let projectile;
     if (enemy.fireMode === 'laser') {
       projectile = createEnemyLaser(position, owner);
+    } else if (enemy.fireMode === 'plasma') {
+      projectile = createPlasma(position, owner);
     } else {
       projectile = createBullet(position, owner);
     }

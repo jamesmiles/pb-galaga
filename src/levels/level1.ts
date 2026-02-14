@@ -2,7 +2,7 @@ import type { LevelConfig } from '../types';
 
 export const level1: LevelConfig = {
   levelNumber: 1,
-  name: 'First Contact',
+  name: 'Invasion',
   waves: [
     {
       waveNumber: 1,

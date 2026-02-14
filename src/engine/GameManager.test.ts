@@ -2,6 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { GameManager } from './GameManager';
 import { WAVE_COMPLETE_BONUS } from './constants';
 
+/** Tick past the level intro typing animation (~3s for level 1). */
+function skipIntro(gm: GameManager): void {
+  gm.tickHeadless(200);
+}
+
 describe('GameManager', () => {
   describe('construction', () => {
     it('creates in headless mode', () => {
@@ -49,9 +54,14 @@ describe('GameManager', () => {
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
 
-      expect(gm.getState().gameStatus).toBe('playing');
+      // Should enter level intro first
+      expect(gm.getState().gameStatus).toBe('levelintro');
       expect(gm.getState().players).toHaveLength(1);
       expect(gm.getState().players[0].id).toBe('player1');
+
+      // Skip through intro to playing
+      skipIntro(gm);
+      expect(gm.getState().gameStatus).toBe('playing');
       gm.destroy();
     });
 
@@ -75,6 +85,7 @@ describe('GameManager', () => {
     function startGame(gm: GameManager): void {
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
     }
 
     it('moves player right on ArrowRight input', () => {
@@ -123,6 +134,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       expect(gm.getState().players[0].isInvulnerable).toBe(true);
 
@@ -139,6 +151,7 @@ describe('GameManager', () => {
       // Start game
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
       expect(gm.getState().gameStatus).toBe('playing');
 
       // Press Escape
@@ -155,6 +168,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       // Pause
       gm.inputHandler.injectMenuInput({ back: true });
@@ -173,6 +187,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       // Pause
       gm.inputHandler.injectMenuInput({ back: true });
@@ -190,6 +205,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       // Pause
       gm.inputHandler.injectMenuInput({ back: true });
@@ -209,6 +225,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       const playerPosBefore = { ...gm.getState().players[0].position };
 
@@ -229,6 +246,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       // Manually set player state to dead with 0 lives (no death sequence)
       const player = gm.getState().players[0];
@@ -245,6 +263,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       const player = gm.getState().players[0];
       player.lives = 0;
@@ -271,6 +290,7 @@ describe('GameManager', () => {
     function startGame(gm: GameManager): void {
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
     }
 
     it('respawns player after death sequence with lives remaining', () => {
@@ -333,6 +353,7 @@ describe('GameManager', () => {
       gm.tickHeadless(1);
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
     }
 
     it('starts with 2 players in co-op mode', () => {
@@ -403,6 +424,7 @@ describe('GameManager', () => {
     function startGame(gm: GameManager): void {
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
     }
 
     it('awards wave bonus when wave is cleared', () => {
@@ -481,12 +503,15 @@ describe('GameManager', () => {
       expect(gm.getState().gameStatus).toBe('levelcomplete');
       expect(gm.getState().currentLevel).toBe(1);
 
-      // Select "Next Level"
+      // Select "Next Level" — enters level intro for level 2
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
-
-      expect(gm.getState().gameStatus).toBe('playing');
+      expect(gm.getState().gameStatus).toBe('levelintro');
       expect(gm.getState().currentLevel).toBe(2);
+
+      // Skip through intro to playing
+      skipIntro(gm);
+      expect(gm.getState().gameStatus).toBe('playing');
       expect(gm.getState().enemies.length).toBeGreaterThan(0);
       gm.destroy();
     });
@@ -497,6 +522,7 @@ describe('GameManager', () => {
       const gm = new GameManager({ headless: true });
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
+      skipIntro(gm);
 
       const start = performance.now();
       gm.tickHeadless(10000);

@@ -14,8 +14,23 @@ import { DiveManager } from './DiveManager';
 import { updateFlightPaths } from './FlightPathManager';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
+/** Intro text per level number. */
+const LEVEL_INTRO_TEXT: Record<number, string> = {
+  1: '2029 AD, the invasion begins',
+  2: 'planetary defence activated',
+  3: 'dark side of the moon',
+  4: 'approaching asteroid belt',
+};
+
+/** Milliseconds between each typed character. */
+const TYPING_SPEED = 50;
+/** Milliseconds to hold after typing completes before transitioning. */
+const TYPING_HOLD_DURATION = 1500;
+
 import { level1 } from '../levels/level1';
 import { level2 } from '../levels/level2';
+import { level3 } from '../levels/level3';
+import { level4 } from '../levels/level4';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -35,6 +50,7 @@ export class GameManager {
   private levelManager: LevelManager;
   private enemyFiringManager: EnemyFiringManager;
   private diveManager: DiveManager;
+  private introTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -48,6 +64,8 @@ export class GameManager {
     this.levelManager = new LevelManager();
     this.levelManager.registerLevel(level1);
     this.levelManager.registerLevel(level2);
+    this.levelManager.registerLevel(level3);
+    this.levelManager.registerLevel(level4);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
 
@@ -110,6 +128,9 @@ export class GameManager {
       case 'levelcomplete':
         this.updateLevelComplete(state);
         break;
+      case 'levelintro':
+        this.updateLevelIntro(state);
+        break;
     }
   }
 
@@ -129,6 +150,37 @@ export class GameManager {
         selectedOption: Math.max(state.menu.selectedOption - 1, 0),
       };
     }
+
+    // Level select submenu
+    if (state.menu.type === 'levelselect') {
+      if (menuInput.back) {
+        SoundManager.play('menuSelect');
+        state.menu = {
+          type: 'start',
+          selectedOption: 0,
+          options: ['1 Player', '2 Players', 'Test Mode'],
+        };
+        return;
+      }
+      if (menuInput.confirm) {
+        SoundManager.play('menuSelect');
+        const selected = state.menu.options[state.menu.selectedOption];
+        if (selected === 'Back') {
+          state.menu = {
+            type: 'start',
+            selectedOption: 0,
+            options: ['1 Player', '2 Players', 'Test Mode'],
+          };
+        } else {
+          // Extract level number from option (e.g. "Level 1: Invasion" → 1)
+          const levelNum = parseInt(selected.split(':')[0].replace('Level ', ''), 10);
+          state.gameMode = 'single';
+          this.startGame(state, levelNum);
+        }
+      }
+      return;
+    }
+
     if (menuInput.confirm) {
       SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
@@ -138,15 +190,18 @@ export class GameManager {
       } else if (selected === '2 Players') {
         state.gameMode = 'co-op';
         this.startGame(state);
+      } else if (selected === 'Test Mode') {
+        state.menu = {
+          type: 'levelselect',
+          selectedOption: 0,
+          options: this.getLevelOptions(),
+        };
       }
     }
   }
 
-  private startGame(state: GameState): void {
-    state.gameStatus = 'playing';
-    state.menu = null;
+  private startGame(state: GameState, startLevel: number = 1): void {
     state.projectiles = [];
-    MusicManager.play('gameplay');
 
     if (state.gameMode === 'co-op') {
       const p1 = createPlayer('player1');
@@ -160,7 +215,35 @@ export class GameManager {
 
     this.enemyFiringManager.reset();
     this.diveManager.reset();
-    this.levelManager.startLevel(state, 1);
+    this.startLevelIntro(state, startLevel);
+  }
+
+  /** Begin the level intro typing sequence, then transition to playing. */
+  private startLevelIntro(state: GameState, level: number): void {
+    const introText = LEVEL_INTRO_TEXT[level] ?? `level ${level}`;
+    state.currentLevel = level;
+    state.gameStatus = 'levelintro';
+    state.menu = {
+      type: 'levelintro',
+      selectedOption: 0,
+      options: [],
+      data: {
+        level,
+        introText,
+        introChars: 0,
+      },
+    };
+    this.introTimer = 0;
+  }
+
+  /** Build level select menu options from registered levels. */
+  private getLevelOptions(): string[] {
+    const options: string[] = [];
+    for (let i = 1; this.levelManager.hasLevel(i); i++) {
+      options.push(`Level ${i}: ${this.levelManager.getLevelName(i)}`);
+    }
+    options.push('Back');
+    return options;
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
@@ -378,17 +461,55 @@ export class GameManager {
         const nextLevel = state.currentLevel + 1;
         state.enemies = [];
         state.projectiles = [];
-        state.gameStatus = 'playing';
-        state.menu = null;
         this.enemyFiringManager.reset();
         this.diveManager.reset();
-        MusicManager.play('gameplay');
-        this.levelManager.startLevel(state, nextLevel);
+        this.startLevelIntro(state, nextLevel);
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
         MusicManager.play('menu');
       }
+    }
+  }
+
+  private updateLevelIntro(state: GameState): void {
+    if (!state.menu?.data) return;
+    const data = state.menu.data;
+    const fullText = data.introText ?? '';
+    const revealed = data.introChars ?? 0;
+
+    this.introTimer += state.deltaTime;
+
+    if (revealed < fullText.length) {
+      // Type next character(s) based on elapsed time
+      const charsToReveal = Math.min(
+        Math.floor(this.introTimer / TYPING_SPEED),
+        fullText.length,
+      );
+      if (charsToReveal > revealed) {
+        // Play key sound for non-space characters
+        if (fullText[charsToReveal - 1] !== ' ') {
+          SoundManager.play('typeKey');
+        }
+        state.menu = {
+          ...state.menu,
+          data: { ...data, introChars: charsToReveal },
+        };
+      }
+    } else {
+      // All chars revealed — hold, then transition to playing
+      const holdStart = fullText.length * TYPING_SPEED;
+      if (this.introTimer >= holdStart + TYPING_HOLD_DURATION) {
+        state.gameStatus = 'playing';
+        state.menu = null;
+        MusicManager.play('gameplay');
+        this.levelManager.startLevel(state, data.level ?? 1);
+      }
+    }
+
+    // Update background during intro
+    if (state.background) {
+      updateBackground(state.background, state.deltaTime / 1000);
     }
   }
 

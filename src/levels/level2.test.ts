@@ -8,7 +8,7 @@ describe('Level 2 Config', () => {
   });
 
   it('has a name', () => {
-    expect(level2.name).toBe('Escalation');
+    expect(level2.name).toBe('Earth Defence');
   });
 
   it('has 6 waves', () => {

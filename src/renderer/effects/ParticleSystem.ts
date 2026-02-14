@@ -28,6 +28,8 @@ const EXPLOSION_COLORS: Record<string, string[]> = {
   A: ['#00ff44', '#66ff88', '#ffffff'],
   B: ['#00ccff', '#55ddff', '#ffffff'],
   C: ['#ff5500', '#ff9933', '#ffffff'],
+  D: ['#ff00ff', '#ff66ff', '#ffffff'],
+  E: ['#ffff00', '#ffff66', '#ffffff'],
   player: ['#ff3344', '#ff7755', '#ffffff'],
   default: ['#ffcc00', '#ff5500', '#ffffff'],
 };
@@ -37,6 +39,8 @@ const FLASH_COLORS: Record<string, string> = {
   A: '#00ff44',
   B: '#00ccff',
   C: '#ff5500',
+  D: '#ff00ff',
+  E: '#ffff00',
   player: '#ff3344',
   default: '#ffcc00',
 };

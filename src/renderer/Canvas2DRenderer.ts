@@ -7,6 +7,7 @@ import { drawEnemies } from './drawing/drawEnemies';
 import { drawProjectiles } from './drawing/drawProjectiles';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
+import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
 
 /**
  * Canvas 2D renderer implementing the GameRenderer interface.
@@ -30,6 +31,11 @@ export class Canvas2DRenderer implements GameRenderer {
 
   // Track game status for cleanup transitions
   private lastGameStatus = '';
+
+  // Background image system
+  private bgImageCache: Map<string, HTMLImageElement> = new Map();
+  private bgScrollOffsets: number[] = [];
+  private currentBgLevel = -1;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -73,10 +79,18 @@ export class Canvas2DRenderer implements GameRenderer {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+    // Load backgrounds on level change
+    if (current.currentLevel !== this.currentBgLevel) {
+      this.loadBackgrounds(current.currentLevel);
+    }
+
+    // Draw background celestial bodies (behind everything)
+    this.drawBackgrounds(ctx, current.currentLevel, renderDt);
+
     // Update particles (runs regardless of game status for lingering effects)
     this.particleSystem.update(renderDt);
 
-    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete') {
+    if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete' || current.gameStatus === 'levelintro') {
       // Menu screens: render stars in background, particles, then overlay
       if (current.background) {
         drawStars(ctx, current.background.stars);
@@ -174,6 +188,54 @@ export class Canvas2DRenderer implements GameRenderer {
           color,
         );
       }
+    }
+  }
+
+  /** Load background images for a level. */
+  private loadBackgrounds(level: number): void {
+    this.currentBgLevel = level;
+    const configs = LEVEL_BACKGROUNDS[level] ?? [];
+    this.bgScrollOffsets = configs.map(() => 0);
+
+    for (const config of configs) {
+      if (!this.bgImageCache.has(config.url)) {
+        const img = new Image();
+        img.src = config.url;
+        this.bgImageCache.set(config.url, img);
+      }
+    }
+  }
+
+  /**
+   * Draw background celestial bodies behind starfield.
+   * Each object starts above the screen and drifts downward through the viewport.
+   * The config `y` value staggers entry timing (higher y = enters later).
+   */
+  private drawBackgrounds(ctx: CanvasRenderingContext2D, level: number, dt: number): void {
+    const configs = LEVEL_BACKGROUNDS[level] ?? [];
+    if (configs.length === 0) return;
+
+    for (let i = 0; i < configs.length; i++) {
+      const config = configs[i];
+      const img = this.bgImageCache.get(config.url);
+      if (!img || !img.complete) continue;
+
+      // Advance scroll (accumulates downward distance)
+      this.bgScrollOffsets[i] += config.scrollSpeed * dt / 1000;
+
+      const h = img.height * config.scale;
+      const w = img.width * config.scale;
+      // Start above screen; y config acts as stagger (higher = enters later)
+      const drawY = -(h / 2) - config.y + this.bgScrollOffsets[i];
+      const drawX = config.x;
+
+      // Only draw while visible
+      if (drawY - h / 2 > GAME_HEIGHT || drawY + h / 2 < 0) continue;
+
+      ctx.save();
+      ctx.globalAlpha = config.alpha;
+      ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
+      ctx.restore();
     }
   }
 

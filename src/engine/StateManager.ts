@@ -68,7 +68,7 @@ export function createInitialState(): GameState {
     menu: {
       type: 'start',
       selectedOption: 0,
-      options: ['1 Player', '2 Players'],
+      options: ['1 Player', '2 Players', 'Test Mode'],
     },
   };
 }

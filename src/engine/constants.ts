@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.4.0';
+export const GAME_VERSION = '0.5.3';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -44,6 +44,16 @@ export const ENEMY_C_HEALTH = 50;
 export const ENEMY_C_SCORE_VALUE = 150;
 export const ENEMY_C_COLLISION_RADIUS = 12;
 
+// Enemy Type D defaults (Curved Fighter)
+export const ENEMY_D_HEALTH = 75;
+export const ENEMY_D_SCORE_VALUE = 250;
+export const ENEMY_D_COLLISION_RADIUS = 14;
+
+// Enemy Type E defaults (Strategic Bomber)
+export const ENEMY_E_HEALTH = 150;
+export const ENEMY_E_SCORE_VALUE = 300;
+export const ENEMY_E_COLLISION_RADIUS = 18;
+
 // Formation defaults
 export const FORMATION_BASE_SPEED = 60; // pixels per second
 export const FORMATION_CELL_WIDTH = 48;
@@ -56,6 +66,12 @@ export const BULLET_SPEED = 200; // pixels per second
 export const BULLET_DAMAGE = 50;
 export const BULLET_MAX_LIFETIME = 3000; // ms
 export const BULLET_COLLISION_RADIUS = 3;
+
+// Plasma defaults
+export const PLASMA_SPEED = 180; // pixels per second
+export const PLASMA_DAMAGE = 75;
+export const PLASMA_MAX_LIFETIME = 3000; // ms
+export const PLASMA_COLLISION_RADIUS = 6;
 
 // Score
 export const WAVE_COMPLETE_BONUS = 500;
