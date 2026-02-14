@@ -1,28 +1,30 @@
 ---
 id: T-0005
-title: "Implement player laser projectile with firing"
+title: Implement player laser projectile with firing
 type: task
-status: review
+status: done
 priority: P0
 owner: engineer
 labels:
-  - gameplay
-  - projectile
-depends_on: [T-0003]
-parallel_with: [T-0004]
+- gameplay
+- projectile
+depends_on:
+- T-0003
+parallel_with:
+- T-0004
 parent_epic: E-0001
 acceptance:
-  - Projectile class implements laser projectile state and behavior
-  - Player fires laser on spacebar press
-  - Laser projectiles move upward at constant speed
-  - Laser projectiles removed when exceeding screen bounds
-  - Laser projectiles removed when exceeding lifetime
-  - Fire rate limiting prevents spam (cooldown)
-  - Projectile state integrates with engine
-  - Unit tests verify projectile physics
-  - Unit tests verify lifetime management
+- Projectile class implements laser projectile state and behavior
+- Player fires laser on spacebar press
+- Laser projectiles move upward at constant speed
+- Laser projectiles removed when exceeding screen bounds
+- Laser projectiles removed when exceeding lifetime
+- Fire rate limiting prevents spam (cooldown)
+- Projectile state integrates with engine
+- Unit tests verify projectile physics
+- Unit tests verify lifetime management
 created_at: '2026-02-13'
-updated_at: '2026-02-13'
+updated_at: '2026-02-14'
 ---
 
 ## Context
