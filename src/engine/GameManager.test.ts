@@ -133,6 +133,97 @@ describe('GameManager', () => {
     });
   });
 
+  describe('pause menu', () => {
+    it('pauses game when Escape is pressed during gameplay', () => {
+      const gm = new GameManager({ headless: true });
+      // Start game
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('playing');
+
+      // Press Escape
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('paused');
+      expect(gm.getState().menu?.type).toBe('pause');
+      expect(gm.getState().menu?.options).toContain('Resume');
+      expect(gm.getState().menu?.options).toContain('Main Menu');
+      gm.destroy();
+    });
+
+    it('resumes game when selecting Resume', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      // Pause
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('paused');
+
+      // Select Resume (already selected by default)
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('playing');
+      expect(gm.getState().menu).toBeNull();
+      gm.destroy();
+    });
+
+    it('resumes game when pressing Escape again', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      // Pause
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('paused');
+
+      // Escape again to resume
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('playing');
+      gm.destroy();
+    });
+
+    it('returns to main menu when selecting Main Menu from pause', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      // Pause
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+
+      // Navigate down to "Main Menu" and confirm
+      gm.inputHandler.injectMenuInput({ down: true });
+      gm.tickHeadless(1);
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('menu');
+      expect(gm.getState().menu?.type).toBe('start');
+      gm.destroy();
+    });
+
+    it('does not advance game state while paused', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      const playerPosBefore = { ...gm.getState().players[0].position };
+
+      // Pause and tick
+      gm.inputHandler.injectMenuInput({ back: true });
+      gm.tickHeadless(1);
+      gm.tickHeadless(60); // Tick 60 more times while paused
+
+      const playerPosAfter = gm.getState().players[0].position;
+      expect(playerPosAfter.x).toBe(playerPosBefore.x);
+      expect(playerPosAfter.y).toBe(playerPosBefore.y);
+      gm.destroy();
+    });
+  });
+
   describe('game over', () => {
     it('triggers game over when player has 0 lives and no active death sequence', () => {
       const gm = new GameManager({ headless: true });

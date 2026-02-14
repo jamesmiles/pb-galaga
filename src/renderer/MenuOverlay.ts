@@ -128,7 +128,7 @@ export class MenuOverlay {
   /** Update the overlay based on current game state. Called each render frame. */
   update(state: GameState): void {
     const menu = state.menu;
-    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete';
+    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete';
 
     if (!showMenu || !menu) {
       this.hide();
@@ -165,6 +165,14 @@ export class MenuOverlay {
         </div>
         ${this.buildOptions(options)}
         <div class="menu-version">v${this.version}</div>
+      `;
+    } else if (type === 'pause') {
+      this.overlay.innerHTML = `
+        <div class="menu-title">PAUSED</div>
+        <div class="menu-controls-group">
+          <div class="menu-controls">Press ESC to resume</div>
+        </div>
+        ${this.buildOptions(options)}
       `;
     } else if (type === 'gameover') {
       let scoreHtml = '';
