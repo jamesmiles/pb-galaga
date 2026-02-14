@@ -1,28 +1,30 @@
 ---
 id: T-0021
-title: "Implement dive attack behavior"
+title: Implement dive attack behavior
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - enemy
-  - ai
-depends_on: [T-0017]
-parallel_with: [T-0020]
+- gameplay
+- enemy
+- ai
+depends_on:
+- T-0017
+parallel_with:
+- T-0020
 parent_epic: E-0002
 acceptance:
-  - DiveManager created in src/engine/DiveManager.ts
-  - Front-line enemies randomly break formation and dive toward player
-  - Dive path curves toward player X position then sweeps downward
-  - Enemies that exit the bottom respawn at their formation position
-  - Maximum 2 simultaneous divers
-  - Minimum 3-second cooldown between new dives
-  - Diving enemies can still fire (if they have fireMode)
-  - "Dive speed varies by enemy type (A: 1.0x, B: 0.7x, C: 1.5x)"
-  - Wired into GameManager.updatePlaying()
-  - Unit tests verify dive selection, path calculation, and re-entry
+- DiveManager created in src/engine/DiveManager.ts
+- Front-line enemies randomly break formation and dive toward player
+- Dive path curves toward player X position then sweeps downward
+- Enemies that exit the bottom respawn at their formation position
+- Maximum 2 simultaneous divers
+- Minimum 3-second cooldown between new dives
+- Diving enemies can still fire (if they have fireMode)
+- 'Dive speed varies by enemy type (A: 1.0x, B: 0.7x, C: 1.5x)'
+- Wired into GameManager.updatePlaying()
+- Unit tests verify dive selection, path calculation, and re-entry
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---

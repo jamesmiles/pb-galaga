@@ -1,27 +1,30 @@
 ---
 id: T-0022
-title: "Implement two-player co-op mode"
+title: Implement two-player co-op mode
 type: task
-status: review
+status: done
 priority: P1
 owner: engineer
 labels:
-  - gameplay
-  - multiplayer
-depends_on: [T-0018]
-parallel_with: [T-0020, T-0021]
+- gameplay
+- multiplayer
+depends_on:
+- T-0018
+parallel_with:
+- T-0020
+- T-0021
 parent_epic: E-0002
 acceptance:
-  - Player 2 blue ship implemented alongside Player 1 red ship
-  - Player 2 controls work (WASD for movement, Q for fire)
-  - Both players can play simultaneously with independent input
-  - Players cannot damage each other (no friendly collision)
-  - Separate score tracking for each player
-  - Separate lives (3 each) for each player
-  - Game over when both players have 0 lives
-  - Start menu updated with "2 Player" option
-  - GameScene renders both ships and dual score/lives HUD
-  - Unit tests verify dual input, independent lives/scores, gameover condition
+- Player 2 blue ship implemented alongside Player 1 red ship
+- Player 2 controls work (WASD for movement, Q for fire)
+- Both players can play simultaneously with independent input
+- Players cannot damage each other (no friendly collision)
+- Separate score tracking for each player
+- Separate lives (3 each) for each player
+- Game over when both players have 0 lives
+- Start menu updated with "2 Player" option
+- GameScene renders both ships and dual score/lives HUD
+- Unit tests verify dual input, independent lives/scores, gameover condition
 created_at: '2026-02-14'
 updated_at: '2026-02-14'
 ---
