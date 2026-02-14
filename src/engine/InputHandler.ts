@@ -81,6 +81,13 @@ export class InputHandler {
     return input;
   }
 
+  /** Poll pause toggle — only checks Escape (consumed on read). */
+  getPauseToggle(): boolean {
+    const pressed = !!this.keyState['Escape'];
+    if (pressed) this.keyState['Escape'] = false;
+    return pressed;
+  }
+
   /** Poll mute toggle (consumed on read to prevent repeat). */
   getMuteToggle(): boolean {
     const pressed = !!this.keyState['KeyM'];
