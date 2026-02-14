@@ -206,7 +206,11 @@ export class Canvas2DRenderer implements GameRenderer {
     }
   }
 
-  /** Draw background celestial bodies behind starfield. */
+  /**
+   * Draw background celestial bodies behind starfield.
+   * Each object starts below the screen and drifts upward through the viewport.
+   * The config `y` value staggers entry timing (higher y = enters later).
+   */
   private drawBackgrounds(ctx: CanvasRenderingContext2D, level: number, dt: number): void {
     const configs = LEVEL_BACKGROUNDS[level] ?? [];
     if (configs.length === 0) return;
@@ -216,25 +220,21 @@ export class Canvas2DRenderer implements GameRenderer {
       const img = this.bgImageCache.get(config.url);
       if (!img || !img.complete) continue;
 
-      // Advance scroll
-      this.bgScrollOffsets[i] = (this.bgScrollOffsets[i] + config.scrollSpeed * dt / 1000) % (GAME_HEIGHT + img.height * config.scale);
+      // Advance scroll (accumulates upward distance)
+      this.bgScrollOffsets[i] += config.scrollSpeed * dt / 1000;
 
-      const drawY = config.y + this.bgScrollOffsets[i];
-      const drawX = config.x;
-      const w = img.width * config.scale;
       const h = img.height * config.scale;
+      const w = img.width * config.scale;
+      // Start below screen; y config acts as stagger (higher = later entry)
+      const drawY = GAME_HEIGHT + h / 2 + config.y - this.bgScrollOffsets[i];
+      const drawX = config.x;
+
+      // Only draw while visible
+      if (drawY - h / 2 > GAME_HEIGHT || drawY + h / 2 < 0) continue;
 
       ctx.save();
       ctx.globalAlpha = config.alpha;
-
-      // Draw at current position (centered)
       ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
-
-      // Wrap: draw again above if scrolled past bottom
-      if (drawY + h / 2 > GAME_HEIGHT) {
-        ctx.drawImage(img, drawX - w / 2, drawY - h / 2 - (GAME_HEIGHT + h), w, h);
-      }
-
       ctx.restore();
     }
   }
