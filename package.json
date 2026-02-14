@@ -1,6 +1,6 @@
 {
   "name": "pb-galaga",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "description": "A modern browser-based arcade space shooter with pixel-art aesthetics, inspired by classic games like Galaga.",
   "type": "module",
   "scripts": {
@@ -15,9 +15,7 @@
     "url": "git+https://github.com/jamesmiles/pb-galaga.git"
   },
   "license": "ISC",
-  "dependencies": {
-    "phaser": "^3.90.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "typescript": "^5.9.3",
