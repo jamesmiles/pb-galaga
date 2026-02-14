@@ -187,6 +187,15 @@ export class MenuOverlay {
         ${scoreHtml}
         ${this.buildOptions(options)}
       `;
+    } else if (type === 'levelselect') {
+      this.overlay.innerHTML = `
+        <div class="menu-title">SELECT LEVEL</div>
+        <div class="menu-controls-group">
+          <div class="menu-controls">Press ESC to go back</div>
+        </div>
+        ${this.buildOptions(options)}
+        <div class="menu-version">v${this.version}</div>
+      `;
     } else if (type === 'levelcomplete') {
       let scoreHtml = '';
       if (data?.finalScore !== undefined) {

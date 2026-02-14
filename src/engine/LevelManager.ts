@@ -85,6 +85,11 @@ export class LevelManager {
     return this.levels.has(levelNumber);
   }
 
+  /** Get the name of a registered level. */
+  getLevelName(levelNumber: number): string {
+    return this.levels.get(levelNumber)?.name ?? '';
+  }
+
   private spawnWave(state: GameState, wave: WaveConfig): void {
     state.enemies = [];
     state.projectiles = [];

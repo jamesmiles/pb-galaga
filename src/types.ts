@@ -159,7 +159,7 @@ export interface BackgroundState {
 // --- Menu ---
 
 export interface MenuState {
-  type: 'start' | 'pause' | 'gameover' | 'levelcomplete';
+  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect';
   selectedOption: number;
   options: string[];
   data?: {

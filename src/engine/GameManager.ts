@@ -133,6 +133,37 @@ export class GameManager {
         selectedOption: Math.max(state.menu.selectedOption - 1, 0),
       };
     }
+
+    // Level select submenu
+    if (state.menu.type === 'levelselect') {
+      if (menuInput.back) {
+        SoundManager.play('menuSelect');
+        state.menu = {
+          type: 'start',
+          selectedOption: 0,
+          options: ['1 Player', '2 Players', 'Test Mode'],
+        };
+        return;
+      }
+      if (menuInput.confirm) {
+        SoundManager.play('menuSelect');
+        const selected = state.menu.options[state.menu.selectedOption];
+        if (selected === 'Back') {
+          state.menu = {
+            type: 'start',
+            selectedOption: 0,
+            options: ['1 Player', '2 Players', 'Test Mode'],
+          };
+        } else {
+          // Extract level number from option (e.g. "Level 1: Invasion" → 1)
+          const levelNum = parseInt(selected.split(':')[0].replace('Level ', ''), 10);
+          state.gameMode = 'single';
+          this.startGame(state, levelNum);
+        }
+      }
+      return;
+    }
+
     if (menuInput.confirm) {
       SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
@@ -142,11 +173,17 @@ export class GameManager {
       } else if (selected === '2 Players') {
         state.gameMode = 'co-op';
         this.startGame(state);
+      } else if (selected === 'Test Mode') {
+        state.menu = {
+          type: 'levelselect',
+          selectedOption: 0,
+          options: this.getLevelOptions(),
+        };
       }
     }
   }
 
-  private startGame(state: GameState): void {
+  private startGame(state: GameState, startLevel: number = 1): void {
     state.gameStatus = 'playing';
     state.menu = null;
     state.projectiles = [];
@@ -164,7 +201,17 @@ export class GameManager {
 
     this.enemyFiringManager.reset();
     this.diveManager.reset();
-    this.levelManager.startLevel(state, 1);
+    this.levelManager.startLevel(state, startLevel);
+  }
+
+  /** Build level select menu options from registered levels. */
+  private getLevelOptions(): string[] {
+    const options: string[] = [];
+    for (let i = 1; this.levelManager.hasLevel(i); i++) {
+      options.push(`Level ${i}: ${this.levelManager.getLevelName(i)}`);
+    }
+    options.push('Back');
+    return options;
   }
 
   private updatePlaying(state: GameState, dtSeconds: number): void {
