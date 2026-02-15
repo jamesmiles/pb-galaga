@@ -1,6 +1,6 @@
 import type { GameState, BossState } from '../types';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
-import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
+import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
 import {
   BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION,
   BOSS_TURRET_SCORE_VALUE, BOSS_SCORE_VALUE, GAME_WIDTH,
@@ -80,8 +80,8 @@ export class BossManager {
       this.fighterSpawnTimer -= dtSeconds * 1000;
       if (this.fighterSpawnTimer <= 0) {
         this.fighterSpawnTimer = BOSS_FIGHTER_SPAWN_INTERVAL;
-        // Spawn a fighter from the bridge, flying downward
-        const fighter = createEnemyA(0, 0);
+        // Spawn a fast fighter from the bridge, flying downward
+        const fighter = createEnemyC(0, 0);
         const spawnX = boss.position.x;
         const spawnY = boss.position.y + boss.height * 0.4;
         fighter.position = { x: spawnX, y: spawnY };

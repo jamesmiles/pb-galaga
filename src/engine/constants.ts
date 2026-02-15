@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.7.2';
+export const GAME_VERSION = '0.7.3';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -140,7 +140,7 @@ export const SECONDARY_WEAPON_DURATION = 15000; // ms (15 seconds)
 // Boss defaults
 export const BOSS_WIDTH = 720;
 export const BOSS_HEIGHT = 200;
-export const BOSS_HEALTH = 500;
+export const BOSS_HEALTH = 1000;
 export const BOSS_TURRET_HEALTH = 400;
 export const BOSS_TURRET_FIRE_RATE = 600; // ms (rapid fire)
 export const BOSS_TURRET_COLLISION_RADIUS = 20;
@@ -148,7 +148,7 @@ export const BOSS_SCORE_VALUE = 5000;
 export const BOSS_TURRET_SCORE_VALUE = 500;
 export const BOSS_DEATH_PHASE_DURATION = 800; // ms per phase
 export const BOSS_ENTRY_SPEED = 30; // px/s
-export const BOSS_FIGHTER_SPAWN_INTERVAL = 4000; // ms between bridge fighter launches
+export const BOSS_FIGHTER_SPAWN_INTERVAL = 1333; // ms between bridge fighter launches
 
 // Life pickup defaults
 export const LIFE_DROP_CHANCE = 0.5; // 50% per level

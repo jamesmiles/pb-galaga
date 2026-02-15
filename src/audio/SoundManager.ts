@@ -41,8 +41,8 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   hitF: [0.9, 0.06, 120, 0.02, 0.12, 0.3, 3, 1, -10, -3, 0, 0, 0, 1, 0, 0, 0, 0.2, 0.18, 0],
   // Missile whistle: eerie rising whistle (enemy homing missile in-flight)
   missileWhistle: [0.3, 0.02, 600, 0.05, 0.2, 0.15, 0, 1, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.1, 0.2],
-  // Boss explosion: massive deep boom with reverb
-  bossExplosion: [1, 0.08, 80, 0.02, 0.2, 0.5, 3, 1, -8, -2, 0, 0, 0, 1.2, 0, 0, 0.1, 0.15, 0.2, 0],
+  // Boss explosion: massive deep boom with reverb (max volume, long sustain)
+  bossExplosion: [2, 0.1, 60, 0.03, 0.35, 0.8, 3, 1, -10, -3, 0, 0, 0, 1.5, 0, 0, 0.15, 0.2, 0.3, 0],
   // Life pickup: bright cheerful chime
   lifePickup: [0.4, 0, 800, 0, 0.02, 0.08, 0, 1, 10, 0, 400, 0.02, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
 };
