@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { BossManager } from './BossManager';
 import { createBoss } from '../objects/boss/code/Boss';
 import { createInitialState, createPlayer } from './StateManager';
-import { BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION, GAME_WIDTH } from './constants';
+import { BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION, BOSS_FIGHTER_SPAWN_INTERVAL, GAME_WIDTH } from './constants';
 import type { GameState } from '../types';
 
 describe('BossManager', () => {
@@ -70,6 +70,18 @@ describe('BossManager', () => {
           state.boss!.position.x + turret.offsetX, 0,
         );
       }
+    });
+
+    it('spawns fighters from bridge when all turrets destroyed', () => {
+      // Kill all turrets
+      for (const turret of state.boss!.turrets) {
+        turret.isAlive = false;
+      }
+
+      const enemiesBefore = state.enemies.length;
+      // Advance past spawn interval
+      manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
+      expect(state.enemies.length).toBe(enemiesBefore + 1);
     });
   });
 

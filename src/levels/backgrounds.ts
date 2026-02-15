@@ -4,6 +4,7 @@ import moonSmallUrl from '../backgrounds/moon-small.png';
 import asteroidsBrownUrl from '../backgrounds/asteroids-brown.png';
 import asteroidsBlueUrl from '../backgrounds/asteroids-blue.png';
 import asteroidsPurpleUrl from '../backgrounds/asteroids-purple.png';
+import marsUrl from '../backgrounds/mars.png';
 
 export interface BackgroundObjectConfig {
   url: string;
@@ -33,5 +34,8 @@ export const LEVEL_BACKGROUNDS: Record<number, BackgroundObjectConfig[]> = {
     { url: asteroidsBlueUrl, x: 550, y: 300, scale: 0.8, alpha: 0.14, scrollSpeed: 14 },
     { url: asteroidsPurpleUrl, x: 650, y: 600, scale: 0.7, alpha: 0.1, scrollSpeed: 10 },
   ],
-  5: [], // Mars + moon drawn procedurally in Canvas2DRenderer
+  5: [
+    { url: marsUrl, x: 350, y: 80, scale: 1.6, alpha: 0.18, scrollSpeed: 8 },
+    { url: moonSmallUrl, x: 620, y: 500, scale: 0.5, alpha: 0.12, scrollSpeed: 12 },
+  ],
 };

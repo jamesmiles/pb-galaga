@@ -198,8 +198,8 @@ function detectProjectileBossBridgeCollisions(state: GameState): void {
   const allTurretsDead = boss.turrets.every(t => !t.isAlive);
   if (!allTurretsDead) return;
 
-  // Bridge collision zone: central area of the boss
-  const bridgeHalfW = boss.width * 0.3;
+  // Bridge collision zone: narrow central area between inner turrets
+  const bridgeHalfW = boss.width * 0.15;
   const bridgeHalfH = boss.height * 0.2;
   const bridgeX = boss.position.x;
   const bridgeY = boss.position.y;

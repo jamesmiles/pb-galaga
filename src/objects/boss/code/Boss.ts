@@ -27,10 +27,10 @@ export function createBoss(): BossState {
     });
   }
 
-  // Upper collision zones — turrets + bridge (bridge exposed after turrets destroyed)
+  // Upper collision zones — turrets + bridge
+  // Bridge zone sits between the two inner turrets (±144 offset), so keep halfW < 144
   const upperCollisionZones: CollisionZone[] = [
-    // Full upper strip covering turrets and bridge
-    { offsetX: 0, offsetY: BOSS_HEIGHT * 0.3, width: BOSS_WIDTH * 0.9, height: BOSS_HEIGHT * 0.4 },
+    { offsetX: 0, offsetY: BOSS_HEIGHT * 0.3, width: BOSS_WIDTH * 0.3, height: BOSS_HEIGHT * 0.4 },
   ];
 
   return {

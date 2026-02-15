@@ -1,14 +1,18 @@
 import type { GameState, BossState } from '../types';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
+import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
 import {
   BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION,
   BOSS_TURRET_SCORE_VALUE, BOSS_SCORE_VALUE, GAME_WIDTH,
+  BOSS_FIGHTER_SPAWN_INTERVAL,
 } from './constants';
 
 /**
  * Manages boss lifecycle: entry, active phase, and death sequence.
  */
 export class BossManager {
+  private fighterSpawnTimer = 0;
+
   /** Update the boss state for one tick. */
   update(state: GameState, dtSeconds: number): void {
     const boss = state.boss;
@@ -70,10 +74,19 @@ export class BossManager {
       }
     }
 
-    // Check if all turrets destroyed — expose bridge
-    const aliveTurrets = boss.turrets.filter(t => t.isAlive);
-    if (aliveTurrets.length === 0 && boss.health > 0) {
-      // Bridge is now vulnerable (handled by CollisionDetector)
+    // Check if all turrets destroyed — expose bridge and launch fighters
+    const allTurretsDead = boss.turrets.every(t => !t.isAlive);
+    if (allTurretsDead && boss.health > 0) {
+      this.fighterSpawnTimer -= dtSeconds * 1000;
+      if (this.fighterSpawnTimer <= 0) {
+        this.fighterSpawnTimer = BOSS_FIGHTER_SPAWN_INTERVAL;
+        // Spawn a fighter from the bridge center
+        const fighter = createEnemyA(0, 0);
+        fighter.position = { x: boss.position.x, y: boss.position.y + boss.height * 0.4 };
+        fighter.velocity = { x: (Math.random() - 0.5) * 100, y: 150 };
+        fighter.flightPathState = null;
+        state.enemies = [...state.enemies, fighter];
+      }
     }
   }
 
@@ -120,6 +133,6 @@ export class BossManager {
   }
 
   reset(): void {
-    // No persistent state to reset
+    this.fighterSpawnTimer = 0;
   }
 }
