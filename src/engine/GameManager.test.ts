@@ -462,30 +462,7 @@ describe('GameManager', () => {
       gm.destroy();
     });
 
-    it('level complete menu returns to main menu', () => {
-      const gm = new GameManager({ headless: true });
-      startGame(gm);
-
-      // Clear all 5 waves
-      for (let wave = 0; wave < 5; wave++) {
-        gm.getState().enemies.forEach(e => { e.isAlive = false; });
-        gm.tickHeadless(1);
-        gm.tickHeadless(200); // Pass wave transition or clearing delay
-      }
-
-      expect(gm.getState().gameStatus).toBe('levelcomplete');
-
-      // Navigate down to "Main Menu" (first option is now "Next Level")
-      gm.inputHandler.injectMenuInput({ down: true });
-      gm.tickHeadless(1);
-      gm.inputHandler.injectMenuInput({ confirm: true });
-      gm.tickHeadless(1);
-
-      expect(gm.getState().gameStatus).toBe('menu');
-      gm.destroy();
-    });
-
-    it('level complete advances to next level', () => {
+    it('level complete auto-advances to next level after 3 seconds', () => {
       const gm = new GameManager({ headless: true });
       startGame(gm);
 
@@ -499,9 +476,8 @@ describe('GameManager', () => {
       expect(gm.getState().gameStatus).toBe('levelcomplete');
       expect(gm.getState().currentLevel).toBe(1);
 
-      // Select "Next Level" — enters level intro for level 2
-      gm.inputHandler.injectMenuInput({ confirm: true });
-      gm.tickHeadless(1);
+      // Wait 3 seconds (180 ticks at 60Hz) — auto-advance, no menu
+      gm.tickHeadless(200);
       expect(gm.getState().gameStatus).toBe('levelintro');
       expect(gm.getState().currentLevel).toBe(2);
 

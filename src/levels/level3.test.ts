@@ -10,8 +10,8 @@ describe('Level 3 — Moon Battle', () => {
     expect(level3.name).toBe('Moon Battle');
   });
 
-  it('has 6 waves', () => {
-    expect(level3.waves.length).toBe(6);
+  it('has 7 waves', () => {
+    expect(level3.waves.length).toBe(7);
   });
 
   it('wave numbers are sequential 1–6', () => {

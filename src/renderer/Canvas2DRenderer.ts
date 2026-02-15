@@ -5,7 +5,7 @@ import { drawStars } from './drawing/drawStars';
 import { drawPlayers } from './drawing/drawPlayer';
 import { drawEnemies } from './drawing/drawEnemies';
 import { drawProjectiles } from './drawing/drawProjectiles';
-import { drawBossLower, drawBossUpper, drawLifePickups } from './drawing/drawBoss';
+import { drawBossLower, drawBossUpper, drawLifePickups, drawRespawnPickups } from './drawing/drawBoss';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
 import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
@@ -153,6 +153,7 @@ export class Canvas2DRenderer implements GameRenderer {
     this.drawAsteroids(ctx, current.asteroids);
     this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
     drawLifePickups(ctx, current.lifePickups, current.currentTime);
+    drawRespawnPickups(ctx, current.respawnPickups, current.currentTime);
     drawPlayers(ctx, current.players, prevPlayers, alpha, current.currentTime);
 
     // Boss upper layer (turrets + bridge, in front of player)
@@ -256,9 +257,9 @@ export class Canvas2DRenderer implements GameRenderer {
       }
     }
 
-    // Enemy F large explosions
+    // Enemy F and G (mini-boss) large explosions
     for (const enemy of current.enemies) {
-      if (!enemy.isAlive && enemy.collisionState === 'destroyed' && enemy.type === 'F') {
+      if (!enemy.isAlive && enemy.collisionState === 'destroyed' && (enemy.type === 'F' || enemy.type === 'G')) {
         this.particleSystem.emitLargeExplosion(
           enemy.position.x, enemy.position.y,
           `${enemy.id}-large`, 'F',

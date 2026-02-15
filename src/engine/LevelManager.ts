@@ -5,6 +5,7 @@ import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
 import { createEnemyD } from '../objects/enemies/enemyD/code/EnemyD';
 import { createEnemyE } from '../objects/enemies/enemyE/code/EnemyE';
 import { createEnemyF } from '../objects/enemies/enemyF/code/EnemyF';
+import { createEnemyG } from '../objects/enemies/enemyG/code/EnemyG';
 import { initFormation } from './FormationManager';
 import { generateFlightPaths } from './FlightPathManager';
 import { LEVEL_CLEAR_DELAY } from './constants';
@@ -21,6 +22,7 @@ const ENEMY_FACTORY: Record<string, (row: number, col: number) => Enemy> = {
   D: createEnemyD,
   E: createEnemyE,
   F: createEnemyF,
+  G: createEnemyG,
 };
 
 /**

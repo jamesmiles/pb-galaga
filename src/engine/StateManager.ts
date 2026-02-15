@@ -1,4 +1,4 @@
-import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup } from '../types';
+import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup, RespawnPickup } from '../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_START_LIVES, PLAYER_MAX_HEALTH,
   FORMATION_BASE_SPEED, FORMATION_CELL_WIDTH, FORMATION_CELL_HEIGHT,
@@ -70,10 +70,11 @@ export function createInitialState(): GameState {
     menu: {
       type: 'start',
       selectedOption: 0,
-      options: ['1 Player', '2 Players', 'Test Mode'],
+      options: ['1 Player', '2 Players', 'Test Mode', '2P Test Mode'],
     },
     boss: null,
     lifePickups: [],
+    respawnPickups: [],
   };
 }
 
@@ -118,6 +119,7 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.menu = source.menu;
   target.boss = source.boss;
   target.lifePickups = source.lifePickups;
+  target.respawnPickups = source.respawnPickups;
 }
 
 /** Create a default player state. */
@@ -138,7 +140,7 @@ export function createPlayer(id: 'player1' | 'player2'): Player {
     score: 0,
     health: PLAYER_MAX_HEALTH,
     maxHealth: PLAYER_MAX_HEALTH,
-    primaryWeapon: 'laser',
+    primaryWeapon: id === 'player1' ? 'bullet' : 'laser',
     primaryLevel: 1,
     secondaryWeapon: null,
     secondaryTimer: 0,
