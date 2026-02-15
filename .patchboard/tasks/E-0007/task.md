@@ -21,6 +21,10 @@ children:
   - T-0073
   - T-0074
   - T-0075
+  - T-0076
+  - T-0077
+  - T-0078
+  - T-0079
 acceptance:
   - "Level end delay (3s clearing phase) across all levels"
   - "Enemy Type F (green stealth bomber) with homing missiles"
@@ -29,7 +33,11 @@ acceptance:
   - "Mars + small moon backgrounds"
   - "Enhanced explosions for stealth bomber and boss"
   - "Level 5 music track"
-  - "~57 new tests, all passing"
+  - "HUD primary weapon and level display"
+  - "Shield/health bar in HUD"
+  - "Reduced secondary weapon timer"
+  - "Life drop pickup (50% per level, heart icon)"
+  - "~70 new tests, all passing"
   - "Version 0.7.0"
 created_at: '2026-02-15'
 updated_at: '2026-02-15'
@@ -52,6 +60,10 @@ Sprint 6 (v0.6.0) delivered weapons, power-ups, asteroids, and per-level music a
 9. **X Formation** (T-0073) - New flight path type
 10. **Level 5 Config** (T-0074) - 5 waves, backgrounds, music, boss wave integration
 11. **Finalization** (T-0075) - Version 0.7.0, tests, build
+12. **HUD Primary Weapon Display** (T-0076) - Show weapon type and power level
+13. **Secondary Timer Rebalance** (T-0077) - Reduce secondary weapon duration
+14. **Shield/Health Bar** (T-0078) - Visual health indicator in HUD
+15. **Life Drop Pickup** (T-0079) - 50% chance per level, heart icon
 
 ## Out of scope
 
