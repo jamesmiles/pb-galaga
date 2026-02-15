@@ -27,7 +27,6 @@ export const LEVEL_BACKGROUNDS: Record<number, BackgroundObjectConfig[]> = {
   ],
   3: [
     { url: moonUrl, x: 300, y: 50, scale: 1.4, alpha: 0.2, scrollSpeed: 15 },
-    { url: moonSmallUrl, x: 600, y: 400, scale: 0.6, alpha: 0.12, scrollSpeed: 10 },
   ],
   4: [
     { url: asteroidsBrownUrl, x: 200, y: 0, scale: 1.0, alpha: 0.18, scrollSpeed: 18 },
