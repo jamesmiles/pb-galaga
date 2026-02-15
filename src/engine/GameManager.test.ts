@@ -487,6 +487,31 @@ describe('GameManager', () => {
       expect(gm.getState().enemies.length).toBeGreaterThan(0);
       gm.destroy();
     });
+
+    it('triggers game over when player dies during level complete', () => {
+      const gm = new GameManager({ headless: true });
+      startGame(gm);
+
+      // Clear all 5 waves of level 1
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        gm.tickHeadless(200); // Pass wave transition or clearing delay
+      }
+
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+
+      // Simulate player death with 0 lives during level complete
+      const player = gm.getState().players[0];
+      player.isAlive = false;
+      player.lives = 0;
+      player.deathSequence = null;
+
+      // Tick should detect game over instead of auto-advancing
+      gm.tickHeadless(200);
+      expect(gm.getState().gameStatus).toBe('gameover');
+      gm.destroy();
+    });
   });
 
   describe('performance', () => {

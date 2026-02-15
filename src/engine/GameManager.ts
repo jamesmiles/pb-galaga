@@ -557,6 +557,26 @@ export class GameManager {
   }
 
   private updateLevelComplete(state: GameState): void {
+    // Handle any lingering death sequences
+    for (const player of state.players) {
+      if (player.deathSequence?.active) {
+        const elapsed = state.currentTime - player.deathSequence.startTime;
+        if (elapsed >= player.deathSequence.duration) {
+          player.deathSequence.active = false;
+        }
+      }
+    }
+
+    // Check game over (player died during clearing phase or level complete)
+    const anyDeathActive = state.players.some(p => p.deathSequence?.active);
+    if (!anyDeathActive) {
+      const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
+      if (state.players.length > 0 && alivePlayers.length === 0) {
+        this.checkGameOver(state);
+        return;
+      }
+    }
+
     // Auto-advance to next level after 3 seconds (no menu interaction)
     this.levelCompleteTimer += state.deltaTime;
     if (this.levelCompleteTimer >= 3000) {
