@@ -2,10 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=dist/index.html">
-  <title>PB-Galaga</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PB-Galaga — A Space Shooter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a1a;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: radial-gradient(ellipse at center, #111133 0%, #0a0a1a 70%);
+    }
+
+    .hero h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #ffff00;
+      text-shadow: 0 0 20px #ffff00, 0 0 40px #888800;
+      margin-bottom: 12px;
+      letter-spacing: 4px;
+    }
+
+    .hero .subtitle {
+      font-size: 18px;
+      color: #88aacc;
+      margin-bottom: 40px;
+    }
+
+    .play-btn {
+      display: inline-block;
+      padding: 16px 48px;
+      font-size: 24px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: #000;
+      background: #00ff00;
+      border: none;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px #00ff0066, 0 0 40px #00ff0033;
+    }
+
+    .play-btn:hover {
+      background: #44ff44;
+      box-shadow: 0 0 30px #00ff0099, 0 0 60px #00ff0066;
+    }
+
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 40px 20px;
+      flex-wrap: wrap;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .feature {
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+      max-width: 260px;
+    }
+
+    .feature h3 {
+      color: #00ffff;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: #888;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .screenshots {
+      text-align: center;
+      padding: 20px 20px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .screenshots h2 {
+      font-size: 18px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 24px;
+    }
+
+    .screenshot-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .screenshot-grid img {
+      width: 320px;
+      height: auto;
+      border: 1px solid #333;
+      border-radius: 4px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .screenshot-grid img:hover {
+      transform: scale(1.03);
+      border-color: #00ffff;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 20px;
+      border-top: 1px solid #222;
+      color: #444;
+      font-size: 12px;
+    }
+
+    .footer a {
+      color: #666;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: #00ffff;
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="dist/index.html">PB-Galaga</a>...</p>
+  <div class="hero">
+    <h1>PB-GALAGA</h1>
+    <p class="subtitle">A browser-based arcade space shooter inspired by the classics</p>
+    <a href="dist/index.html" class="play-btn">Play Now</a>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <h3>5 Levels</h3>
+      <p>Fight through waves of enemies from Earth orbit to the Mars colony</p>
+    </div>
+    <div class="feature">
+      <h3>Boss Fights</h3>
+      <p>Face the mothership with 6 turrets, fighters, and devastating firepower</p>
+    </div>
+    <div class="feature">
+      <h3>Co-op Mode</h3>
+      <p>Team up with a friend in 2-player cooperative gameplay</p>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Coming Soon</h3>
+      <p>Expanded campaign with new levels beyond Mars</p>
+    </div>
+    <div class="feature">
+      <h3>Better Music</h3>
+      <p>New chiptune tracks and refined audio across all levels</p>
+    </div>
+    <div class="feature">
+      <h3>More Enemies</h3>
+      <p>Refined enemy AI, new formations, and improved pixel-art graphics</p>
+    </div>
+  </div>
+
+  <div class="screenshots">
+    <h2>Screenshots</h2>
+    <div class="screenshot-grid">
+      <img src="screenshots/start-menu.png" alt="PB-Galaga start menu">
+      <img src="screenshots/gameplay.png" alt="PB-Galaga gameplay with enemy formation">
+      <img src="screenshots/post-explosion.png" alt="PB-Galaga combat">
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/jamesmiles/pb-galaga">GitHub</a>
+  </div>
 </body>
 </html>
