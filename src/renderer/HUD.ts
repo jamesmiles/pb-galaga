@@ -45,6 +45,17 @@ export function drawHUD(
   ctx.textAlign = 'left';
   ctx.fillText(`Engine: ${engineFps} | Render: ${renderFps}`, 10, 20);
 
+  // Primary weapon display (bottom-left)
+  if (p1) {
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#aaaaaa';
+    ctx.textAlign = 'left';
+    const primaryColor = p1.primaryWeapon === 'laser' ? '#4488ff' : '#ff4444';
+    const levelDots = '\u2588'.repeat(p1.primaryLevel) + '\u2591'.repeat(4 - p1.primaryLevel);
+    ctx.fillStyle = primaryColor;
+    ctx.fillText(`${p1.primaryWeapon.toUpperCase()} ${levelDots}`, 10, 780);
+  }
+
   // Secondary weapon timer (bottom-center bar)
   if (p1?.secondaryWeapon) {
     const barWidth = 100;
@@ -71,6 +82,35 @@ export function drawHUD(
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText(p1.secondaryWeapon.toUpperCase(), GAME_WIDTH / 2, barY - 4);
+  }
+
+  // Shield/health bar (bottom-right)
+  if (p1) {
+    const barWidth = 80;
+    const barHeight = 6;
+    const barX = GAME_WIDTH - barWidth - 10;
+    const barY = 780;
+    const healthPct = Math.max(0, p1.health / p1.maxHealth);
+
+    // Health bar color: green → yellow → red
+    let barColor: string;
+    if (healthPct > 0.6) barColor = '#44ff44';
+    else if (healthPct > 0.3) barColor = '#ffff44';
+    else barColor = '#ff4444';
+
+    // Background
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    // Fill
+    ctx.fillStyle = barColor;
+    ctx.fillRect(barX, barY, barWidth * healthPct, barHeight);
+
+    // Label
+    ctx.font = '10px monospace';
+    ctx.fillStyle = '#aaaaaa';
+    ctx.textAlign = 'right';
+    ctx.fillText('SHIELD', GAME_WIDTH - 10, barY - 4);
   }
 
   ctx.restore();

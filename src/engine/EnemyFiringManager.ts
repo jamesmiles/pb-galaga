@@ -2,6 +2,7 @@ import type { GameState, Enemy } from '../types';
 import { createEnemyLaser } from '../objects/projectiles/laser/code/Laser';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
 import { createPlasma } from '../objects/projectiles/plasma/code/Plasma';
+import { createEnemyHomingMissile } from '../objects/projectiles/missile/code/EnemyHoming';
 import { BULLET_SPEED } from './constants';
 
 /** Fire rate config per enemy fire mode (ms). */
@@ -10,6 +11,7 @@ const FIRE_RATE_CONFIG: Record<string, { base: number; jitter: number }> = {
   bullet: { base: 2000, jitter: 500 },
   plasma: { base: 2500, jitter: 400 },
   spread: { base: 4000, jitter: 600 },
+  homing: { base: 3500, jitter: 500 },
 };
 
 /**
@@ -92,6 +94,8 @@ export class EnemyFiringManager {
       projectile = createEnemyLaser(position, owner);
     } else if (enemy.fireMode === 'plasma') {
       projectile = createPlasma(position, owner);
+    } else if (enemy.fireMode === 'homing') {
+      projectile = createEnemyHomingMissile(position, owner);
     } else {
       projectile = createBullet(position, owner);
     }

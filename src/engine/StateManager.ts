@@ -1,4 +1,4 @@
-import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState } from '../types';
+import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup } from '../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_START_LIVES, PLAYER_MAX_HEALTH,
   FORMATION_BASE_SPEED, FORMATION_CELL_WIDTH, FORMATION_CELL_HEIGHT,
@@ -72,6 +72,8 @@ export function createInitialState(): GameState {
       selectedOption: 0,
       options: ['1 Player', '2 Players', 'Test Mode'],
     },
+    boss: null,
+    lifePickups: [],
   };
 }
 
@@ -114,6 +116,8 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.background = source.background;
   target.formation = source.formation;
   target.menu = source.menu;
+  target.boss = source.boss;
+  target.lifePickups = source.lifePickups;
 }
 
 /** Create a default player state. */

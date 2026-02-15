@@ -454,11 +454,7 @@ describe('GameManager', () => {
       for (let wave = 0; wave < 5; wave++) {
         gm.getState().enemies.forEach(e => { e.isAlive = false; });
         gm.tickHeadless(1);
-
-        // Wait for wave transition if not final
-        if (wave < 4) {
-          gm.tickHeadless(200); // ~3.3s to pass transition
-        }
+        gm.tickHeadless(200); // Pass wave transition or clearing delay
       }
 
       expect(gm.getState().gameStatus).toBe('levelcomplete');
@@ -474,7 +470,7 @@ describe('GameManager', () => {
       for (let wave = 0; wave < 5; wave++) {
         gm.getState().enemies.forEach(e => { e.isAlive = false; });
         gm.tickHeadless(1);
-        if (wave < 4) gm.tickHeadless(200);
+        gm.tickHeadless(200); // Pass wave transition or clearing delay
       }
 
       expect(gm.getState().gameStatus).toBe('levelcomplete');
@@ -497,7 +493,7 @@ describe('GameManager', () => {
       for (let wave = 0; wave < 5; wave++) {
         gm.getState().enemies.forEach(e => { e.isAlive = false; });
         gm.tickHeadless(1);
-        if (wave < 4) gm.tickHeadless(200);
+        gm.tickHeadless(200); // Pass wave transition or clearing delay
       }
 
       expect(gm.getState().gameStatus).toBe('levelcomplete');

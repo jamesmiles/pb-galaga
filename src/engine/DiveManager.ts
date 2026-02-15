@@ -15,6 +15,7 @@ const DIVE_SPEED_MULTIPLIER: Record<string, number> = {
   A: 1.0,
   B: 0.7,
   C: 1.5,
+  F: 0.8,
 };
 
 /** How far below screen before re-entry. */

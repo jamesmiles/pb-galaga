@@ -33,4 +33,5 @@ export const LEVEL_BACKGROUNDS: Record<number, BackgroundObjectConfig[]> = {
     { url: asteroidsBlueUrl, x: 550, y: 300, scale: 0.8, alpha: 0.14, scrollSpeed: 14 },
     { url: asteroidsPurpleUrl, x: 650, y: 600, scale: 0.7, alpha: 0.1, scrollSpeed: 10 },
   ],
+  5: [], // Mars + moon drawn procedurally in Canvas2DRenderer
 };

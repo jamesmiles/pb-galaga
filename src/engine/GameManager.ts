@@ -17,12 +17,15 @@ import { MusicManager } from '../audio/MusicManager';
 import { AsteroidManager } from './AsteroidManager';
 import { updateSecondaryTimer } from './WeaponManager';
 import { WeaponPickupManager } from './WeaponPickupManager';
+import { BossManager } from './BossManager';
+import { LifePickupManager } from './LifePickupManager';
 /** Intro text per level number. */
 const LEVEL_INTRO_TEXT: Record<number, string> = {
   1: '2029 AD, the invasion begins',
   2: 'planetary defence activated',
   3: 'dark side of the moon',
   4: 'approaching asteroid belt',
+  5: 'defeat the mars colony',
 };
 
 /** Milliseconds between each typed character. */
@@ -34,6 +37,7 @@ import { level1 } from '../levels/level1';
 import { level2 } from '../levels/level2';
 import { level3 } from '../levels/level3';
 import { level4 } from '../levels/level4';
+import { level5 } from '../levels/level5';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -55,6 +59,8 @@ export class GameManager {
   private diveManager: DiveManager;
   private asteroidManager: AsteroidManager;
   private weaponPickupManager: WeaponPickupManager;
+  private bossManager: BossManager;
+  private lifePickupManager: LifePickupManager;
   private introTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
@@ -71,10 +77,13 @@ export class GameManager {
     this.levelManager.registerLevel(level2);
     this.levelManager.registerLevel(level3);
     this.levelManager.registerLevel(level4);
+    this.levelManager.registerLevel(level5);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
     this.asteroidManager = new AsteroidManager();
     this.weaponPickupManager = new WeaponPickupManager();
+    this.bossManager = new BossManager();
+    this.lifePickupManager = new LifePickupManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
@@ -318,19 +327,27 @@ export class GameManager {
     this.enemyFiringManager.update(state, dtSeconds);
     if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
 
-    // 7. Update background, asteroids, and weapon pickups
+    // 6b. Boss update
+    this.bossManager.update(state, dtSeconds);
+
+    // Check if boss health reached 0 and start death sequence
+    if (state.boss?.isAlive && state.boss.health <= 0 && !state.boss.deathSequence) {
+      this.bossManager.startDeathSequence(state.boss);
+    }
+
+    // 7. Update background, asteroids, weapon pickups, and life pickups
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
     this.asteroidManager.update(state, dtSeconds * 1000);
     this.weaponPickupManager.updatePickups(state, dtSeconds * 1000);
+    this.lifePickupManager.update(state, dtSeconds * 1000);
 
     // 8. Level/wave progression
-    const waveBefore = state.currentWave;
     const waveStatusBefore = state.waveStatus;
     this.levelManager.update(state);
 
-    // Detect wave completion
+    // Detect wave completion (active → transition or clearing)
     if (waveStatusBefore === 'active' && state.waveStatus !== 'active') {
       // Award wave bonus to alive players
       for (const player of state.players) {
@@ -338,28 +355,36 @@ export class GameManager {
           player.score += WAVE_COMPLETE_BONUS;
         }
       }
+    }
 
-      // If waveStatus is 'complete' (no more waves), transition to level complete
-      if (state.waveStatus === 'complete') {
-        state.gameStatus = 'levelcomplete';
-        MusicManager.stop();
-        const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
-        const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
-        state.menu = {
-          type: 'levelcomplete',
-          selectedOption: 0,
-          options: hasNextLevel ? ['Next Level', 'Main Menu'] : ['Main Menu'],
-          data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
-        };
-        return;
-      }
+    // Detect clearing phase completing → level complete
+    if (waveStatusBefore === 'clearing' && state.waveStatus === 'complete') {
+      state.gameStatus = 'levelcomplete';
+      MusicManager.stop();
+      const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+      const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
+      state.menu = {
+        type: 'levelcomplete',
+        selectedOption: 0,
+        options: hasNextLevel ? ['Next Level', 'Main Menu'] : ['Main Menu'],
+        data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
+      };
+      return;
     }
 
     // 9. Collision detection — track deaths for type-specific sounds
     const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type }]));
     const asteroidHealthMap = new Map(state.asteroids.map(a => [a.id, { alive: a.isAlive, health: a.health }]));
+    const bossTurretAliveMap = state.boss ? new Map(state.boss.turrets.map(t => [t.id, t.isAlive])) : new Map<string, boolean>();
+    const bossHealthBefore = state.boss?.health ?? 0;
+    const lifePickupCountBefore = state.lifePickups.filter(p => p.isActive).length;
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
+    // Life pickup sound
+    const lifePickupCountAfter = state.lifePickups.filter(p => p.isActive).length;
+    if (lifePickupCountAfter < lifePickupCountBefore) {
+      SoundManager.play('lifePickup');
+    }
     for (const enemy of state.enemies) {
       const before = enemyAliveMap.get(enemy.id);
       if (before?.alive && !enemy.isAlive) {
@@ -377,6 +402,19 @@ export class GameManager {
         } else if (asteroid.health < before.health) {
           SoundManager.play('asteroidHit');
         }
+      }
+    }
+    // Boss turret death sounds
+    if (state.boss) {
+      for (const turret of state.boss.turrets) {
+        const wasBefore = bossTurretAliveMap.get(turret.id);
+        if (wasBefore && !turret.isAlive) {
+          SoundManager.play('bossExplosion');
+        }
+      }
+      // Boss bridge hit sound
+      if (state.boss.health < bossHealthBefore && state.boss.health > 0) {
+        SoundManager.play('hitF');
       }
     }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
@@ -504,8 +542,11 @@ export class GameManager {
         const nextLevel = state.currentLevel + 1;
         state.enemies = [];
         state.projectiles = [];
+        state.boss = null;
+        state.lifePickups = [];
         this.enemyFiringManager.reset();
         this.diveManager.reset();
+        this.lifePickupManager.reset();
         this.startLevelIntro(state, nextLevel);
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();

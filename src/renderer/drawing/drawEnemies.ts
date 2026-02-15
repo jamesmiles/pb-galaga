@@ -8,6 +8,7 @@ const ENEMY_COLORS: Record<string, { fill: string; glow: string; accent: string 
   C: { fill: '#ff5500', glow: '#ff5500', accent: '#ff8822' },
   D: { fill: '#ff00ff', glow: '#ff00ff', accent: '#ff66ff' },
   E: { fill: '#ffff00', glow: '#ffff00', accent: '#ffff66' },
+  F: { fill: '#00ff88', glow: '#00ff88', accent: '#44ffaa' },
 };
 
 /**
@@ -39,6 +40,8 @@ export function drawEnemies(
       drawEnemyC(ctx, pos.x, pos.y, colors);
     } else if (enemy.type === 'D') {
       drawEnemyD(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'F') {
+      drawEnemyF(ctx, pos.x, pos.y, colors);
     } else {
       drawEnemyE(ctx, pos.x, pos.y, colors);
     }
@@ -226,4 +229,45 @@ function drawEnemyE(
   ctx.fillStyle = colors.accent;
   ctx.fillRect(x - 17, y - 8, 3, 2);
   ctx.fillRect(x + 14, y - 8, 3, 2);
+}
+
+/** Type F: Stealth Bomber — wide angular stealth shape with green tint */
+function drawEnemyF(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Wide stealth body — angular bat-wing shape (nose facing down)
+  ctx.beginPath();
+  ctx.moveTo(x, y + 10);           // Nose (bottom-center)
+  ctx.lineTo(x - 20, y - 8);      // Left wingtip leading edge
+  ctx.lineTo(x - 16, y - 12);     // Left wingtip trailing
+  ctx.lineTo(x - 6, y - 4);       // Left inner notch
+  ctx.lineTo(x, y - 8);           // Center trailing
+  ctx.lineTo(x + 6, y - 4);       // Right inner notch
+  ctx.lineTo(x + 16, y - 12);     // Right wingtip trailing
+  ctx.lineTo(x + 20, y - 8);      // Right wingtip leading edge
+  ctx.closePath();
+  ctx.fill();
+
+  // Engine pods (accent)
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 10, y - 6, 4, 4);
+  ctx.fillRect(x + 6, y - 6, 4, 4);
+
+  // Central missile bay (darker)
+  ctx.fillStyle = '#006644';
+  ctx.fillRect(x - 3, y + 2, 6, 4);
+
+  // Cockpit slit (menacing red)
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff2222';
+  ctx.fillRect(x - 4, y - 1, 8, 2);
+
+  // Wingtip markers
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 19, y - 10, 3, 2);
+  ctx.fillRect(x + 16, y - 10, 3, 2);
 }

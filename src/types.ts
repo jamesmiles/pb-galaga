@@ -87,14 +87,14 @@ export interface FlightPathState {
 
 export interface Enemy {
   id: string;
-  type: 'A' | 'B' | 'C' | 'D' | 'E';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
   position: Vector2D;
   velocity: Vector2D;
   rotation: number;
   isAlive: boolean;
   health: number;
   maxHealth: number;
-  fireMode: 'none' | 'laser' | 'bullet' | 'plasma' | 'spread';
+  fireMode: 'none' | 'laser' | 'bullet' | 'plasma' | 'spread' | 'homing';
   fireCooldown: number;
   fireRate: number;
   isThrusting: boolean;
@@ -135,6 +135,59 @@ export interface Projectile {
   turnRate?: number;
   isHoming?: boolean;
   homingDelay?: number;
+}
+
+// --- Boss ---
+
+export interface BossTurret {
+  id: string;
+  position: Vector2D;       // Absolute position (updated from boss center + offset)
+  offsetX: number;           // Relative to boss center
+  offsetY: number;
+  health: number;
+  maxHealth: number;
+  isAlive: boolean;
+  fireCooldown: number;
+  fireRate: number;
+  collisionRadius: number;
+}
+
+export interface BossDeathSequence {
+  phase: number;             // 0-4 (turrets 0-3, then bridge=4)
+  timer: number;
+  phaseDuration: number;
+}
+
+export interface CollisionZone {
+  offsetX: number;           // Relative to boss center
+  offsetY: number;
+  width: number;
+  height: number;
+}
+
+export interface BossState {
+  position: Vector2D;
+  velocity: Vector2D;
+  width: number;
+  height: number;
+  isAlive: boolean;
+  health: number;
+  maxHealth: number;
+  turrets: BossTurret[];
+  layer: 'entering' | 'active' | 'dying';
+  deathSequence: BossDeathSequence | null;
+  scoreValue: number;
+  upperCollisionZones: CollisionZone[];
+}
+
+// --- Life Pickup ---
+
+export interface LifePickup {
+  id: string;
+  position: Vector2D;
+  velocity: Vector2D;
+  isActive: boolean;
+  lifetime: number;
 }
 
 // --- Weapon Pickup ---
@@ -238,7 +291,7 @@ export interface GameState {
   gameStatus: GameStatus;
   currentLevel: number;
   currentWave: number;
-  waveStatus: 'active' | 'complete' | 'transition';
+  waveStatus: 'active' | 'complete' | 'transition' | 'clearing';
   players: Player[];
   enemies: Enemy[];
   projectiles: Projectile[];
@@ -248,11 +301,13 @@ export interface GameState {
   background: BackgroundState;
   formation: FormationState;
   menu: MenuState | null;
+  boss: BossState | null;
+  lifePickups: LifePickup[];
 }
 
 // --- Level Config ---
 
-export type FormationType = 'line' | 'v-formation' | 'swarm' | 'grid' | 'w-curve' | 'chiral' | 'diagonal' | 'side-wave' | 'm-shape' | 'inverted-v';
+export type FormationType = 'line' | 'v-formation' | 'swarm' | 'grid' | 'w-curve' | 'chiral' | 'diagonal' | 'side-wave' | 'm-shape' | 'inverted-v' | 'x-formation';
 
 export interface LevelConfig {
   levelNumber: number;
@@ -261,7 +316,7 @@ export interface LevelConfig {
 }
 
 export interface WaveSlot {
-  type: 'A' | 'B' | 'C' | 'D' | 'E';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
   row: number;
   col: number;
 }
@@ -272,10 +327,11 @@ export interface WaveConfig {
   delay: number;
   formation?: FormationType;  // Wave-level formation type (used with slots)
   slots?: WaveSlot[];         // Explicit enemy placement; overrides enemies array
+  bossSpawn?: boolean;        // If true, spawn boss instead of formation enemies
 }
 
 export interface EnemySpawnConfig {
-  type: 'A' | 'B' | 'C' | 'D' | 'E';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
   count: number;
   formation: FormationType;
   rows: number;

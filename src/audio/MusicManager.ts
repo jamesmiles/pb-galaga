@@ -3,7 +3,7 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
 
 /**
  * Simple chiptune song data in ZzFXM format.
@@ -225,12 +225,55 @@ const LEVEL4_SONG: ZzFXMSong = [
   165, // BPM
 ];
 
+// Level 5 theme: epic boss battle, 3-channel, 175 BPM
+// Aggressive stabs, heavy bass drops, relentless rhythm
+const LEVEL5_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Aggressive lead synth (square, distorted)
+    [0.4, 0.1, 330, 0, 0.06, 0.05, 2, 1, 0.3, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.02, 0],
+    // 1: Heavy sub bass (sine, punishing)
+    [0.45, 0, 55, 0.01, 0.3, 0.25, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.06, 0],
+    // 2: Rapid snare/kick (noise, aggressive)
+    [0.35, 0, 120, 0, 0.02, 0.04, 4, 1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0.3, 0.01, 0],
+  ],
+  // Patterns
+  [
+    // Pattern 0: Boss approach — menacing stabs
+    [
+      // Channel 0: Stabby lead
+      [72, 0, 0, 72, 0, 0, 0, undefined, 0, 75, 0, 0, 72, 0, 0, 0, undefined, 0, 79, 0, 0, 77, 0, 0],
+      // Channel 1: Pounding bass
+      [36, 1, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 34, 1, 0, 34, 1, 0, 36, 1, 0, 0, undefined, 0],
+      // Channel 2: Relentless drums
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
+    ],
+    // Pattern 1: Battle intensity — chromatic chaos
+    [
+      // Channel 0: Aggressive chromatic riffs
+      [79, 0, 0, 77, 0, 0, 75, 0, 0, 77, 0, 0, 82, 0, 0, 79, 0, 0, 75, 0, 0, 72, 0, 0],
+      // Channel 1: Heavy drops
+      [36, 1, 0, 36, 1, 0, 0, undefined, 0, 34, 1, 0, 36, 1, 0, 0, undefined, 0, 39, 1, 0, 36, 1, 0],
+      // Channel 2: Double-time hits
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 1, 0, 1], // Channel 0
+    [0, 1, 0, 1], // Channel 1
+    [0, 1, 0, 1], // Channel 2
+  ],
+  175, // BPM — intense boss battle
+];
+
 const TRACKS: Record<MusicTrack, ZzFXMSong> = {
   menu: MENU_SONG,
   level1: LEVEL1_SONG,
   level2: LEVEL2_SONG,
   level3: LEVEL3_SONG,
   level4: LEVEL4_SONG,
+  level5: LEVEL5_SONG,
 };
 
 /**

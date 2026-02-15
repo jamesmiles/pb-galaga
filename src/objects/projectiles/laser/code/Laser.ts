@@ -61,21 +61,28 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
     proj.homingDelay -= dtMs;
   }
 
-  // Homing: steer toward nearest alive enemy
+  // Homing: steer toward nearest target
   if (proj.isHoming && proj.turnRate && state &&
       (proj.homingDelay === undefined || proj.homingDelay <= 0)) {
-    const enemies = state.enemies.filter(e => e.isAlive);
-    if (enemies.length > 0) {
-      // Find nearest enemy
-      let nearest = enemies[0];
+    // Enemy-fired homing targets players; player-fired homing targets enemies
+    let targets: { position: { x: number; y: number } }[];
+    if (proj.owner.type === 'enemy') {
+      targets = state.players.filter(p => p.isAlive);
+    } else {
+      targets = state.enemies.filter(e => e.isAlive);
+    }
+
+    if (targets.length > 0) {
+      // Find nearest target
+      let nearest = targets[0];
       let nearestDist = Infinity;
-      for (const e of enemies) {
-        const dx = e.position.x - proj.position.x;
-        const dy = e.position.y - proj.position.y;
+      for (const t of targets) {
+        const dx = t.position.x - proj.position.x;
+        const dy = t.position.y - proj.position.y;
         const dist = dx * dx + dy * dy;
         if (dist < nearestDist) {
           nearestDist = dist;
-          nearest = e;
+          nearest = t;
         }
       }
 

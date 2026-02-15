@@ -1,0 +1,114 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { BossManager } from './BossManager';
+import { createBoss } from '../objects/boss/code/Boss';
+import { createInitialState, createPlayer } from './StateManager';
+import { BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION, GAME_WIDTH } from './constants';
+import type { GameState } from '../types';
+
+describe('BossManager', () => {
+  let manager: BossManager;
+  let state: GameState;
+
+  beforeEach(() => {
+    manager = new BossManager();
+    state = createInitialState();
+    state.gameStatus = 'playing';
+    state.players = [createPlayer('player1')];
+    state.boss = createBoss();
+  });
+
+  describe('entry phase', () => {
+    it('drifts boss downward during entry', () => {
+      const yBefore = state.boss!.position.y;
+      manager.update(state, 1); // 1 second
+      expect(state.boss!.position.y).toBeGreaterThan(yBefore);
+    });
+
+    it('transitions to active when reaching target Y', () => {
+      expect(state.boss!.layer).toBe('entering');
+      // Fast-forward entry
+      manager.update(state, 10); // Should reach target
+      expect(state.boss!.layer).toBe('active');
+    });
+  });
+
+  describe('active phase', () => {
+    beforeEach(() => {
+      // Skip entry
+      state.boss!.layer = 'active';
+      state.boss!.position.y = 120;
+    });
+
+    it('oscillates horizontally', () => {
+      state.currentTime = 0;
+      manager.update(state, 0.5);
+      const x1 = state.boss!.position.x;
+
+      state.currentTime = 500; // Quarter cycle of oscillation
+      manager.update(state, 0.5);
+      const x2 = state.boss!.position.x;
+
+      // Position should change as time changes
+      expect(Math.abs(x1 - x2)).toBeGreaterThan(0.01);
+    });
+
+    it('turrets fire bullets', () => {
+      // Set low cooldowns to trigger fire
+      for (const turret of state.boss!.turrets) {
+        turret.fireCooldown = 0;
+      }
+
+      const projsBefore = state.projectiles.length;
+      manager.update(state, 0.1);
+      expect(state.projectiles.length).toBeGreaterThan(projsBefore);
+    });
+
+    it('updates turret positions relative to boss', () => {
+      manager.update(state, 0.1);
+      for (const turret of state.boss!.turrets) {
+        expect(turret.position.x).toBeCloseTo(
+          state.boss!.position.x + turret.offsetX, 0,
+        );
+      }
+    });
+  });
+
+  describe('death sequence', () => {
+    beforeEach(() => {
+      state.boss!.layer = 'active';
+      state.boss!.position.y = 120;
+    });
+
+    it('starts death sequence correctly', () => {
+      manager.startDeathSequence(state.boss!);
+      expect(state.boss!.layer).toBe('dying');
+      expect(state.boss!.deathSequence).not.toBeNull();
+      expect(state.boss!.deathSequence!.phase).toBe(0);
+    });
+
+    it('progresses through 5 death phases', () => {
+      manager.startDeathSequence(state.boss!);
+
+      for (let i = 0; i < 5; i++) {
+        const dtMs = BOSS_DEATH_PHASE_DURATION + 100;
+        manager.update(state, dtMs / 1000);
+      }
+
+      // After all phases, boss should be dead
+      expect(state.boss!.isAlive).toBe(false);
+      expect(state.boss!.deathSequence).toBeNull();
+    });
+
+    it('awards score to alive players after death', () => {
+      const scoreBefore = state.players[0].score;
+      manager.startDeathSequence(state.boss!);
+
+      // Fast-forward through all phases
+      for (let i = 0; i < 6; i++) {
+        manager.update(state, (BOSS_DEATH_PHASE_DURATION + 100) / 1000);
+      }
+
+      expect(state.players[0].score).toBeGreaterThan(scoreBefore);
+    });
+  });
+});

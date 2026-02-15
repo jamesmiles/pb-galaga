@@ -4,6 +4,7 @@ import { createInitialState, createPlayer } from './StateManager';
 import { createEnemyA } from '../objects/enemies/enemyA/code/EnemyA';
 import { createLaser, createEnemyLaser } from '../objects/projectiles/laser/code/Laser';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
+import { createBoss } from '../objects/boss/code/Boss';
 
 describe('CollisionDetector', () => {
   describe('player-enemy collisions', () => {
@@ -391,6 +392,135 @@ describe('CollisionDetector', () => {
       expect(bullet.isActive).toBe(true);
       expect(bullet.hasCollided).toBe(false);
       expect(state.asteroids[0].health).toBe(100);
+    });
+  });
+
+  describe('boss collisions', () => {
+    it('player projectile damages boss turret', () => {
+      const state = createInitialState();
+      state.players = [createPlayer('player1')];
+      state.boss = createBoss();
+      state.boss.layer = 'active';
+      state.boss.position = { x: 400, y: 120 };
+      // Update turret positions
+      for (const t of state.boss.turrets) {
+        t.position = { x: state.boss.position.x + t.offsetX, y: state.boss.position.y + t.offsetY };
+      }
+
+      const turret = state.boss.turrets[0];
+      const laser = createLaser({ x: turret.position.x, y: turret.position.y }, { type: 'player', id: 'player1' });
+      state.projectiles = [laser];
+
+      const healthBefore = turret.health;
+      detectCollisions(state);
+
+      expect(turret.health).toBeLessThan(healthBefore);
+      expect(laser.hasCollided).toBe(true);
+    });
+
+    it('bridge is immune while turrets alive', () => {
+      const state = createInitialState();
+      state.players = [createPlayer('player1')];
+      state.boss = createBoss();
+      state.boss.layer = 'active';
+      state.boss.position = { x: 400, y: 120 };
+
+      // Fire at bridge center (turrets still alive)
+      const laser = createLaser(
+        { x: 400, y: 120 },
+        { type: 'player', id: 'player1' },
+      );
+      state.projectiles = [laser];
+
+      const healthBefore = state.boss.health;
+      detectCollisions(state);
+
+      // Bridge health shouldn't change — it may hit a turret instead
+      // The key test is that bridge health is unchanged
+      expect(state.boss.health).toBe(healthBefore);
+    });
+
+    it('bridge takes damage after all turrets destroyed', () => {
+      const state = createInitialState();
+      state.players = [createPlayer('player1')];
+      state.boss = createBoss();
+      state.boss.layer = 'active';
+      state.boss.position = { x: 400, y: 120 };
+
+      // Kill all turrets
+      for (const t of state.boss.turrets) {
+        t.isAlive = false;
+      }
+
+      // Fire at bridge center
+      const laser = createLaser(
+        { x: 400, y: state.boss.position.y },
+        { type: 'player', id: 'player1' },
+      );
+      state.projectiles = [laser];
+
+      const healthBefore = state.boss.health;
+      detectCollisions(state);
+
+      expect(state.boss.health).toBeLessThan(healthBefore);
+    });
+
+    it('player dies on collision with boss upper zone', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      state.players = [player];
+      state.boss = createBoss();
+      state.boss.layer = 'active';
+      state.boss.position = { x: 400, y: 120 };
+
+      // Position player inside the upper collision zone
+      const zone = state.boss.upperCollisionZones[0];
+      player.position = {
+        x: state.boss.position.x + zone.offsetX,
+        y: state.boss.position.y + zone.offsetY,
+      };
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(false);
+    });
+
+    it('player is not hit by boss during entry phase', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      state.players = [player];
+      state.boss = createBoss();
+      // layer stays 'entering'
+
+      player.position = { x: state.boss.position.x, y: state.boss.position.y };
+
+      detectCollisions(state);
+
+      expect(player.isAlive).toBe(true);
+    });
+  });
+
+  describe('life pickup collisions', () => {
+    it('player picks up life and gains extra life', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.position = { x: 100, y: 100 };
+      state.players = [player];
+      state.lifePickups = [{
+        id: 'life-0',
+        position: { x: 100, y: 100 },
+        velocity: { x: 0, y: 50 },
+        isActive: true,
+        lifetime: 0,
+      }];
+
+      const livesBefore = player.lives;
+      detectCollisions(state);
+
+      expect(player.lives).toBe(livesBefore + 1);
+      expect(state.lifePickups[0].isActive).toBe(false);
     });
   });
 });

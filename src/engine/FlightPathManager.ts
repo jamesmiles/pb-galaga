@@ -11,6 +11,7 @@ const ENTRY_SPEED_MULTIPLIER: Record<string, number> = {
   C: 1.3,
   D: 1.1,
   E: 0.6,
+  F: 0.7,
 };
 
 /**
@@ -74,6 +75,7 @@ export function generateFlightPaths(
     'side-wave': generateSideWavePaths,
     'm-shape': generateMShapePaths,
     'inverted-v': generateInvertedVPaths,
+    'x-formation': generateXFormationPaths,
   };
 
   const gen = generators[formation];
@@ -320,6 +322,38 @@ function generateInvertedVPaths(enemies: Enemy[], fs: FormationState): void {
       { x: startX, y: startY },
       { x: convergenceX, y: convergenceY },
       { x: target.x + (isLeftSide ? -30 : 30), y: target.y - 40 },
+      target,
+    ];
+    createFlightPath(enemy, controlPoints, fs);
+  }
+}
+
+/**
+ * X-formation: Enemies enter from top-left and top-right corners,
+ * cross through the center forming an X pattern, then curve to formation slots.
+ */
+function generateXFormationPaths(enemies: Enemy[], fs: FormationState): void {
+  const cx = GAME_WIDTH / 2;
+  const count = enemies.length;
+
+  for (let i = 0; i < count; i++) {
+    const enemy = enemies[i];
+    const target = getSlotPosition(enemy, fs);
+    const fromLeft = i % 2 === 0;
+    const stagger = Math.floor(i / 2) * 15;
+
+    // Start from opposite top corners
+    const startX = fromLeft ? -20 : GAME_WIDTH + 20;
+    const startY = -20 + stagger;
+
+    // Cross through center — each side crosses to the opposite
+    const crossX = fromLeft ? GAME_WIDTH * 0.65 : GAME_WIDTH * 0.35;
+    const crossY = GAME_HEIGHT * 0.3 + stagger * 0.5;
+
+    const controlPoints: Vector2D[] = [
+      { x: startX, y: startY },
+      { x: crossX, y: crossY },
+      { x: target.x + (fromLeft ? 30 : -30), y: target.y - 40 },
       target,
     ];
     createFlightPath(enemy, controlPoints, fs);

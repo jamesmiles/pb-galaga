@@ -77,7 +77,7 @@ describe('evaluateBezier', () => {
 });
 
 describe('generateFlightPaths', () => {
-  const formationTypes: FormationType[] = ['w-curve', 'chiral', 'diagonal', 'side-wave', 'm-shape', 'inverted-v'];
+  const formationTypes: FormationType[] = ['w-curve', 'chiral', 'diagonal', 'side-wave', 'm-shape', 'inverted-v', 'x-formation'];
 
   for (const type of formationTypes) {
     it(`generates paths for ${type} formation`, () => {

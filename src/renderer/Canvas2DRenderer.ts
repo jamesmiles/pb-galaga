@@ -5,6 +5,7 @@ import { drawStars } from './drawing/drawStars';
 import { drawPlayers } from './drawing/drawPlayer';
 import { drawEnemies } from './drawing/drawEnemies';
 import { drawProjectiles } from './drawing/drawProjectiles';
+import { drawBossLower, drawBossUpper, drawLifePickups } from './drawing/drawBoss';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
 import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
@@ -31,6 +32,13 @@ export class Canvas2DRenderer implements GameRenderer {
 
   // Track game status for cleanup transitions
   private lastGameStatus = '';
+
+  // Track boss state for death explosion detection
+  private lastBossTurretAlive: boolean[] = [];
+  private lastBossHealth = 0;
+
+  // Procedural Mars background scroll
+  private marsScrollY = 0;
 
   // Background image system
   private bgImageCache: Map<string, HTMLImageElement> = new Map();
@@ -88,6 +96,11 @@ export class Canvas2DRenderer implements GameRenderer {
     const bgDt = current.gameStatus === 'paused' ? 0 : renderDt;
     this.drawBackgrounds(ctx, current.currentLevel, bgDt);
 
+    // Level 5 procedural Mars background
+    if (current.currentLevel === 5) {
+      this.drawMarsBackground(ctx, bgDt);
+    }
+
     // Update particles (runs regardless of game status for lingering effects)
     this.particleSystem.update(renderDt);
 
@@ -137,11 +150,24 @@ export class Canvas2DRenderer implements GameRenderer {
     if (current.background) {
       drawStars(ctx, current.background.stars);
     }
+
+    // Boss lower hull (behind everything gameplay-related)
+    if (current.boss) {
+      drawBossLower(ctx, current.boss);
+    }
+
     drawEnemies(ctx, current.enemies, prevEnemies, alpha);
     drawProjectiles(ctx, current.projectiles, prevProjectiles, alpha);
     this.drawAsteroids(ctx, current.asteroids);
     this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
+    drawLifePickups(ctx, current.lifePickups, current.currentTime);
     drawPlayers(ctx, current.players, prevPlayers, alpha, current.currentTime);
+
+    // Boss upper layer (turrets + bridge, in front of player)
+    if (current.boss) {
+      drawBossUpper(ctx, current.boss);
+    }
+
     this.particleSystem.draw(ctx);
 
     ctx.restore();
@@ -190,6 +216,59 @@ export class Canvas2DRenderer implements GameRenderer {
           asteroid.position.y,
           asteroid.id,
           'asteroid',
+        );
+      }
+    }
+
+    // Boss turret and bridge death explosions
+    if (current.boss) {
+      for (let i = 0; i < current.boss.turrets.length; i++) {
+        const turret = current.boss.turrets[i];
+        const wasBefore = this.lastBossTurretAlive[i] ?? true;
+        if (wasBefore && !turret.isAlive) {
+          this.particleSystem.emitLargeExplosion(
+            turret.position.x, turret.position.y,
+            turret.id, 'bossTurret',
+          );
+        }
+      }
+      this.lastBossTurretAlive = current.boss.turrets.map(t => t.isAlive);
+
+      // Boss bridge death (boss health goes to 0)
+      if (this.lastBossHealth > 0 && current.boss.health <= 0 && current.boss.deathSequence) {
+        this.particleSystem.emitLargeExplosion(
+          current.boss.position.x, current.boss.position.y,
+          'boss-bridge', 'bossBridge',
+        );
+      }
+      this.lastBossHealth = current.boss.health;
+
+      // Death sequence phase explosions
+      if (current.boss.deathSequence) {
+        const phase = current.boss.deathSequence.phase;
+        if (phase < 4) {
+          const turret = current.boss.turrets[phase];
+          if (turret) {
+            this.particleSystem.emitLargeExplosion(
+              turret.position.x, turret.position.y,
+              `boss-death-phase-${phase}`, 'bossTurret',
+            );
+          }
+        } else if (phase === 4) {
+          this.particleSystem.emitLargeExplosion(
+            current.boss.position.x, current.boss.position.y,
+            'boss-death-final', 'bossBridge',
+          );
+        }
+      }
+    }
+
+    // Enemy F large explosions
+    for (const enemy of current.enemies) {
+      if (!enemy.isAlive && enemy.collisionState === 'destroyed' && enemy.type === 'F') {
+        this.particleSystem.emitLargeExplosion(
+          enemy.position.x, enemy.position.y,
+          `${enemy.id}-large`, 'F',
         );
       }
     }
@@ -252,6 +331,70 @@ export class Canvas2DRenderer implements GameRenderer {
       ctx.save();
       ctx.globalAlpha = config.alpha;
       ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
+      ctx.restore();
+    }
+  }
+
+  /** Draw procedural Mars planet and small moon for Level 5. */
+  private drawMarsBackground(ctx: CanvasRenderingContext2D, dt: number): void {
+    this.marsScrollY += 8 * dt / 1000; // Slow drift
+
+    // Mars — large reddish planet
+    const marsX = 350;
+    const marsY = -150 + this.marsScrollY;
+    const marsR = 180;
+
+    if (marsY + marsR > -20 && marsY - marsR < GAME_HEIGHT + 20) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+
+      // Mars body
+      const marsGrad = ctx.createRadialGradient(marsX - 30, marsY - 30, 0, marsX, marsY, marsR);
+      marsGrad.addColorStop(0, '#cc6633');
+      marsGrad.addColorStop(0.6, '#993322');
+      marsGrad.addColorStop(1, '#661111');
+      ctx.fillStyle = marsGrad;
+      ctx.beginPath();
+      ctx.arc(marsX, marsY, marsR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Surface features (dark patches)
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#442211';
+      ctx.beginPath();
+      ctx.arc(marsX - 40, marsY + 20, 50, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(marsX + 60, marsY - 30, 35, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Small moon — orbiting nearby
+    const moonX = 620;
+    const moonY = -50 + this.marsScrollY * 1.3; // Slightly faster
+    const moonR = 25;
+
+    if (moonY + moonR > -20 && moonY - moonR < GAME_HEIGHT + 20) {
+      ctx.save();
+      ctx.globalAlpha = 0.12;
+
+      const moonGrad = ctx.createRadialGradient(moonX - 5, moonY - 5, 0, moonX, moonY, moonR);
+      moonGrad.addColorStop(0, '#aaaaaa');
+      moonGrad.addColorStop(1, '#555555');
+      ctx.fillStyle = moonGrad;
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Crater
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#333333';
+      ctx.beginPath();
+      ctx.arc(moonX + 5, moonY - 5, 8, 0, Math.PI * 2);
+      ctx.fill();
+
       ctx.restore();
     }
   }
