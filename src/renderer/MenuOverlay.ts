@@ -98,7 +98,7 @@ const MENU_STYLES = `
     position: absolute;
     bottom: 12px;
     font-size: 12px;
-    color: #444;
+    color: #44ff44;
   }
 
   .intro-level-label {
