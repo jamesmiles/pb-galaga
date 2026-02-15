@@ -40,6 +40,11 @@ const MENU_STYLES = `
     color: #44ff44;
   }
 
+  .menu-title.gamecomplete {
+    color: #ffdd00;
+    text-shadow: 0 0 12px #ffdd00, 0 0 30px #ff8800;
+  }
+
   .menu-subtitle {
     font-size: 16px;
     color: #88aacc;
@@ -152,7 +157,7 @@ export class MenuOverlay {
   /** Update the overlay based on current game state. Called each render frame. */
   update(state: GameState): void {
     const menu = state.menu;
-    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete' || state.gameStatus === 'levelintro';
+    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete' || state.gameStatus === 'levelintro' || state.gameStatus === 'gamecomplete';
 
     if (!showMenu || !menu) {
       this.hide();
@@ -240,6 +245,21 @@ export class MenuOverlay {
         <div class="menu-title levelcomplete">${levelLabel}</div>
         ${scoreHtml}
         ${this.buildOptions(options)}
+      `;
+    } else if (type === 'gamecomplete') {
+      const text = (data?.introText as string) ?? '';
+      const chars = (data?.introChars as number) ?? 0;
+      const revealed = text.slice(0, chars).replace(/\n/g, '<br>');
+      const done = chars >= text.length;
+      let scoreHtml = '';
+      if (data?.finalScore !== undefined) {
+        scoreHtml += `<div class="menu-score">Final Score: ${data.finalScore}</div>`;
+      }
+      this.overlay.innerHTML = `
+        <div class="menu-title gamecomplete">MISSION COMPLETE</div>
+        ${scoreHtml}
+        <div class="intro-typing">${revealed}${done ? '' : '<span class="intro-cursor">_</span>'}</div>
+        ${done ? this.buildOptions(options) : ''}
       `;
     }
   }

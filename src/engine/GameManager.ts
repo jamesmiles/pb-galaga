@@ -147,6 +147,9 @@ export class GameManager {
       case 'levelintro':
         this.updateLevelIntro(state);
         break;
+      case 'gamecomplete':
+        this.updateGameComplete(state);
+        break;
     }
   }
 
@@ -357,18 +360,36 @@ export class GameManager {
       }
     }
 
-    // Detect clearing phase completing → level complete
+    // Detect clearing phase completing → level complete or game complete
     if (waveStatusBefore === 'clearing' && state.waveStatus === 'complete') {
-      state.gameStatus = 'levelcomplete';
       MusicManager.stop();
       const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
       const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
-      state.menu = {
-        type: 'levelcomplete',
-        selectedOption: 0,
-        options: hasNextLevel ? ['Next Level', 'Main Menu'] : ['Main Menu'],
-        data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
-      };
+
+      if (!hasNextLevel) {
+        // Final level complete — game complete sequence
+        const playerName = state.players.length > 1 ? 'space force' : 'space force';
+        state.gameStatus = 'gamecomplete';
+        this.introTimer = 0;
+        state.menu = {
+          type: 'gamecomplete',
+          selectedOption: 0,
+          options: ['Main Menu'],
+          data: {
+            finalScore: totalScore,
+            introText: `mission complete // ${new Date().toISOString().slice(0, 10)}\n\nspace force has defeated the mothership.\n\nbut long range sensors detect survivors\nregrouping on the martian surface...\n\n... coming soon`,
+            introChars: 0,
+          },
+        };
+      } else {
+        state.gameStatus = 'levelcomplete';
+        state.menu = {
+          type: 'levelcomplete',
+          selectedOption: 0,
+          options: ['Next Level', 'Main Menu'],
+          data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
+        };
+      }
       return;
     }
 
@@ -553,6 +574,46 @@ export class GameManager {
         this.stateManager.currentState.background = createBackground();
         MusicManager.play('menu');
       }
+    }
+  }
+
+  private updateGameComplete(state: GameState): void {
+    if (!state.menu?.data) return;
+    const data = state.menu.data;
+    const fullText = data.introText ?? '';
+    const revealed = data.introChars ?? 0;
+
+    this.introTimer += state.deltaTime;
+
+    if (revealed < fullText.length) {
+      // Typing animation — same as level intro
+      const charsToReveal = Math.min(
+        Math.floor(this.introTimer / TYPING_SPEED),
+        fullText.length,
+      );
+      if (charsToReveal > revealed) {
+        if (fullText[charsToReveal - 1] !== ' ') {
+          SoundManager.play('typeKey');
+        }
+        state.menu = {
+          ...state.menu,
+          data: { ...data, introChars: charsToReveal },
+        };
+      }
+    } else {
+      // Typing done — handle menu input
+      const menuInput = this.inputHandler.getMenuInput();
+      if (menuInput.confirm) {
+        SoundManager.play('menuSelect');
+        this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
+      }
+    }
+
+    // Update background during sequence
+    if (state.background) {
+      updateBackground(state.background, state.deltaTime / 1000);
     }
   }
 
