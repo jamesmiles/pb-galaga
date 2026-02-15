@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.8.2';
+export const GAME_VERSION = '0.8.3';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -135,7 +135,7 @@ export const ASTEROID_SPEED_MAX = 80; // px/s
 export const ASTEROID_DAMAGE = 50;
 
 // Weapon pickup defaults
-export const WEAPON_PICKUP_DROP_CHANCE = 0.15; // 15% per enemy kill
+export const WEAPON_PICKUP_DROP_CHANCE = 0.08; // 8% per enemy kill
 export const WEAPON_PICKUP_CYCLE_INTERVAL = 5000; // ms between type flips
 export const WEAPON_PICKUP_SPEED = 60; // px/s downward drift
 export const WEAPON_PICKUP_LIFETIME = 10000; // ms
