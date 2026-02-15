@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -45,8 +45,10 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   bossExplosion: [3, 0.12, 40, 0.04, 0.5, 1.2, 3, 1, -12, -4, 0, 0, 0, 2, 0, 0, 0.2, 0.25, 0.4, 0],
   // Life pickup: bright cheerful chime
   lifePickup: [0.4, 0, 800, 0, 0.02, 0.08, 0, 1, 10, 0, 400, 0.02, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
-  // Mini-boss hit: heavy resonant explosion (between F and boss)
+  // Mini-boss death: heavy resonant explosion (between F and boss)
   hitG: [1, 0.08, 80, 0.03, 0.15, 0.4, 3, 1, -10, -3, 0, 0, 0, 1.2, 0, 0, 0.1, 0.2, 0.2, 0],
+  // Mini-boss per-hit: short metallic clang (high freq, sharp attack, ring-out)
+  hitGClang: [0.4, 0.02, 1800, 0, 0.01, 0.06, 0, 0.5, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.03, 0],
   // Respawn pickup: dramatic ascending power-up fanfare (two-tone rising chime)
   respawnPickup: [0.6, 0, 500, 0.01, 0.06, 0.15, 0, 1, 15, 3, 600, 0.04, 0.08, 0, 0, 0, 0, 0.8, 0.04, 0],
 };
