@@ -405,7 +405,7 @@ export class GameManager {
     }
 
     // 9. Collision detection — track deaths for type-specific sounds
-    const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type }]));
+    const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type, health: e.health }]));
     const asteroidHealthMap = new Map(state.asteroids.map(a => [a.id, { alive: a.isAlive, health: a.health }]));
     const bossTurretAliveMap = state.boss ? new Map(state.boss.turrets.map(t => [t.id, t.isAlive])) : new Map<string, boolean>();
     const bossHealthBefore = state.boss?.health ?? 0;
@@ -430,6 +430,9 @@ export class GameManager {
         SoundManager.play(hitSound);
         // Maybe spawn a weapon pickup
         this.weaponPickupManager.maybeSpawnPickup(state, enemy.position);
+      } else if (before?.alive && enemy.isAlive && enemy.type === 'G' && enemy.health < before.health) {
+        // Mini-boss per-hit metallic clang
+        SoundManager.play('hitGClang');
       }
     }
     for (const asteroid of state.asteroids) {
