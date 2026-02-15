@@ -2,7 +2,7 @@
 id: T-0066
 title: "Boss data model and GameState integration"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, boss, types]

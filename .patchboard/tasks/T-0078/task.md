@@ -2,7 +2,7 @@
 id: T-0078
 title: "Shield (health) status bar in HUD"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, hud, rendering]

@@ -17,12 +17,15 @@ import { MusicManager } from '../audio/MusicManager';
 import { AsteroidManager } from './AsteroidManager';
 import { updateSecondaryTimer } from './WeaponManager';
 import { WeaponPickupManager } from './WeaponPickupManager';
+import { BossManager } from './BossManager';
+import { LifePickupManager } from './LifePickupManager';
 /** Intro text per level number. */
 const LEVEL_INTRO_TEXT: Record<number, string> = {
-  1: '2029 AD, the invasion begins',
-  2: 'planetary defence activated',
-  3: 'dark side of the moon',
-  4: 'approaching asteroid belt',
+  1: '2029.07.04 // 03:17 UTC\nfirst contact confirmed. space force scrambled to defend earth.',
+  2: '// 07:45 UTC\nthe swarm has reached orbit. space force activates planetary defence grid.',
+  3: '// 12:08 UTC\nenemy stronghold detected on the far side of the moon. space force moves to intercept.',
+  4: '// 18:32 UTC\nhostile signatures in the asteroid belt. space force navigates the debris field.',
+  5: '// 23:00 UTC\nenemy command has seized the mars colony. space force begins final assault on the mothership.',
 };
 
 /** Milliseconds between each typed character. */
@@ -34,6 +37,7 @@ import { level1 } from '../levels/level1';
 import { level2 } from '../levels/level2';
 import { level3 } from '../levels/level3';
 import { level4 } from '../levels/level4';
+import { level5 } from '../levels/level5';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -55,6 +59,8 @@ export class GameManager {
   private diveManager: DiveManager;
   private asteroidManager: AsteroidManager;
   private weaponPickupManager: WeaponPickupManager;
+  private bossManager: BossManager;
+  private lifePickupManager: LifePickupManager;
   private introTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
@@ -71,10 +77,13 @@ export class GameManager {
     this.levelManager.registerLevel(level2);
     this.levelManager.registerLevel(level3);
     this.levelManager.registerLevel(level4);
+    this.levelManager.registerLevel(level5);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
     this.asteroidManager = new AsteroidManager();
     this.weaponPickupManager = new WeaponPickupManager();
+    this.bossManager = new BossManager();
+    this.lifePickupManager = new LifePickupManager();
 
     // Initialize background
     this.stateManager.currentState.background = createBackground();
@@ -137,6 +146,9 @@ export class GameManager {
         break;
       case 'levelintro':
         this.updateLevelIntro(state);
+        break;
+      case 'gamecomplete':
+        this.updateGameComplete(state);
         break;
     }
   }
@@ -318,19 +330,27 @@ export class GameManager {
     this.enemyFiringManager.update(state, dtSeconds);
     if (state.projectiles.length > projCountBeforeEnemy) SoundManager.play('enemyFire');
 
-    // 7. Update background, asteroids, and weapon pickups
+    // 6b. Boss update
+    this.bossManager.update(state, dtSeconds);
+
+    // Check if boss health reached 0 and start death sequence
+    if (state.boss?.isAlive && state.boss.health <= 0 && !state.boss.deathSequence) {
+      this.bossManager.startDeathSequence(state.boss);
+    }
+
+    // 7. Update background, asteroids, weapon pickups, and life pickups
     if (state.background) {
       updateBackground(state.background, dtSeconds);
     }
     this.asteroidManager.update(state, dtSeconds * 1000);
     this.weaponPickupManager.updatePickups(state, dtSeconds * 1000);
+    this.lifePickupManager.update(state, dtSeconds * 1000);
 
     // 8. Level/wave progression
-    const waveBefore = state.currentWave;
     const waveStatusBefore = state.waveStatus;
     this.levelManager.update(state);
 
-    // Detect wave completion
+    // Detect wave completion (active → transition or clearing)
     if (waveStatusBefore === 'active' && state.waveStatus !== 'active') {
       // Award wave bonus to alive players
       for (const player of state.players) {
@@ -338,28 +358,54 @@ export class GameManager {
           player.score += WAVE_COMPLETE_BONUS;
         }
       }
+    }
 
-      // If waveStatus is 'complete' (no more waves), transition to level complete
-      if (state.waveStatus === 'complete') {
+    // Detect clearing phase completing → level complete or game complete
+    if (waveStatusBefore === 'clearing' && state.waveStatus === 'complete') {
+      MusicManager.stop();
+      const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
+      const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
+
+      if (!hasNextLevel) {
+        // Final level complete — game complete sequence
+        const playerName = state.players.length > 1 ? 'space force' : 'space force';
+        state.gameStatus = 'gamecomplete';
+        this.introTimer = 0;
+        state.menu = {
+          type: 'gamecomplete',
+          selectedOption: 0,
+          options: ['Main Menu'],
+          data: {
+            finalScore: totalScore,
+            introText: `mission complete // ${new Date().toISOString().slice(0, 10)}\n\nspace force has defeated the mothership.\n\nbut long range sensors detect survivors\nregrouping on the martian surface...\n\n... coming soon`,
+            introChars: 0,
+          },
+        };
+      } else {
         state.gameStatus = 'levelcomplete';
-        MusicManager.stop();
-        const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
-        const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
         state.menu = {
           type: 'levelcomplete',
           selectedOption: 0,
-          options: hasNextLevel ? ['Next Level', 'Main Menu'] : ['Main Menu'],
+          options: ['Next Level', 'Main Menu'],
           data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
         };
-        return;
       }
+      return;
     }
 
     // 9. Collision detection — track deaths for type-specific sounds
     const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type }]));
     const asteroidHealthMap = new Map(state.asteroids.map(a => [a.id, { alive: a.isAlive, health: a.health }]));
+    const bossTurretAliveMap = state.boss ? new Map(state.boss.turrets.map(t => [t.id, t.isAlive])) : new Map<string, boolean>();
+    const bossHealthBefore = state.boss?.health ?? 0;
+    const lifePickupCountBefore = state.lifePickups.filter(p => p.isActive).length;
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
+    // Life pickup sound
+    const lifePickupCountAfter = state.lifePickups.filter(p => p.isActive).length;
+    if (lifePickupCountAfter < lifePickupCountBefore) {
+      SoundManager.play('lifePickup');
+    }
     for (const enemy of state.enemies) {
       const before = enemyAliveMap.get(enemy.id);
       if (before?.alive && !enemy.isAlive) {
@@ -377,6 +423,19 @@ export class GameManager {
         } else if (asteroid.health < before.health) {
           SoundManager.play('asteroidHit');
         }
+      }
+    }
+    // Boss turret death sounds
+    if (state.boss) {
+      for (const turret of state.boss.turrets) {
+        const wasBefore = bossTurretAliveMap.get(turret.id);
+        if (wasBefore && !turret.isAlive) {
+          SoundManager.play('bossExplosion');
+        }
+      }
+      // Boss bridge hit sound
+      if (state.boss.health < bossHealthBefore && state.boss.health > 0) {
+        SoundManager.play('hitF');
       }
     }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
@@ -504,14 +563,57 @@ export class GameManager {
         const nextLevel = state.currentLevel + 1;
         state.enemies = [];
         state.projectiles = [];
+        state.boss = null;
+        state.lifePickups = [];
         this.enemyFiringManager.reset();
         this.diveManager.reset();
+        this.lifePickupManager.reset();
         this.startLevelIntro(state, nextLevel);
       } else if (selected === 'Main Menu') {
         this.stateManager.reset();
         this.stateManager.currentState.background = createBackground();
         MusicManager.play('menu');
       }
+    }
+  }
+
+  private updateGameComplete(state: GameState): void {
+    if (!state.menu?.data) return;
+    const data = state.menu.data;
+    const fullText = data.introText ?? '';
+    const revealed = data.introChars ?? 0;
+
+    this.introTimer += state.deltaTime;
+
+    if (revealed < fullText.length) {
+      // Typing animation — same as level intro
+      const charsToReveal = Math.min(
+        Math.floor(this.introTimer / TYPING_SPEED),
+        fullText.length,
+      );
+      if (charsToReveal > revealed) {
+        if (fullText[charsToReveal - 1] !== ' ') {
+          SoundManager.play('typeKey');
+        }
+        state.menu = {
+          ...state.menu,
+          data: { ...data, introChars: charsToReveal },
+        };
+      }
+    } else {
+      // Typing done — handle menu input
+      const menuInput = this.inputHandler.getMenuInput();
+      if (menuInput.confirm) {
+        SoundManager.play('menuSelect');
+        this.stateManager.reset();
+        this.stateManager.currentState.background = createBackground();
+        MusicManager.play('menu');
+      }
+    }
+
+    // Update background during sequence
+    if (state.background) {
+      updateBackground(state.background, state.deltaTime / 1000);
     }
   }
 

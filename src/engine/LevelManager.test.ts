@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { LevelManager } from './LevelManager';
 import { createInitialState, createPlayer } from './StateManager';
 import { level1 } from '../levels/level1';
-import { FIXED_TIMESTEP, WAVE_COMPLETE_BONUS } from './constants';
+import { FIXED_TIMESTEP, WAVE_COMPLETE_BONUS, LEVEL_CLEAR_DELAY } from './constants';
 import type { GameState } from '../types';
 
 describe('LevelManager', () => {
@@ -113,7 +113,7 @@ describe('LevelManager', () => {
       expect(types.has('C')).toBe(true);
     });
 
-    it('status is complete after all enemies in final wave destroyed', () => {
+    it('status is clearing then complete after all enemies in final wave destroyed', () => {
       manager.startLevel(state, 1);
       state.deltaTime = FIXED_TIMESTEP;
 
@@ -129,6 +129,12 @@ describe('LevelManager', () => {
         manager.update(state);
       }
 
+      // Final wave enters clearing phase first
+      expect(state.waveStatus).toBe('clearing');
+
+      // After clearing delay, transitions to complete
+      state.deltaTime = LEVEL_CLEAR_DELAY + 100;
+      manager.update(state);
       expect(state.waveStatus).toBe('complete');
     });
   });

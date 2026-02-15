@@ -2,7 +2,7 @@
 id: T-0069
 title: "Enhanced explosions for stealth bomber and boss"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, effects]

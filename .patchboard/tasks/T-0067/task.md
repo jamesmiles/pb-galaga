@@ -2,7 +2,7 @@
 id: T-0067
 title: "Enemy Type F - stealth bomber with homing missiles"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, enemy, projectile]

@@ -28,7 +28,7 @@ export type ZzFXMSong = [ZzFXMInstrument[], ZzFXMPattern[], number[][], number];
  */
 export function zzfxM(song: ZzFXMSong): number[] {
   const [instruments, patterns, sequence, bpm] = song;
-  const samplesPerBeat = (bpm / 60 * 44100 / 4) | 0; // samples per row
+  const samplesPerBeat = (44100 * 60 / bpm / 4) | 0; // samples per row
   const songLength = sequence[0].length;
   const channelCount = patterns[0]?.length ?? 0;
 

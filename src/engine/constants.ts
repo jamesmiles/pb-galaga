@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.6.2';
+export const GAME_VERSION = '0.7.8';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -53,6 +53,18 @@ export const ENEMY_D_COLLISION_RADIUS = 14;
 export const ENEMY_E_HEALTH = 150;
 export const ENEMY_E_SCORE_VALUE = 300;
 export const ENEMY_E_COLLISION_RADIUS = 18;
+
+// Enemy Type F defaults (Stealth Bomber)
+export const ENEMY_F_HEALTH = 125;
+export const ENEMY_F_SCORE_VALUE = 350;
+export const ENEMY_F_COLLISION_RADIUS = 16;
+
+// Enemy homing missile defaults (enemy-fired)
+export const ENEMY_HOMING_SPEED = 200;
+export const ENEMY_HOMING_TURN_RATE = 2.5; // rad/s
+export const ENEMY_HOMING_DAMAGE = 40;
+export const ENEMY_HOMING_MAX_LIFETIME = 5000; // ms
+export const ENEMY_HOMING_COLLISION_RADIUS = 4;
 
 // Formation defaults
 export const FORMATION_BASE_SPEED = 60; // pixels per second
@@ -123,7 +135,31 @@ export const WEAPON_PICKUP_CYCLE_INTERVAL = 5000; // ms between type flips
 export const WEAPON_PICKUP_SPEED = 60; // px/s downward drift
 export const WEAPON_PICKUP_LIFETIME = 10000; // ms
 export const WEAPON_PICKUP_COLLISION_RADIUS = 12;
-export const SECONDARY_WEAPON_DURATION = 60000; // ms (60 seconds)
+export const SECONDARY_WEAPON_DURATION = 15000; // ms (15 seconds)
+
+// Boss defaults
+export const BOSS_WIDTH = 720;
+export const BOSS_HEIGHT = 200;
+export const BOSS_HEALTH = 1000;
+export const BOSS_TURRET_HEALTH = 400;
+export const BOSS_TURRET_FIRE_RATE = 600; // ms (rapid fire)
+export const BOSS_TURRET_COLLISION_RADIUS = 20;
+export const BOSS_SCORE_VALUE = 5000;
+export const BOSS_TURRET_SCORE_VALUE = 500;
+export const BOSS_DEATH_PHASE_DURATION = 800; // ms per phase
+export const BOSS_ROCKET_TURRET_HEALTH = 300;
+export const BOSS_ROCKET_TURRET_FIRE_RATE = 1200; // ms
+export const BOSS_ENTRY_SPEED = 30; // px/s
+export const BOSS_FIGHTER_SPAWN_INTERVAL = 1333; // ms between bridge fighter launches
+
+// Life pickup defaults
+export const LIFE_DROP_CHANCE = 0.5; // 50% per level
+export const LIFE_PICKUP_SPEED = 50; // px/s downward drift
+export const LIFE_PICKUP_LIFETIME = 12000; // ms
+export const LIFE_PICKUP_COLLISION_RADIUS = 10;
+
+// Level clear delay
+export const LEVEL_CLEAR_DELAY = 3000; // ms
 
 // Score
 export const WAVE_COMPLETE_BONUS = 500;

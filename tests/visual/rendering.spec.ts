@@ -23,8 +23,8 @@ test.describe('PB-Galaga Rendering', () => {
     await page.waitForTimeout(200);
     await page.keyboard.up('Enter');
 
-    // Let game run for 3 seconds to stabilize FPS counters
-    await page.waitForTimeout(3000);
+    // Let game run long enough for level intro typing to finish (~5.5s) + FPS stabilize
+    await page.waitForTimeout(8000);
 
     // Screenshot gameplay
     await page.screenshot({ path: 'tests/visual/screenshots/gameplay.png' });
@@ -55,9 +55,9 @@ test.describe('PB-Galaga Rendering', () => {
     await page.goto('/');
     await page.waitForTimeout(2000);
 
-    // Start game
+    // Start game and wait for level intro typing to finish
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(8000);
 
     // Fire at enemies for a bit
     await page.keyboard.down('Space');

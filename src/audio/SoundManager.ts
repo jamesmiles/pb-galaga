@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'typeKey' | 'asteroidHit' | 'asteroidExplode';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -37,6 +37,14 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   asteroidHit: [0.5, 0.04, 150, 0, 0.04, 0.08, 3, 1, -3, 0, 0, 0, 0, 0.7, 0, 0, 0, 0.3, 0.06, 0],
   // Asteroid explode: crumbling dirt burst (deep rumble with noise)
   asteroidExplode: [0.7, 0.06, 100, 0.01, 0.1, 0.3, 3, 1, -6, -1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0.15, 0],
+  // Type F hit: deep resonant boom (stealth bomber, louder)
+  hitF: [0.9, 0.06, 120, 0.02, 0.12, 0.3, 3, 1, -10, -3, 0, 0, 0, 1, 0, 0, 0, 0.2, 0.18, 0],
+  // Missile whistle: eerie rising whistle (enemy homing missile in-flight)
+  missileWhistle: [0.3, 0.02, 600, 0.05, 0.2, 0.15, 0, 1, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.1, 0.2],
+  // Boss explosion: massive deep boom with reverb (max volume, very long sustain)
+  bossExplosion: [3, 0.12, 40, 0.04, 0.5, 1.2, 3, 1, -12, -4, 0, 0, 0, 2, 0, 0, 0.2, 0.25, 0.4, 0],
+  // Life pickup: bright cheerful chime
+  lifePickup: [0.4, 0, 800, 0, 0.02, 0.08, 0, 1, 10, 0, 400, 0.02, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
 };
 
 /**

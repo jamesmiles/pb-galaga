@@ -4,8 +4,11 @@ import { createEnemyB } from '../objects/enemies/enemyB/code/EnemyB';
 import { createEnemyC } from '../objects/enemies/enemyC/code/EnemyC';
 import { createEnemyD } from '../objects/enemies/enemyD/code/EnemyD';
 import { createEnemyE } from '../objects/enemies/enemyE/code/EnemyE';
+import { createEnemyF } from '../objects/enemies/enemyF/code/EnemyF';
 import { initFormation } from './FormationManager';
 import { generateFlightPaths } from './FlightPathManager';
+import { LEVEL_CLEAR_DELAY } from './constants';
+import { createBoss } from '../objects/boss/code/Boss';
 
 /** Wave transition duration in ms. */
 const WAVE_TRANSITION_DURATION = 3000;
@@ -17,6 +20,7 @@ const ENEMY_FACTORY: Record<string, (row: number, col: number) => Enemy> = {
   C: createEnemyC,
   D: createEnemyD,
   E: createEnemyE,
+  F: createEnemyF,
 };
 
 /**
@@ -25,6 +29,7 @@ const ENEMY_FACTORY: Record<string, (row: number, col: number) => Enemy> = {
 export class LevelManager {
   private levels: Map<number, LevelConfig> = new Map();
   private waveTransitionTimer: number = 0;
+  private clearingTimer: number = 0;
 
   registerLevel(config: LevelConfig): void {
     this.levels.set(config.levelNumber, config);
@@ -39,6 +44,7 @@ export class LevelManager {
     state.currentWave = 1;
     state.waveStatus = 'transition';
     this.waveTransitionTimer = 0;
+    this.clearingTimer = 0;
 
     this.spawnWave(state, config.waves[0]);
   }
@@ -54,23 +60,43 @@ export class LevelManager {
       return;
     }
 
+    // Handle clearing phase countdown
+    if (state.waveStatus === 'clearing') {
+      this.clearingTimer += state.deltaTime;
+      if (this.clearingTimer >= LEVEL_CLEAR_DELAY) {
+        state.waveStatus = 'complete';
+        this.clearingTimer = 0;
+      }
+      return;
+    }
+
     if (state.waveStatus !== 'active') return;
 
-    // Check if all enemies are destroyed
+    // Check if all enemies are destroyed (standard wave)
     const aliveEnemies = state.enemies.filter(e => e.isAlive);
-    if (aliveEnemies.length === 0 && state.enemies.length > 0) {
-      state.waveStatus = 'complete';
+    const enemiesCleared = aliveEnemies.length === 0 && state.enemies.length > 0;
 
+    // For boss waves, check boss completion
+    const config = this.levels.get(state.currentLevel);
+    const currentWaveConfig = config?.waves[state.currentWave - 1];
+    const isBossWave = currentWaveConfig?.bossSpawn === true;
+    const bossCleared = isBossWave && state.boss && !state.boss.isAlive && !state.boss.deathSequence;
+
+    const waveCleared = isBossWave ? bossCleared : enemiesCleared;
+
+    if (waveCleared) {
       // Check if there are more waves
-      const config = this.levels.get(state.currentLevel);
       if (config && state.currentWave < config.waves.length) {
-        // Start transition to next wave
+        // Mid-level wave: transition immediately to next wave
         state.currentWave++;
         state.waveStatus = 'transition';
         this.waveTransitionTimer = 0;
         this.spawnWave(state, config.waves[state.currentWave - 1]);
+      } else {
+        // Final wave: enter clearing phase before level complete
+        state.waveStatus = 'clearing';
+        this.clearingTimer = 0;
       }
-      // If no more waves, status stays 'complete' — T-0024 handles level complete
     }
   }
 
@@ -93,6 +119,12 @@ export class LevelManager {
   private spawnWave(state: GameState, wave: WaveConfig): void {
     state.enemies = [];
     state.projectiles = [];
+
+    // Boss wave: spawn boss instead of formation enemies
+    if (wave.bossSpawn) {
+      state.boss = createBoss();
+      return;
+    }
 
     if (wave.slots && wave.slots.length > 0) {
       // Explicit slot placement — derive grid size from max row/col

@@ -2,7 +2,7 @@
 id: T-0075
 title: "Version bump to 0.7.0 and finalization"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, release]

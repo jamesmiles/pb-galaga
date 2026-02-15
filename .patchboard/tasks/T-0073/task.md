@@ -2,7 +2,7 @@
 id: T-0073
 title: "X formation flight path"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, formation]

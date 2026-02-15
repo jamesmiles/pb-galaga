@@ -3,7 +3,7 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
 
 /**
  * Simple chiptune song data in ZzFXM format.
@@ -141,37 +141,37 @@ const LEVEL2_SONG: ZzFXMSong = [
   130, // BPM
 ];
 
-// Level 3 theme: crazy synth, 3-channel, 140 BPM
-// Rapid arpeggios, chromatic runs, off-beat patterns
+// Level 3 theme: driving rock anthem, 3-channel, 135 BPM
+// Similar feel to Level 2 but with a minor-key edge and higher energy
 const LEVEL3_SONG: ZzFXMSong = [
   // Instruments
   [
-    // 0: Arpeggiated synth (detuned square, fast)
-    [0.3, 0.1, 440, 0, 0.08, 0.06, 2, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.01, 0],
-    // 1: Wobble bass (frequency-modulated)
-    [0.35, 0, 80, 0.02, 0.2, 0.15, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0.6, 0.04, 0],
-    // 2: Fast hi-hats (noise, short)
-    [0.2, 0, 200, 0, 0.01, 0.02, 4, 1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0.2, 0, 0],
+    // 0: Overdriven guitar (sawtooth, punchy — like Level 2)
+    [0.4, 0, 220, 0.01, 0.15, 0.1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
+    // 1: Bass guitar (square, deep)
+    [0.3, 0, 110, 0.01, 0.2, 0.12, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.03, 0],
+    // 2: Drums (noise percussion)
+    [0.35, 0, 100, 0, 0.02, 0.05, 4, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0.3, 0.01, 0],
   ],
-  // Patterns
+  // Patterns — minor key feel (A minor: A=69, B=71, C=72, D=74, E=76)
   [
-    // Pattern 0: Arpeggio frenzy
+    // Pattern 0: Driving verse in A minor
     [
-      // Channel 0: Rapid arpeggios (chromatic)
-      [72, 0, 0, 75, 0, 0, 79, 0, 0, 82, 0, 0, 79, 0, 0, 75, 0, 0, 73, 0, 0, 70, 0, 0],
-      // Channel 1: Wobble bass
-      [36, 1, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 39, 1, 0, 0, undefined, 0, 34, 1, 0, 0, undefined, 0],
-      // Channel 2: Hi-hats
-      [80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0],
+      // Channel 0: Power chord riff
+      [69, 0, 0, 72, 0, 0, 76, 0, 0, 72, 0, 0, 69, 0, 0, 74, 0, 0, 72, 0, 0, 69, 0, 0],
+      // Channel 1: Bass guitar
+      [45, 1, 0, 0, undefined, 0, 45, 1, 0, 0, undefined, 0, 48, 1, 0, 0, undefined, 0, 50, 1, 0, 0, undefined, 0],
+      // Channel 2: Driving drums
+      [60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0],
     ],
-    // Pattern 1: Chromatic run variation
+    // Pattern 1: Chorus — higher energy
     [
-      // Channel 0: Descending chromatic run
-      [84, 0, 0, 82, 0, 0, 80, 0, 0, 78, 0, 0, 76, 0, 0, 74, 0, 0, 72, 0, 0, 75, 0, 0],
-      // Channel 1: Off-beat bass
-      [0, undefined, 0, 39, 1, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 34, 1, 0, 0, undefined, 0, 36, 1, 0],
-      // Channel 2: Hi-hat syncopation
-      [80, 2, 0, 0, undefined, 0, 80, 2, 0, 80, 2, 0, 0, undefined, 0, 80, 2, 0, 80, 2, 0, 0, undefined, 0],
+      // Channel 0: Rising melody
+      [72, 0, 0, 74, 0, 0, 76, 0, 0, 74, 0, 0, 72, 0, 0, 69, 0, 0, 67, 0, 0, 69, 0, 0],
+      // Channel 1: Driving bass
+      [48, 1, 0, 48, 1, 0, 50, 1, 0, 0, undefined, 0, 45, 1, 0, 45, 1, 0, 43, 1, 0, 0, undefined, 0],
+      // Channel 2: Drums
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
     ],
   ],
   // Sequence
@@ -180,7 +180,7 @@ const LEVEL3_SONG: ZzFXMSong = [
     [0, 1, 0, 1], // Channel 1
     [0, 1, 0, 1], // Channel 2
   ],
-  140, // BPM
+  135, // BPM
 ];
 
 // Level 4 theme: drum and bass, 3-channel, 165 BPM
@@ -225,12 +225,55 @@ const LEVEL4_SONG: ZzFXMSong = [
   165, // BPM
 ];
 
+// Level 5 theme: heavy boss rock, 3-channel, 145 BPM
+// Intense but musical — heavier take on the Level 2 rock style
+const LEVEL5_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Heavy guitar (sawtooth, thick — louder than Level 2)
+    [0.45, 0, 220, 0.01, 0.12, 0.08, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
+    // 1: Bass guitar (square, heavy)
+    [0.35, 0, 110, 0.01, 0.2, 0.15, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.65, 0.03, 0],
+    // 2: Drums (noise percussion, punchy)
+    [0.35, 0, 100, 0, 0.02, 0.05, 4, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0.3, 0.01, 0],
+  ],
+  // Patterns — E minor for a darker boss feel (E=64, F#=66, G=67, A=69, B=71)
+  [
+    // Pattern 0: Heavy riff
+    [
+      // Channel 0: Power chord riff
+      [64, 0, 0, 67, 0, 0, 69, 0, 0, 67, 0, 0, 64, 0, 0, 71, 0, 0, 69, 0, 0, 67, 0, 0],
+      // Channel 1: Driving bass
+      [40, 1, 0, 0, undefined, 0, 40, 1, 0, 0, undefined, 0, 43, 1, 0, 43, 1, 0, 45, 1, 0, 0, undefined, 0],
+      // Channel 2: Driving drums
+      [60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0],
+    ],
+    // Pattern 1: Chorus — climactic
+    [
+      // Channel 0: Higher power melody
+      [71, 0, 0, 69, 0, 0, 67, 0, 0, 69, 0, 0, 71, 0, 0, 74, 0, 0, 71, 0, 0, 69, 0, 0],
+      // Channel 1: Heavy bass walk
+      [47, 1, 0, 47, 1, 0, 45, 1, 0, 0, undefined, 0, 43, 1, 0, 43, 1, 0, 40, 1, 0, 0, undefined, 0],
+      // Channel 2: Driving drums
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 1, 0, 1], // Channel 0
+    [0, 1, 0, 1], // Channel 1
+    [0, 1, 0, 1], // Channel 2
+  ],
+  145, // BPM — heavy boss rock
+];
+
 const TRACKS: Record<MusicTrack, ZzFXMSong> = {
   menu: MENU_SONG,
   level1: LEVEL1_SONG,
   level2: LEVEL2_SONG,
   level3: LEVEL3_SONG,
   level4: LEVEL4_SONG,
+  level5: LEVEL5_SONG,
 };
 
 /**

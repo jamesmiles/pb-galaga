@@ -2,7 +2,7 @@
 id: T-0076
 title: "HUD primary weapon and level display"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, hud, rendering]

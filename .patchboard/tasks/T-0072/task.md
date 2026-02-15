@@ -2,7 +2,7 @@
 id: T-0072
 title: "Boss rendering - two-layer drawing"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, boss, rendering]

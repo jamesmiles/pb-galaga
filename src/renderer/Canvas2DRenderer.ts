@@ -5,6 +5,7 @@ import { drawStars } from './drawing/drawStars';
 import { drawPlayers } from './drawing/drawPlayer';
 import { drawEnemies } from './drawing/drawEnemies';
 import { drawProjectiles } from './drawing/drawProjectiles';
+import { drawBossLower, drawBossUpper, drawLifePickups } from './drawing/drawBoss';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
 import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
@@ -31,6 +32,10 @@ export class Canvas2DRenderer implements GameRenderer {
 
   // Track game status for cleanup transitions
   private lastGameStatus = '';
+
+  // Track boss state for death explosion detection
+  private lastBossTurretAlive: boolean[] = [];
+  private lastBossHealth = 0;
 
   // Background image system
   private bgImageCache: Map<string, HTMLImageElement> = new Map();
@@ -137,11 +142,24 @@ export class Canvas2DRenderer implements GameRenderer {
     if (current.background) {
       drawStars(ctx, current.background.stars);
     }
+
+    // Boss lower hull (behind everything gameplay-related)
+    if (current.boss) {
+      drawBossLower(ctx, current.boss);
+    }
+
     drawEnemies(ctx, current.enemies, prevEnemies, alpha);
     drawProjectiles(ctx, current.projectiles, prevProjectiles, alpha);
     this.drawAsteroids(ctx, current.asteroids);
     this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
+    drawLifePickups(ctx, current.lifePickups, current.currentTime);
     drawPlayers(ctx, current.players, prevPlayers, alpha, current.currentTime);
+
+    // Boss upper layer (turrets + bridge, in front of player)
+    if (current.boss) {
+      drawBossUpper(ctx, current.boss);
+    }
+
     this.particleSystem.draw(ctx);
 
     ctx.restore();
@@ -190,6 +208,60 @@ export class Canvas2DRenderer implements GameRenderer {
           asteroid.position.y,
           asteroid.id,
           'asteroid',
+        );
+      }
+    }
+
+    // Boss turret and bridge death explosions
+    if (current.boss) {
+      for (let i = 0; i < current.boss.turrets.length; i++) {
+        const turret = current.boss.turrets[i];
+        const wasBefore = this.lastBossTurretAlive[i] ?? true;
+        if (wasBefore && !turret.isAlive) {
+          this.particleSystem.emitLargeExplosion(
+            turret.position.x, turret.position.y,
+            turret.id, 'bossTurret',
+          );
+        }
+      }
+      this.lastBossTurretAlive = current.boss.turrets.map(t => t.isAlive);
+
+      // Boss bridge death (boss health goes to 0)
+      if (this.lastBossHealth > 0 && current.boss.health <= 0 && current.boss.deathSequence) {
+        this.particleSystem.emitLargeExplosion(
+          current.boss.position.x, current.boss.position.y,
+          'boss-bridge', 'bossBridge',
+        );
+      }
+      this.lastBossHealth = current.boss.health;
+
+      // Death sequence phase explosions
+      if (current.boss.deathSequence) {
+        const phase = current.boss.deathSequence.phase;
+        const turretCount = current.boss.turrets.length;
+        if (phase < turretCount) {
+          const turret = current.boss.turrets[phase];
+          if (turret) {
+            this.particleSystem.emitLargeExplosion(
+              turret.position.x, turret.position.y,
+              `boss-death-phase-${phase}`, 'bossTurret',
+            );
+          }
+        } else if (phase === turretCount) {
+          this.particleSystem.emitLargeExplosion(
+            current.boss.position.x, current.boss.position.y,
+            'boss-death-final', 'bossBridge',
+          );
+        }
+      }
+    }
+
+    // Enemy F large explosions
+    for (const enemy of current.enemies) {
+      if (!enemy.isAlive && enemy.collisionState === 'destroyed' && enemy.type === 'F') {
+        this.particleSystem.emitLargeExplosion(
+          enemy.position.x, enemy.position.y,
+          `${enemy.id}-large`, 'F',
         );
       }
     }

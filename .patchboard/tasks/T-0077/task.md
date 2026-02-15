@@ -2,7 +2,7 @@
 id: T-0077
 title: "Reduce secondary weapon timer duration"
 type: task
-status: todo
+status: review
 priority: P2
 owner: engineer
 labels: [level-5, balance]

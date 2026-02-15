@@ -30,8 +30,11 @@ const EXPLOSION_COLORS: Record<string, string[]> = {
   C: ['#ff5500', '#ff9933', '#ffffff'],
   D: ['#ff00ff', '#ff66ff', '#ffffff'],
   E: ['#ffff00', '#ffff66', '#ffffff'],
+  F: ['#00ff88', '#44ffaa', '#ffffff'],
   player: ['#ff3344', '#ff7755', '#ffffff'],
   asteroid: ['#886644', '#aa8855', '#ccaa77'],
+  bossTurret: ['#ff8800', '#ffaa44', '#ffffff'],
+  bossBridge: ['#ff4400', '#ff6622', '#ffaa44', '#ffffff'],
   default: ['#ffcc00', '#ff5500', '#ffffff'],
 };
 
@@ -42,8 +45,11 @@ const FLASH_COLORS: Record<string, string> = {
   C: '#ff5500',
   D: '#ff00ff',
   E: '#ffff00',
+  F: '#00ff88',
   player: '#ff3344',
   asteroid: '#886644',
+  bossTurret: '#ff8800',
+  bossBridge: '#ff4400',
   default: '#ffcc00',
 };
 
@@ -97,6 +103,43 @@ export class ParticleSystem {
       this.shakeDuration = 150;
       this.shakeIntensity = 4;
     }
+  }
+
+  /**
+   * Emit a large explosion — more particles, higher speed, longer life, screen shake.
+   * Used for boss turrets, boss bridge, and type F deaths.
+   */
+  emitLargeExplosion(x: number, y: number, entityId: string, entityType: string): void {
+    if (this.explodedEntities.has(entityId)) return;
+    this.explodedEntities.add(entityId);
+
+    const isBridge = entityType === 'bossBridge';
+    const colors = EXPLOSION_COLORS[entityType] || EXPLOSION_COLORS.default;
+    const count = isBridge ? 150 : 50;
+    const speedRange = isBridge ? 450 : 250;
+    const lifespan = isBridge ? 1500 : 800;
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 40 + Math.random() * speedRange;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color,
+        life: lifespan,
+        maxLife: lifespan,
+        size: isBridge ? 4 + Math.random() * 6 : 3 + Math.random() * 4,
+      });
+    }
+
+    // Screen shake
+    this.shakeTimer = 0;
+    this.shakeDuration = isBridge ? 600 : 200;
+    this.shakeIntensity = isBridge ? 15 : 5;
   }
 
   /**
