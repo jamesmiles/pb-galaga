@@ -9,6 +9,7 @@ const ENEMY_COLORS: Record<string, { fill: string; glow: string; accent: string 
   D: { fill: '#ff00ff', glow: '#ff00ff', accent: '#ff66ff' },
   E: { fill: '#ffff00', glow: '#ffff00', accent: '#ffff66' },
   F: { fill: '#00ff88', glow: '#00ff88', accent: '#44ffaa' },
+  G: { fill: '#00ff88', glow: '#00ff88', accent: '#44ffaa' }, // Same green as F
 };
 
 /**
@@ -42,6 +43,8 @@ export function drawEnemies(
       drawEnemyD(ctx, pos.x, pos.y, colors);
     } else if (enemy.type === 'F') {
       drawEnemyF(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'G') {
+      drawEnemyG(ctx, pos.x, pos.y, colors, enemy.health, enemy.maxHealth);
     } else {
       drawEnemyE(ctx, pos.x, pos.y, colors);
     }
@@ -270,4 +273,56 @@ function drawEnemyF(
   ctx.fillStyle = colors.accent;
   ctx.fillRect(x - 19, y - 10, 3, 2);
   ctx.fillRect(x + 16, y - 10, 3, 2);
+}
+
+/** Type G: Mini-Boss — 2.5x scaled stealth bomber with health bar */
+function drawEnemyG(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+  health: number, maxHealth: number,
+): void {
+  const s = 2.5; // Scale factor
+  ctx.fillStyle = colors.fill;
+
+  // Wide stealth body — angular bat-wing shape (nose facing down), scaled 2.5x
+  ctx.beginPath();
+  ctx.moveTo(x, y + 10 * s);
+  ctx.lineTo(x - 20 * s, y - 8 * s);
+  ctx.lineTo(x - 16 * s, y - 12 * s);
+  ctx.lineTo(x - 6 * s, y - 4 * s);
+  ctx.lineTo(x, y - 8 * s);
+  ctx.lineTo(x + 6 * s, y - 4 * s);
+  ctx.lineTo(x + 16 * s, y - 12 * s);
+  ctx.lineTo(x + 20 * s, y - 8 * s);
+  ctx.closePath();
+  ctx.fill();
+
+  // Engine pods (accent)
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 10 * s, y - 6 * s, 4 * s, 4 * s);
+  ctx.fillRect(x + 6 * s, y - 6 * s, 4 * s, 4 * s);
+
+  // Twin missile bays (darker)
+  ctx.fillStyle = '#006644';
+  ctx.fillRect(x - 8 * s, y + 2 * s, 5 * s, 4 * s);
+  ctx.fillRect(x + 3 * s, y + 2 * s, 5 * s, 4 * s);
+
+  // Cockpit slit (menacing red, wider)
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff2222';
+  ctx.fillRect(x - 6 * s, y - 1 * s, 12 * s, 2 * s);
+
+  // Wingtip markers
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 19 * s, y - 10 * s, 3 * s, 2 * s);
+  ctx.fillRect(x + 16 * s, y - 10 * s, 3 * s, 2 * s);
+
+  // Health bar
+  const barW = 60;
+  const healthPct = health / maxHealth;
+  ctx.fillStyle = '#333333';
+  ctx.fillRect(x - barW / 2, y - 14 * s, barW, 4);
+  ctx.fillStyle = healthPct > 0.5 ? '#44ff44' : healthPct > 0.25 ? '#ffff00' : '#ff4444';
+  ctx.fillRect(x - barW / 2, y - 14 * s, barW * healthPct, 4);
 }

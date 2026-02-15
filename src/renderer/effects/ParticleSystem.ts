@@ -31,6 +31,7 @@ const EXPLOSION_COLORS: Record<string, string[]> = {
   D: ['#ff00ff', '#ff66ff', '#ffffff'],
   E: ['#ffff00', '#ffff66', '#ffffff'],
   F: ['#00ff88', '#44ffaa', '#ffffff'],
+  G: ['#00ff88', '#44ffaa', '#ffff00', '#ffffff'],
   player: ['#ff3344', '#ff7755', '#ffffff'],
   asteroid: ['#886644', '#aa8855', '#ccaa77'],
   bossTurret: ['#ff8800', '#ffaa44', '#ffffff'],

@@ -187,9 +187,9 @@ describe('spawnPlayerProjectiles', () => {
 
       spawnPlayerProjectiles(state);
 
-      // Only primary laser (level 1)
+      // Only primary weapon (level 1) — P1 starts with bullet
       expect(state.projectiles.length).toBe(1);
-      expect(state.projectiles[0].type).toBe('laser');
+      expect(state.projectiles[0].type).toBe('bullet');
     });
   });
 });

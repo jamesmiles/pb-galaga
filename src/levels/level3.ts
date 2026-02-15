@@ -139,5 +139,16 @@ export const level3: LevelConfig = {
         ]),
       ],
     },
+
+    // Wave 7: Mini-Boss — single large stealth bomber with double homing missiles
+    {
+      waveNumber: 7,
+      delay: 3000,
+      enemies: [],
+      formation: 'grid',
+      slots: [
+        { type: 'G', row: 0, col: 4 },
+      ],
+    },
   ],
 };

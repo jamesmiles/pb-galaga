@@ -95,6 +95,14 @@ export class EnemyFiringManager {
     } else if (enemy.fireMode === 'plasma') {
       projectile = createPlasma(position, owner);
     } else if (enemy.fireMode === 'homing') {
+      if (enemy.type === 'G') {
+        // Mini-boss fires double homing missiles from wing pods (2.5x scale)
+        const wingOffset = 25; // ~10 * 2.5 scale, matching engine pod positions
+        const left = createEnemyHomingMissile({ x: enemy.position.x - wingOffset, y: enemy.position.y }, owner);
+        const right = createEnemyHomingMissile({ x: enemy.position.x + wingOffset, y: enemy.position.y }, owner);
+        state.projectiles = [...state.projectiles, left, right];
+        return;
+      }
       projectile = createEnemyHomingMissile(position, owner);
     } else {
       projectile = createBullet(position, owner);

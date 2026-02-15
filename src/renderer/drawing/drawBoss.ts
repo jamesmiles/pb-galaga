@@ -1,4 +1,4 @@
-import type { BossState } from '../../types';
+import type { BossState, RespawnPickup } from '../../types';
 
 /**
  * Draw the boss lower hull — muted, behind the player.
@@ -162,6 +162,46 @@ export function drawLifePickups(ctx: CanvasRenderingContext2D, pickups: { positi
     ctx.bezierCurveTo(x - scale, y - scale * 0.3, x - scale * 0.5, y - scale, x, y - scale * 0.4);
     ctx.bezierCurveTo(x + scale * 0.5, y - scale, x + scale, y - scale * 0.3, x, y + scale * 0.4);
     ctx.fill();
+
+    ctx.restore();
+  }
+}
+
+/**
+ * Draw respawn pickups as pulsing "P1" / "P2" icons.
+ */
+export function drawRespawnPickups(ctx: CanvasRenderingContext2D, pickups: RespawnPickup[], time: number): void {
+  for (const pickup of pickups) {
+    if (!pickup.isActive) continue;
+
+    const { x, y } = pickup.position;
+    const pulse = 0.8 + 0.2 * Math.sin(time * 0.006);
+    const color = pickup.targetPlayerId === 'player1' ? '#ff4444' : '#4488ff';
+    const label = pickup.targetPlayerId === 'player1' ? '1P' : '2P';
+
+    ctx.save();
+    // Outer glow circle
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = color;
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.3 * pulse;
+    ctx.beginPath();
+    ctx.arc(x, y, 16 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner solid circle
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.arc(x, y, 10 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Label text
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y);
 
     ctx.restore();
   }

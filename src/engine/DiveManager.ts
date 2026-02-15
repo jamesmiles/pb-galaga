@@ -61,7 +61,7 @@ export class DiveManager {
 
   private initiateDive(state: GameState, aliveEnemies: Enemy[]): void {
     // Get candidates: alive, not diving
-    const candidates = aliveEnemies.filter(e => !e.diveState && !e.flightPathState && !this.activeDivers.has(e.id));
+    const candidates = aliveEnemies.filter(e => !e.diveState && !e.flightPathState && !this.activeDivers.has(e.id) && e.type !== 'G');
     if (candidates.length === 0) return;
 
     // Pick a random candidate

@@ -227,8 +227,9 @@ export class MenuOverlay {
         <div class="intro-typing">${revealed}${done ? '' : '<span class="intro-cursor">_</span>'}</div>
       `;
     } else if (type === 'levelselect') {
+      const coopLabel = data?.testCoop ? ' (CO-OP)' : '';
       this.overlay.innerHTML = `
-        <div class="menu-title">SELECT LEVEL</div>
+        <div class="menu-title">SELECT LEVEL${coopLabel}</div>
         <div class="menu-controls-group">
           <div class="menu-controls">Press ESC to go back</div>
         </div>
@@ -244,7 +245,6 @@ export class MenuOverlay {
       this.overlay.innerHTML = `
         <div class="menu-title levelcomplete">${levelLabel}</div>
         ${scoreHtml}
-        ${this.buildOptions(options)}
       `;
     } else if (type === 'gamecomplete') {
       const text = (data?.introText as string) ?? '';

@@ -1,5 +1,6 @@
 import type { GameState, Player, Enemy, Projectile, Asteroid, Vector2D, BossState, BossTurret } from '../types';
-import { PLAYER_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS, ASTEROID_DAMAGE, LIFE_PICKUP_COLLISION_RADIUS, BOSS_TURRET_SCORE_VALUE } from './constants';
+import { PLAYER_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS, ASTEROID_DAMAGE, LIFE_PICKUP_COLLISION_RADIUS, BOSS_TURRET_SCORE_VALUE, GAME_WIDTH, GAME_HEIGHT } from './constants';
+import { respawnPlayer } from '../objects/player/code/PlayerShip';
 import { damagePlayer } from '../objects/player/code/PlayerShip';
 import { damageEnemy } from '../objects/enemies/enemyA/code/EnemyA';
 import { upgradeWeapon } from './WeaponManager';
@@ -22,6 +23,7 @@ export function detectCollisions(state: GameState): void {
   detectPlayerAsteroidCollisions(state);
   detectProjectileAsteroidCollisions(state);
   detectPlayerLifePickupCollisions(state);
+  detectPlayerRespawnPickupCollisions(state);
   if (state.boss) {
     detectProjectileBossTurretCollisions(state);
     detectProjectileBossBridgeCollisions(state);
@@ -219,6 +221,26 @@ function detectProjectileBossBridgeCollisions(state: GameState): void {
       if (boss.health <= 0) {
         boss.health = 0;
         // Don't set isAlive=false here — death sequence handles that
+      }
+    }
+  }
+}
+
+function detectPlayerRespawnPickupCollisions(state: GameState): void {
+  for (const pickup of state.respawnPickups) {
+    if (!pickup.isActive) continue;
+    for (const player of state.players) {
+      if (!player.isAlive) continue;
+      const dist = distance(player.position, pickup.position);
+      if (dist < PLAYER_COLLISION_RADIUS + LIFE_PICKUP_COLLISION_RADIUS) {
+        pickup.isActive = false;
+        // Revive the targeted dead player
+        const deadPlayer = state.players.find(p => p.id === pickup.targetPlayerId);
+        if (deadPlayer && !deadPlayer.isAlive && deadPlayer.lives <= 0) {
+          deadPlayer.lives = 1;
+          respawnPlayer(deadPlayer);
+        }
+        break;
       }
     }
   }

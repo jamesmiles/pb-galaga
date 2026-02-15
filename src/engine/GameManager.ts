@@ -62,6 +62,7 @@ export class GameManager {
   private bossManager: BossManager;
   private lifePickupManager: LifePickupManager;
   private introTimer = 0;
+  private levelCompleteTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -172,12 +173,13 @@ export class GameManager {
 
     // Level select submenu
     if (state.menu.type === 'levelselect') {
+      const testCoop = state.menu.data?.testCoop === true;
       if (menuInput.back) {
         SoundManager.play('menuSelect');
         state.menu = {
           type: 'start',
           selectedOption: 0,
-          options: ['1 Player', '2 Players', 'Test Mode'],
+          options: ['1 Player', '2 Players', 'Test Mode', '2P Test Mode'],
         };
         return;
       }
@@ -188,12 +190,12 @@ export class GameManager {
           state.menu = {
             type: 'start',
             selectedOption: 0,
-            options: ['1 Player', '2 Players', 'Test Mode'],
+            options: ['1 Player', '2 Players', 'Test Mode', '2P Test Mode'],
           };
         } else {
           // Extract level number from option (e.g. "Level 1: Invasion" → 1)
           const levelNum = parseInt(selected.split(':')[0].replace('Level ', ''), 10);
-          state.gameMode = 'single';
+          state.gameMode = testCoop ? 'co-op' : 'single';
           this.startGame(state, levelNum);
         }
       }
@@ -214,6 +216,13 @@ export class GameManager {
           type: 'levelselect',
           selectedOption: 0,
           options: this.getLevelOptions(),
+        };
+      } else if (selected === '2P Test Mode') {
+        state.menu = {
+          type: 'levelselect',
+          selectedOption: 0,
+          options: this.getLevelOptions(),
+          data: { testCoop: true },
         };
       }
     }
@@ -363,12 +372,12 @@ export class GameManager {
     // Detect clearing phase completing → level complete or game complete
     if (waveStatusBefore === 'clearing' && state.waveStatus === 'complete') {
       MusicManager.stop();
+      this.inputHandler.clearAll();
       const totalScore = state.players.reduce((sum, p) => sum + p.score, 0);
       const hasNextLevel = this.levelManager.hasLevel(state.currentLevel + 1);
 
       if (!hasNextLevel) {
         // Final level complete — game complete sequence
-        const playerName = state.players.length > 1 ? 'space force' : 'space force';
         state.gameStatus = 'gamecomplete';
         this.introTimer = 0;
         state.menu = {
@@ -382,11 +391,13 @@ export class GameManager {
           },
         };
       } else {
+        // Auto-advance to next level after a brief delay (no menu)
         state.gameStatus = 'levelcomplete';
+        this.levelCompleteTimer = 0;
         state.menu = {
           type: 'levelcomplete',
           selectedOption: 0,
-          options: ['Next Level', 'Main Menu'],
+          options: [],
           data: { finalScore: totalScore, wave: state.currentWave, level: state.currentLevel },
         };
       }
@@ -399,12 +410,18 @@ export class GameManager {
     const bossTurretAliveMap = state.boss ? new Map(state.boss.turrets.map(t => [t.id, t.isAlive])) : new Map<string, boolean>();
     const bossHealthBefore = state.boss?.health ?? 0;
     const lifePickupCountBefore = state.lifePickups.filter(p => p.isActive).length;
+    const respawnPickupCountBefore = state.respawnPickups.filter(p => p.isActive).length;
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
     // Life pickup sound
     const lifePickupCountAfter = state.lifePickups.filter(p => p.isActive).length;
     if (lifePickupCountAfter < lifePickupCountBefore) {
       SoundManager.play('lifePickup');
+    }
+    // Respawn pickup sound
+    const respawnPickupCountAfter = state.respawnPickups.filter(p => p.isActive).length;
+    if (respawnPickupCountAfter < respawnPickupCountBefore) {
+      SoundManager.play('respawnPickup');
     }
     for (const enemy of state.enemies) {
       const before = enemyAliveMap.get(enemy.id);
@@ -444,7 +461,7 @@ export class GameManager {
       // Clear weapon powerups on death: reset to defaults, remove active pickups
       for (const player of state.players) {
         if (!player.isAlive && player.collisionState === 'destroyed') {
-          player.primaryWeapon = 'laser';
+          player.primaryWeapon = player.id === 'player1' ? 'bullet' : 'laser';
           player.primaryLevel = 1;
           player.secondaryWeapon = null;
           player.secondaryTimer = 0;
@@ -540,40 +557,24 @@ export class GameManager {
   }
 
   private updateLevelComplete(state: GameState): void {
-    const menuInput = this.inputHandler.getMenuInput();
-    if (!state.menu) return;
+    // Auto-advance to next level after 3 seconds (no menu interaction)
+    this.levelCompleteTimer += state.deltaTime;
+    if (this.levelCompleteTimer >= 3000) {
+      const nextLevel = state.currentLevel + 1;
+      state.enemies = [];
+      state.projectiles = [];
+      state.boss = null;
+      state.lifePickups = [];
+      state.respawnPickups = [];
+      this.enemyFiringManager.reset();
+      this.diveManager.reset();
+      this.lifePickupManager.reset();
+      this.startLevelIntro(state, nextLevel);
+    }
 
-    if (menuInput.down) {
-      state.menu = {
-        ...state.menu,
-        selectedOption: Math.min(state.menu.selectedOption + 1, state.menu.options.length - 1),
-      };
-    }
-    if (menuInput.up) {
-      state.menu = {
-        ...state.menu,
-        selectedOption: Math.max(state.menu.selectedOption - 1, 0),
-      };
-    }
-    if (menuInput.confirm) {
-      SoundManager.play('menuSelect');
-      const selected = state.menu.options[state.menu.selectedOption];
-      if (selected === 'Next Level') {
-        // Advance to next level — keep player scores and lives
-        const nextLevel = state.currentLevel + 1;
-        state.enemies = [];
-        state.projectiles = [];
-        state.boss = null;
-        state.lifePickups = [];
-        this.enemyFiringManager.reset();
-        this.diveManager.reset();
-        this.lifePickupManager.reset();
-        this.startLevelIntro(state, nextLevel);
-      } else if (selected === 'Main Menu') {
-        this.stateManager.reset();
-        this.stateManager.currentState.background = createBackground();
-        MusicManager.play('menu');
-      }
+    // Update background during transition
+    if (state.background) {
+      updateBackground(state.background, state.deltaTime / 1000);
     }
   }
 

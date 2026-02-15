@@ -87,7 +87,7 @@ export interface FlightPathState {
 
 export interface Enemy {
   id: string;
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
   position: Vector2D;
   velocity: Vector2D;
   rotation: number;
@@ -191,6 +191,17 @@ export interface LifePickup {
   lifetime: number;
 }
 
+// --- Respawn Pickup (co-op) ---
+
+export interface RespawnPickup {
+  id: string;
+  targetPlayerId: 'player1' | 'player2';
+  position: Vector2D;
+  velocity: Vector2D;
+  isActive: boolean;
+  lifetime: number;
+}
+
 // --- Weapon Pickup ---
 
 export interface WeaponPickup {
@@ -262,6 +273,7 @@ export interface MenuState {
     wave?: number;
     introText?: string;
     introChars?: number;
+    testCoop?: boolean;
   };
 }
 
@@ -304,6 +316,7 @@ export interface GameState {
   menu: MenuState | null;
   boss: BossState | null;
   lifePickups: LifePickup[];
+  respawnPickups: RespawnPickup[];
 }
 
 // --- Level Config ---
@@ -317,7 +330,7 @@ export interface LevelConfig {
 }
 
 export interface WaveSlot {
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
   row: number;
   col: number;
 }
@@ -332,7 +345,7 @@ export interface WaveConfig {
 }
 
 export interface EnemySpawnConfig {
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
   count: number;
   formation: FormationType;
   rows: number;

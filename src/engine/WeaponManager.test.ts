@@ -21,44 +21,44 @@ describe('upgradeWeapon', () => {
   describe('primary weapons', () => {
     it('upgrades same primary type from level 1 to 2', () => {
       const p = createPlayer('player1');
-      expect(p.primaryWeapon).toBe('laser');
+      expect(p.primaryWeapon).toBe('bullet');
       expect(p.primaryLevel).toBe(1);
-      upgradeWeapon(p, makePickup('primary', 'laser'));
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
       expect(p.primaryLevel).toBe(2);
     });
 
     it('upgrades through all levels: 1→2→3→4', () => {
       const p = createPlayer('player1');
-      upgradeWeapon(p, makePickup('primary', 'laser'));
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
       expect(p.primaryLevel).toBe(2);
-      upgradeWeapon(p, makePickup('primary', 'laser'));
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
       expect(p.primaryLevel).toBe(3);
-      upgradeWeapon(p, makePickup('primary', 'laser'));
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
       expect(p.primaryLevel).toBe(4);
     });
 
     it('caps at level 4', () => {
       const p = createPlayer('player1');
       p.primaryLevel = 4;
-      upgradeWeapon(p, makePickup('primary', 'laser'));
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
       expect(p.primaryLevel).toBe(4);
     });
 
-    it('switches primary type and resets to level 1', () => {
+    it('switches primary type but keeps power level', () => {
       const p = createPlayer('player1');
       p.primaryLevel = 3;
-      upgradeWeapon(p, makePickup('primary', 'bullet'));
-      expect(p.primaryWeapon).toBe('bullet');
-      expect(p.primaryLevel).toBe(1);
-    });
-
-    it('switches back to laser resets to level 1', () => {
-      const p = createPlayer('player1');
-      p.primaryWeapon = 'bullet';
-      p.primaryLevel = 2;
       upgradeWeapon(p, makePickup('primary', 'laser'));
       expect(p.primaryWeapon).toBe('laser');
-      expect(p.primaryLevel).toBe(1);
+      expect(p.primaryLevel).toBe(3);
+    });
+
+    it('switches back to bullet keeps power level', () => {
+      const p = createPlayer('player1');
+      p.primaryWeapon = 'laser';
+      p.primaryLevel = 2;
+      upgradeWeapon(p, makePickup('primary', 'bullet'));
+      expect(p.primaryWeapon).toBe('bullet');
+      expect(p.primaryLevel).toBe(2);
     });
   });
 
