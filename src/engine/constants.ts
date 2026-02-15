@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.7.3';
+export const GAME_VERSION = '0.7.4';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -147,6 +147,8 @@ export const BOSS_TURRET_COLLISION_RADIUS = 20;
 export const BOSS_SCORE_VALUE = 5000;
 export const BOSS_TURRET_SCORE_VALUE = 500;
 export const BOSS_DEATH_PHASE_DURATION = 800; // ms per phase
+export const BOSS_ROCKET_TURRET_HEALTH = 300;
+export const BOSS_ROCKET_TURRET_FIRE_RATE = 1200; // ms
 export const BOSS_ENTRY_SPEED = 30; // px/s
 export const BOSS_FIGHTER_SPAWN_INTERVAL = 1333; // ms between bridge fighter launches
 

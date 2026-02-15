@@ -64,12 +64,15 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
   // Homing: steer toward nearest target
   if (proj.isHoming && proj.turnRate && state &&
       (proj.homingDelay === undefined || proj.homingDelay <= 0)) {
-    // Enemy-fired homing targets players; player-fired homing targets enemies
+    // Enemy-fired homing targets players; player-fired homing targets enemies + boss turrets
     let targets: { position: { x: number; y: number } }[];
     if (proj.owner.type === 'enemy') {
       targets = state.players.filter(p => p.isAlive);
     } else {
-      targets = state.enemies.filter(e => e.isAlive);
+      targets = [...state.enemies.filter(e => e.isAlive)];
+      if (state.boss?.isAlive) {
+        targets.push(...state.boss.turrets.filter(t => t.isAlive));
+      }
     }
 
     if (targets.length > 0) {

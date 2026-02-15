@@ -150,6 +150,7 @@ export interface BossTurret {
   fireCooldown: number;
   fireRate: number;
   collisionRadius: number;
+  fireType: 'bullet' | 'rocket' | 'homing'; // What projectile this turret fires
 }
 
 export interface BossDeathSequence {

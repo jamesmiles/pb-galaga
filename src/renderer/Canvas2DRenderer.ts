@@ -238,7 +238,8 @@ export class Canvas2DRenderer implements GameRenderer {
       // Death sequence phase explosions
       if (current.boss.deathSequence) {
         const phase = current.boss.deathSequence.phase;
-        if (phase < 4) {
+        const turretCount = current.boss.turrets.length;
+        if (phase < turretCount) {
           const turret = current.boss.turrets[phase];
           if (turret) {
             this.particleSystem.emitLargeExplosion(
@@ -246,7 +247,7 @@ export class Canvas2DRenderer implements GameRenderer {
               `boss-death-phase-${phase}`, 'bossTurret',
             );
           }
-        } else if (phase === 4) {
+        } else if (phase === turretCount) {
           this.particleSystem.emitLargeExplosion(
             current.boss.position.x, current.boss.position.y,
             'boss-death-final', 'bossBridge',

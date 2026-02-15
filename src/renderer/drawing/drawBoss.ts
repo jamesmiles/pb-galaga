@@ -55,20 +55,26 @@ export function drawBossUpper(ctx: CanvasRenderingContext2D, boss: BossState): v
     ctx.save();
 
     if (turret.isAlive) {
-      // Active turret — bright with glow
+      // Color by turret type
+      const colors = turret.fireType === 'rocket'
+        ? { glow: '#ff3300', base: '#882200', barrel: '#aa3300', cap: '#ff5533' }
+        : turret.fireType === 'homing'
+        ? { glow: '#00ff66', base: '#005522', barrel: '#00aa44', cap: '#33ff88' }
+        : { glow: '#ff8800', base: '#885500', barrel: '#aa6600', cap: '#ffaa44' };
+
       ctx.shadowBlur = 12;
-      ctx.shadowColor = '#ff8800';
+      ctx.shadowColor = colors.glow;
 
       // Turret base
-      ctx.fillStyle = '#885500';
+      ctx.fillStyle = colors.base;
       ctx.fillRect(turret.position.x - 14, turret.position.y - 10, 28, 20);
 
       // Turret barrel
-      ctx.fillStyle = '#aa6600';
+      ctx.fillStyle = colors.barrel;
       ctx.fillRect(turret.position.x - 4, turret.position.y + 8, 8, 14);
 
       // Turret cap
-      ctx.fillStyle = '#ffaa44';
+      ctx.fillStyle = colors.cap;
       ctx.beginPath();
       ctx.arc(turret.position.x, turret.position.y, 10, 0, Math.PI * 2);
       ctx.fill();

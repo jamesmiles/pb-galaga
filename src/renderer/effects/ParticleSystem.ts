@@ -115,9 +115,9 @@ export class ParticleSystem {
 
     const isBridge = entityType === 'bossBridge';
     const colors = EXPLOSION_COLORS[entityType] || EXPLOSION_COLORS.default;
-    const count = isBridge ? 80 : 50;
-    const speedRange = isBridge ? 300 : 250;
-    const lifespan = isBridge ? 1000 : 800;
+    const count = isBridge ? 150 : 50;
+    const speedRange = isBridge ? 450 : 250;
+    const lifespan = isBridge ? 1500 : 800;
 
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
@@ -132,14 +132,14 @@ export class ParticleSystem {
         color,
         life: lifespan,
         maxLife: lifespan,
-        size: 3 + Math.random() * 4,
+        size: isBridge ? 4 + Math.random() * 6 : 3 + Math.random() * 4,
       });
     }
 
     // Screen shake
     this.shakeTimer = 0;
-    this.shakeDuration = isBridge ? 300 : 200;
-    this.shakeIntensity = isBridge ? 8 : 5;
+    this.shakeDuration = isBridge ? 600 : 200;
+    this.shakeIntensity = isBridge ? 15 : 5;
   }
 
   /**

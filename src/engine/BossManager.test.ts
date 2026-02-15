@@ -109,6 +109,36 @@ describe('BossManager', () => {
       expect(fighter.diveState).not.toBeNull();
     });
 
+    it('rocket turret fires rockets', () => {
+      const rocketTurret = state.boss!.turrets.find(t => t.fireType === 'rocket')!;
+      rocketTurret.fireCooldown = 0;
+      // Suppress other turrets
+      for (const t of state.boss!.turrets) {
+        if (t !== rocketTurret) t.fireCooldown = 99999;
+      }
+
+      manager.update(state, 0.1);
+      const rocket = state.projectiles.find(p => p.type === 'rocket');
+      expect(rocket).toBeDefined();
+      expect(rocket!.velocity.y).toBeGreaterThan(0); // fires downward
+    });
+
+    it('homing turret fires homing missiles', () => {
+      const homingTurret = state.boss!.turrets.find(t => t.fireType === 'homing')!;
+      homingTurret.fireCooldown = 0;
+      for (const t of state.boss!.turrets) {
+        if (t !== homingTurret) t.fireCooldown = 99999;
+      }
+
+      manager.update(state, 0.1);
+      const missile = state.projectiles.find(p => p.isHoming);
+      expect(missile).toBeDefined();
+    });
+
+    it('has 6 turrets total', () => {
+      expect(state.boss!.turrets.length).toBe(6);
+    });
+
     it('does not spawn fighters while turrets are alive', () => {
       const enemiesBefore = state.enemies.length;
       manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
@@ -138,10 +168,11 @@ describe('BossManager', () => {
       expect(state.boss!.deathSequence!.phase).toBe(0);
     });
 
-    it('progresses through 5 death phases', () => {
+    it('progresses through all death phases (turrets + bridge)', () => {
       manager.startDeathSequence(state.boss!);
+      const totalPhases = state.boss!.turrets.length + 1; // turrets + bridge
 
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < totalPhases; i++) {
         const dtMs = BOSS_DEATH_PHASE_DURATION + 100;
         manager.update(state, dtMs / 1000);
       }
@@ -154,9 +185,9 @@ describe('BossManager', () => {
     it('awards score to alive players after death', () => {
       const scoreBefore = state.players[0].score;
       manager.startDeathSequence(state.boss!);
+      const totalPhases = state.boss!.turrets.length + 2; // extra margin
 
-      // Fast-forward through all phases
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < totalPhases; i++) {
         manager.update(state, (BOSS_DEATH_PHASE_DURATION + 100) / 1000);
       }
 
