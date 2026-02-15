@@ -16,7 +16,7 @@ export function createEnemyG(row: number, col: number): Enemy {
     maxHealth: ENEMY_G_HEALTH,
     fireMode: 'homing',
     fireCooldown: 0,
-    fireRate: 2500, // Faster than F (3500ms)
+    fireRate: 1800, // Aggressive — fires double homing missiles frequently
     isThrusting: false,
     isFiring: false,
     collisionState: 'none',

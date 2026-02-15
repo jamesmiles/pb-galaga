@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.8.1';
+export const GAME_VERSION = '0.8.2';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -60,7 +60,7 @@ export const ENEMY_F_SCORE_VALUE = 350;
 export const ENEMY_F_COLLISION_RADIUS = 16;
 
 // Enemy Type G defaults (Mini-Boss — scaled-up stealth bomber)
-export const ENEMY_G_HEALTH = 625; // 5x normal F health
+export const ENEMY_G_HEALTH = 1250; // 10x normal F health
 export const ENEMY_G_SCORE_VALUE = 1000;
 export const ENEMY_G_COLLISION_RADIUS = 40; // ~2.5x F radius
 

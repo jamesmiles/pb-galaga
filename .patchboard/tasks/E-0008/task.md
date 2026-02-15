@@ -18,6 +18,8 @@ children:
   - T-0084
   - T-0085
   - T-0086
+  - T-0087
+  - T-0088
 acceptance:
   - "P1 starts with bullets instead of laser"
   - "Co-op respawn pickup system (once per level when player is dead)"
@@ -27,7 +29,9 @@ acceptance:
   - "Death weapon reset respects P1 default (bullet)"
   - "New sound effects: respawnPickup, hitG"
   - "All 378 tests passing"
-  - "Version 0.8.1"
+  - "Weapon switch preserves power level"
+  - "Mini-boss HP and fire rate tuned"
+  - "Version 0.8.2"
 created_at: '2026-02-15'
 updated_at: '2026-02-15'
 ---

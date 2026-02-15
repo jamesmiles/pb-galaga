@@ -15,9 +15,8 @@ export function upgradeWeapon(player: Player, pickup: WeaponPickup): void {
         player.primaryLevel = (player.primaryLevel + 1) as 1 | 2 | 3 | 4;
       }
     } else {
-      // Different type: switch and reset to level 1
+      // Different type: switch but keep current power level
       player.primaryWeapon = weapon;
-      player.primaryLevel = 1;
     }
   } else {
     const weapon = pickup.currentWeapon as 'rocket' | 'missile';
