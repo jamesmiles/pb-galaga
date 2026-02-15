@@ -87,6 +87,43 @@
       line-height: 1.5;
     }
 
+    .engine {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+      text-align: center;
+    }
+
+    .engine h2 {
+      font-size: 18px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+    }
+
+    .engine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+      text-align: left;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .engine-grid dt {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .engine-grid dd {
+      color: #44ff44;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
     .screenshots {
       text-align: center;
       padding: 20px 20px 60px;
@@ -177,12 +214,30 @@
     </div>
   </div>
 
+  <div class="engine">
+    <h2>The Engine</h2>
+    <dl class="engine-grid">
+      <dt>Language</dt>
+      <dd>TypeScript (strict mode)</dd>
+      <dt>Rendering</dt>
+      <dd>Canvas 2D — no framework</dd>
+      <dt>Audio</dt>
+      <dd>ZzFX + ZzFXM procedural synthesis</dd>
+      <dt>Physics</dt>
+      <dd>60 Hz fixed timestep with interpolation</dd>
+      <dt>Build</dt>
+      <dd>84 KB minified — zero runtime dependencies</dd>
+      <dt>Testing</dt>
+      <dd>379 unit tests + Playwright visual tests</dd>
+    </dl>
+  </div>
+
   <div class="screenshots">
     <h2>Screenshots</h2>
     <div class="screenshot-grid">
       <img src="screenshots/start-menu.png" alt="PB-Galaga start menu">
       <img src="screenshots/gameplay.png" alt="PB-Galaga gameplay with enemy formation">
-      <img src="screenshots/post-explosion.png" alt="PB-Galaga combat">
+      <img src="screenshots/earth-sprite.png" alt="Earth background sprite">
     </div>
   </div>
 

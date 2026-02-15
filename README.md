@@ -31,7 +31,7 @@ PB-Galaga is a test-driven, browser-based game built with a fixed time-step engi
 | Action | Player 1 | Player 2 |
 |--------|----------|----------|
 | Move | Arrow keys | WASD |
-| Fire | Spacebar | E |
+| Fire | Spacebar | Q |
 | Pause | Escape | Escape |
 | Mute | M | M |
 
@@ -74,4 +74,4 @@ pb-galaga/
 
 ## License
 
-ISC
+MIT — see [LICENSE](LICENSE)
