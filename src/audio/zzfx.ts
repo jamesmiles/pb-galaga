@@ -156,9 +156,9 @@ export function zzfxGenerate(
     d = (
       shape === 0 ? Math.sin(t) : // Sine
       shape === 1 ? Math.sin(t) ** 3 : // Shaped sine
-      shape === 2 ? Math.sin((t % PI2) > Math.PI ? -1 : 1) : // Square-ish
-      shape === 3 ? ((t % PI2) / PI2 * 2 - 1 + (((t % PI2) / PI2 * 2 - 1) > 0 ? -1 : 1)) * 0.7 : // Saw-ish
-      0
+      shape === 2 ? ((t % PI2) > Math.PI ? -1 : 1) : // Square
+      shape === 3 ? (((t % PI2) / PI2) * 2 - 1) : // Sawtooth
+      Math.random() * 2 - 1 // Noise (shape >= 4)
     );
 
     // Tremolo
