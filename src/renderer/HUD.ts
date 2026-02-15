@@ -1,4 +1,4 @@
-import type { GameState } from '../types';
+import type { GameState, Player } from '../types';
 import { GAME_WIDTH, SECONDARY_WEAPON_DURATION } from '../engine/constants';
 
 /**
@@ -45,73 +45,115 @@ export function drawHUD(
   ctx.textAlign = 'left';
   ctx.fillText(`Engine: ${engineFps} | Render: ${renderFps}`, 10, 20);
 
-  // Primary weapon display (bottom-left)
+  // Bottom HUD: weapon & shield status bars
+  const coop = state.gameMode === 'co-op' && p2;
   if (p1) {
-    ctx.font = '10px monospace';
-    ctx.fillStyle = '#aaaaaa';
-    ctx.textAlign = 'left';
-    const primaryColor = p1.primaryWeapon === 'laser' ? '#4488ff' : '#ff4444';
-    const levelDots = '\u2588'.repeat(p1.primaryLevel) + '\u2591'.repeat(4 - p1.primaryLevel);
-    ctx.fillStyle = primaryColor;
-    ctx.fillText(`${p1.primaryWeapon.toUpperCase()} ${levelDots}`, 10, 780);
+    if (coop) {
+      // Co-op: P1 left half, P2 right half
+      drawPlayerStatusBar(ctx, p1, 'left');
+      drawPlayerStatusBar(ctx, p2!, 'right');
+    } else {
+      // Single player: spread across full width
+      drawPlayerStatusBar(ctx, p1, 'full');
+    }
   }
 
-  // Secondary weapon timer (bottom-center bar)
-  if (p1?.secondaryWeapon) {
-    const barWidth = 100;
-    const barHeight = 6;
-    const barX = GAME_WIDTH / 2 - barWidth / 2;
-    const barY = 780;
-    const fill = Math.max(0, p1.secondaryTimer / SECONDARY_WEAPON_DURATION);
+  ctx.restore();
+}
+
+/** Draw primary weapon, secondary timer bar, and shield bar for one player. */
+function drawPlayerStatusBar(
+  ctx: CanvasRenderingContext2D,
+  player: Player,
+  side: 'left' | 'right' | 'full',
+): void {
+  const barY = 780;
+  const barHeight = 6;
+  const isP2 = player.id === 'player2';
+  const tintColor = isP2 ? '#4488ff' : '#ffffff';
+
+  // Layout depends on side
+  let primaryX: number;
+  let primaryAlign: CanvasTextAlign;
+  let secondaryBarX: number;
+  let secondaryLabelX: number;
+  let shieldBarX: number;
+  let shieldLabelX: number;
+  let shieldLabelAlign: CanvasTextAlign;
+  const secondaryBarWidth = 100;
+  const shieldBarWidth = 80;
+
+  if (side === 'left') {
+    // P1: primary far-left, secondary left-center, shield center-left
+    primaryX = 10;
+    primaryAlign = 'left';
+    secondaryBarX = 150;
+    secondaryLabelX = 200;
+    shieldBarX = 290;
+    shieldLabelX = 370;
+    shieldLabelAlign = 'right';
+  } else if (side === 'right') {
+    // P2: shield center-right, secondary right-center, primary far-right
+    primaryX = GAME_WIDTH - 10;
+    primaryAlign = 'right';
+    secondaryBarX = GAME_WIDTH - 250;
+    secondaryLabelX = GAME_WIDTH - 200;
+    shieldBarX = GAME_WIDTH - 370;
+    shieldLabelX = GAME_WIDTH - 290;
+    shieldLabelAlign = 'left';
+  } else {
+    // Full width (single player): same as original layout
+    primaryX = 10;
+    primaryAlign = 'left';
+    secondaryBarX = GAME_WIDTH / 2 - secondaryBarWidth / 2;
+    secondaryLabelX = GAME_WIDTH / 2;
+    shieldBarX = GAME_WIDTH - shieldBarWidth - 10;
+    shieldLabelX = GAME_WIDTH - 10;
+    shieldLabelAlign = 'right';
+  }
+
+  // Primary weapon
+  ctx.font = '10px monospace';
+  ctx.textAlign = primaryAlign;
+  const primaryColor = player.primaryWeapon === 'laser' ? '#4488ff' : '#ff4444';
+  const levelDots = '\u2588'.repeat(player.primaryLevel) + '\u2591'.repeat(4 - player.primaryLevel);
+  ctx.fillStyle = primaryColor;
+  ctx.fillText(`${player.primaryWeapon.toUpperCase()} ${levelDots}`, primaryX, barY);
+
+  // Secondary weapon timer bar
+  if (player.secondaryWeapon) {
+    const fill = Math.max(0, player.secondaryTimer / SECONDARY_WEAPON_DURATION);
     const weaponColors: Record<string, string> = {
       rocket: '#aa44ff',
       missile: '#44ff44',
     };
-    const color = weaponColors[p1.secondaryWeapon] ?? '#ffffff';
+    const color = weaponColors[player.secondaryWeapon] ?? '#ffffff';
 
-    // Background
     ctx.fillStyle = '#333333';
-    ctx.fillRect(barX, barY, barWidth, barHeight);
-
-    // Fill
+    ctx.fillRect(secondaryBarX, barY, secondaryBarWidth, barHeight);
     ctx.fillStyle = color;
-    ctx.fillRect(barX, barY, barWidth * fill, barHeight);
+    ctx.fillRect(secondaryBarX, barY, secondaryBarWidth * fill, barHeight);
 
-    // Label
     ctx.font = '10px monospace';
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = tintColor;
     ctx.textAlign = 'center';
-    ctx.fillText(p1.secondaryWeapon.toUpperCase(), GAME_WIDTH / 2, barY - 4);
+    ctx.fillText(player.secondaryWeapon.toUpperCase(), secondaryLabelX, barY - 4);
   }
 
-  // Shield/health bar (bottom-right)
-  if (p1) {
-    const barWidth = 80;
-    const barHeight = 6;
-    const barX = GAME_WIDTH - barWidth - 10;
-    const barY = 780;
-    const healthPct = Math.max(0, p1.health / p1.maxHealth);
+  // Shield/health bar
+  const healthPct = Math.max(0, player.health / player.maxHealth);
+  let barColor: string;
+  if (healthPct > 0.6) barColor = '#44ff44';
+  else if (healthPct > 0.3) barColor = '#ffff44';
+  else barColor = '#ff4444';
 
-    // Health bar color: green → yellow → red
-    let barColor: string;
-    if (healthPct > 0.6) barColor = '#44ff44';
-    else if (healthPct > 0.3) barColor = '#ffff44';
-    else barColor = '#ff4444';
+  ctx.fillStyle = '#333333';
+  ctx.fillRect(shieldBarX, barY, shieldBarWidth, barHeight);
+  ctx.fillStyle = barColor;
+  ctx.fillRect(shieldBarX, barY, shieldBarWidth * healthPct, barHeight);
 
-    // Background
-    ctx.fillStyle = '#333333';
-    ctx.fillRect(barX, barY, barWidth, barHeight);
-
-    // Fill
-    ctx.fillStyle = barColor;
-    ctx.fillRect(barX, barY, barWidth * healthPct, barHeight);
-
-    // Label
-    ctx.font = '10px monospace';
-    ctx.fillStyle = '#aaaaaa';
-    ctx.textAlign = 'right';
-    ctx.fillText('SHIELD', GAME_WIDTH - 10, barY - 4);
-  }
-
-  ctx.restore();
+  ctx.font = '10px monospace';
+  ctx.fillStyle = isP2 ? '#4488ff' : '#aaaaaa';
+  ctx.textAlign = shieldLabelAlign;
+  ctx.fillText('SHIELD', shieldLabelX, barY - 4);
 }
