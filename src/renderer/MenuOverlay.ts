@@ -215,7 +215,7 @@ export class MenuOverlay {
       const level = data?.level ?? 1;
       const text = (data?.introText as string) ?? '';
       const chars = (data?.introChars as number) ?? 0;
-      const revealed = text.slice(0, chars);
+      const revealed = text.slice(0, chars).replace(/\n/g, '<br>');
       const done = chars >= text.length;
       this.overlay.innerHTML = `
         <div class="intro-level-label">Level ${level}</div>

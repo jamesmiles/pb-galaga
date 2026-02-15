@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { GameManager } from './GameManager';
 import { WAVE_COMPLETE_BONUS } from './constants';
 
-/** Tick past the level intro typing animation (~3s for level 1). */
+/** Tick past the level intro typing animation (~6s for longest intro). */
 function skipIntro(gm: GameManager): void {
-  gm.tickHeadless(200);
+  gm.tickHeadless(400);
 }
 
 describe('GameManager', () => {

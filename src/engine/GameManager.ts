@@ -21,11 +21,11 @@ import { BossManager } from './BossManager';
 import { LifePickupManager } from './LifePickupManager';
 /** Intro text per level number. */
 const LEVEL_INTRO_TEXT: Record<number, string> = {
-  1: '2029 AD, the invasion begins',
-  2: 'planetary defence activated',
-  3: 'dark side of the moon',
-  4: 'approaching asteroid belt',
-  5: 'defeat the mars colony',
+  1: '2029.07.04 // 03:17 UTC\nfirst contact confirmed. space force scrambled to defend earth.',
+  2: '// 07:45 UTC\nthe swarm has reached orbit. space force activates planetary defence grid.',
+  3: '// 12:08 UTC\nenemy stronghold detected on the far side of the moon. space force moves to intercept.',
+  4: '// 18:32 UTC\nhostile signatures in the asteroid belt. space force navigates the debris field.',
+  5: '// 23:00 UTC\nenemy command has seized the mars colony. space force begins final assault on the mothership.',
 };
 
 /** Milliseconds between each typed character. */
