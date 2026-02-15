@@ -80,11 +80,19 @@ export class BossManager {
       this.fighterSpawnTimer -= dtSeconds * 1000;
       if (this.fighterSpawnTimer <= 0) {
         this.fighterSpawnTimer = BOSS_FIGHTER_SPAWN_INTERVAL;
-        // Spawn a fighter from the bridge center
+        // Spawn a fighter from the bridge, flying downward
         const fighter = createEnemyA(0, 0);
-        fighter.position = { x: boss.position.x, y: boss.position.y + boss.height * 0.4 };
+        const spawnX = boss.position.x;
+        const spawnY = boss.position.y + boss.height * 0.4;
+        fighter.position = { x: spawnX, y: spawnY };
         fighter.velocity = { x: (Math.random() - 0.5) * 100, y: 150 };
-        fighter.flightPathState = null;
+        // Set dive state so formation manager doesn't override position
+        fighter.diveState = {
+          phase: 'sweep',
+          progress: 0,
+          targetX: spawnX + (Math.random() - 0.5) * 200,
+          startPos: { x: spawnX, y: spawnY },
+        };
         state.enemies = [...state.enemies, fighter];
       }
     }

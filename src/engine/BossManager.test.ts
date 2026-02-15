@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { BossManager } from './BossManager';
 import { createBoss } from '../objects/boss/code/Boss';
 import { createInitialState, createPlayer } from './StateManager';
-import { BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION, BOSS_FIGHTER_SPAWN_INTERVAL, GAME_WIDTH } from './constants';
+import { BOSS_ENTRY_SPEED, BOSS_DEATH_PHASE_DURATION, BOSS_FIGHTER_SPAWN_INTERVAL, BOSS_WIDTH, GAME_WIDTH } from './constants';
 import type { GameState } from '../types';
 
 describe('BossManager', () => {
@@ -82,6 +82,46 @@ describe('BossManager', () => {
       // Advance past spawn interval
       manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
       expect(state.enemies.length).toBe(enemiesBefore + 1);
+    });
+
+    it('spawned fighters appear at bridge position, not screen bottom', () => {
+      state.boss!.position = { x: 400, y: 120 };
+      for (const turret of state.boss!.turrets) {
+        turret.isAlive = false;
+      }
+
+      manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
+
+      const fighter = state.enemies[state.enemies.length - 1];
+      // Fighter should spawn near the boss, not at the bottom of the screen
+      expect(fighter.position.y).toBeLessThan(300);
+      expect(fighter.position.x).toBeCloseTo(400, -1);
+    });
+
+    it('spawned fighters have dive state so formation does not override position', () => {
+      for (const turret of state.boss!.turrets) {
+        turret.isAlive = false;
+      }
+
+      manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
+
+      const fighter = state.enemies[state.enemies.length - 1];
+      expect(fighter.diveState).not.toBeNull();
+    });
+
+    it('does not spawn fighters while turrets are alive', () => {
+      const enemiesBefore = state.enemies.length;
+      manager.update(state, (BOSS_FIGHTER_SPAWN_INTERVAL + 100) / 1000);
+      expect(state.enemies.length).toBe(enemiesBefore);
+    });
+
+    it('turrets are separated from bridge zone', () => {
+      const boss = state.boss!;
+      const bridgeHalfW = boss.width * 0.09; // Matches CollisionDetector
+      for (const turret of boss.turrets) {
+        // Every turret offset should be outside the bridge zone
+        expect(Math.abs(turret.offsetX)).toBeGreaterThan(bridgeHalfW + turret.collisionRadius);
+      }
     });
   });
 

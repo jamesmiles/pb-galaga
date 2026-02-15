@@ -8,11 +8,14 @@ import {
 /** Create the initial boss state with 4 turrets spanning the width. */
 export function createBoss(): BossState {
   const cx = GAME_WIDTH / 2;
-  const turretSpacing = BOSS_WIDTH / 5; // 4 turrets evenly distributed
+  // 4 turrets: 2 outer pair and 2 inner pair, with a gap in the center for the bridge
+  const outerOffset = BOSS_WIDTH * 0.42; // ~302px from center
+  const innerOffset = BOSS_WIDTH * 0.2;  // ~144px from center
+  const turretOffsets = [-outerOffset, -innerOffset, innerOffset, outerOffset];
 
   const turrets: BossTurret[] = [];
   for (let i = 0; i < 4; i++) {
-    const offsetX = -BOSS_WIDTH / 2 + turretSpacing * (i + 1);
+    const offsetX = turretOffsets[i];
     turrets.push({
       id: `boss-turret-${i}`,
       position: { x: cx + offsetX, y: -BOSS_HEIGHT / 2 }, // Updated during entry
@@ -27,10 +30,10 @@ export function createBoss(): BossState {
     });
   }
 
-  // Upper collision zones — turrets + bridge
-  // Bridge zone sits between the two inner turrets (±144 offset), so keep halfW < 144
+  // Upper collision zones — bridge only (turrets have their own circle collision)
+  // Bridge sits between inner turrets at ±144px, so width must be < 288
   const upperCollisionZones: CollisionZone[] = [
-    { offsetX: 0, offsetY: BOSS_HEIGHT * 0.3, width: BOSS_WIDTH * 0.3, height: BOSS_HEIGHT * 0.4 },
+    { offsetX: 0, offsetY: BOSS_HEIGHT * 0.3, width: BOSS_WIDTH * 0.18, height: BOSS_HEIGHT * 0.4 },
   ];
 
   return {
