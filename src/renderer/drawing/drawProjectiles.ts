@@ -34,9 +34,15 @@ export function drawProjectiles(
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 4, 12);
     } else if (proj.type === 'plasma') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff00ff', 6, 10);
+    } else if (proj.type === 'rocket') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#aa44ff', 5, 10);
+    } else if (proj.type === 'missile') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#44ff44', 3, 6);
+    } else if (proj.type === 'snake') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, 14);
     } else {
       const isPlayerBullet = proj.owner.type === 'player';
-      const trailColor = isPlayerBullet ? '#00ffff' : '#ff8800';
+      const trailColor = isPlayerBullet ? '#ff4444' : '#ff8800';
       drawTrails(ctx, pos.x, pos.y, nx, ny, trailColor, 4, 6);
     }
 
@@ -65,11 +71,48 @@ export function drawProjectiles(
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(pos.x - 1, pos.y - 3, 2, 6);
+    } else if (proj.type === 'rocket') {
+      // Purple rocket with flame glow
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#8800ff';
+      ctx.fillStyle = '#aa44ff';
+      ctx.fillRect(pos.x - 2.5, pos.y - 5, 5, 10);
+
+      // White hot tip
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(pos.x - 1, pos.y - 5, 2, 3);
+
+      // Flame tail
+      ctx.fillStyle = '#cc88ff';
+      ctx.fillRect(pos.x - 2, pos.y + 3, 4, 4);
+    } else if (proj.type === 'missile') {
+      // Green homing missile
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = '#44ff44';
+      ctx.fillStyle = '#44ff44';
+      ctx.fillRect(pos.x - 1.5, pos.y - 4, 3, 8);
+
+      // Bright green exhaust
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#88ffaa';
+      ctx.fillRect(pos.x - 1, pos.y + 2, 2, 3);
+    } else if (proj.type === 'snake') {
+      // Thick cyan beam with heavy glow
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = '#00ffff';
+      ctx.fillStyle = '#00ffff';
+      ctx.fillRect(pos.x - 4, pos.y - 7, 8, 14);
+
+      // Bright white core
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(pos.x - 2, pos.y - 5, 4, 10);
     } else {
       // Bullet — color depends on owner
       const isPlayerBullet = proj.owner.type === 'player';
-      const color = isPlayerBullet ? '#00ffff' : '#ffff00';
-      const glowColor = isPlayerBullet ? '#00ffff' : '#ff8800';
+      const color = isPlayerBullet ? '#ff4444' : '#ffff00';
+      const glowColor = isPlayerBullet ? '#ff4444' : '#ff8800';
 
       ctx.shadowBlur = 6;
       ctx.shadowColor = glowColor;

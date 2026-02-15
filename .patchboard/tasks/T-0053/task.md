@@ -2,9 +2,9 @@
 id: T-0053
 title: "Rebalance projectile stats (bullet speed, plasma size)"
 type: task
-status: todo
+status: review
 priority: P2
-owner: null
+owner: engineer
 labels: [sprint-6, balance]
 depends_on: [T-0052]
 parallel_with: []

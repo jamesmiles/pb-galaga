@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'typeKey';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'typeKey' | 'asteroidHit' | 'asteroidExplode';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -33,6 +33,10 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   hitE: [0.8, 0.05, 180, 0.01, 0.1, 0.25, 3, 1, -8, -2, 0, 0, 0, 0.9, 0, 0, 0, 0.2, 0.15, 0],
   // Keyboard typing click
   typeKey: [0.15, 0.01, 1200, 0, 0.005, 0.01, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8, 0.005, 0],
+  // Asteroid hit: dull dirt thud (low frequency, short, gritty)
+  asteroidHit: [0.5, 0.04, 150, 0, 0.04, 0.08, 3, 1, -3, 0, 0, 0, 0, 0.7, 0, 0, 0, 0.3, 0.06, 0],
+  // Asteroid explode: crumbling dirt burst (deep rumble with noise)
+  asteroidExplode: [0.7, 0.06, 100, 0.01, 0.1, 0.3, 3, 1, -6, -1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0.15, 0],
 };
 
 /**

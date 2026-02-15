@@ -2,9 +2,9 @@
 id: T-0058
 title: "Implement player weapon state and upgrade logic"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, engine, weapon]
 depends_on: [T-0052]
 parallel_with: [T-0061]

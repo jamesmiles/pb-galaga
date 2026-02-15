@@ -1,4 +1,4 @@
-import type { GameState, Player, Enemy, Projectile, Powerup, Star, FormationState, MenuState, BackgroundState } from '../types';
+import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState } from '../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_START_LIVES, PLAYER_MAX_HEALTH,
   FORMATION_BASE_SPEED, FORMATION_CELL_WIDTH, FORMATION_CELL_HEIGHT,
@@ -63,6 +63,8 @@ export function createInitialState(): GameState {
     enemies: [],
     projectiles: [],
     powerups: [],
+    weaponPickups: [],
+    asteroids: [],
     background: { stars: [], scrollSpeed: 0 },
     formation: createInitialFormation(),
     menu: {
@@ -107,6 +109,8 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.enemies = source.enemies;
   target.projectiles = source.projectiles;
   target.powerups = source.powerups;
+  target.weaponPickups = source.weaponPickups;
+  target.asteroids = source.asteroids;
   target.background = source.background;
   target.formation = source.formation;
   target.menu = source.menu;
@@ -130,7 +134,11 @@ export function createPlayer(id: 'player1' | 'player2'): Player {
     score: 0,
     health: PLAYER_MAX_HEALTH,
     maxHealth: PLAYER_MAX_HEALTH,
-    fireMode: 'normal',
+    primaryWeapon: 'laser',
+    primaryLevel: 1,
+    secondaryWeapon: null,
+    secondaryTimer: 0,
+    secondaryCooldown: 0,
     fireCooldown: 0,
     isThrusting: false,
     isFiring: false,

@@ -56,7 +56,11 @@ export interface Player {
   score: number;
   health: number;
   maxHealth: number;
-  fireMode: 'normal' | 'rapid' | 'spread';
+  primaryWeapon: 'laser' | 'bullet';
+  primaryLevel: 1 | 2 | 3 | 4;
+  secondaryWeapon: 'rocket' | 'missile' | null;
+  secondaryTimer: number;
+  secondaryCooldown: number;
   fireCooldown: number;
   isThrusting: boolean;
   isFiring: boolean;
@@ -113,7 +117,7 @@ export type ProjectileOwner =
 
 export interface Projectile {
   id: string;
-  type: 'laser' | 'bullet' | 'rocket' | 'missile' | 'plasma';
+  type: 'laser' | 'bullet' | 'rocket' | 'missile' | 'plasma' | 'snake';
   owner: ProjectileOwner;
   position: Vector2D;
   velocity: Vector2D;
@@ -125,6 +129,41 @@ export interface Projectile {
   maxLifetime: number;
   collisionRadius: number;
   hasCollided: boolean;
+  // Optional fields for acceleration/homing behavior
+  acceleration?: number;
+  maxSpeed?: number;
+  turnRate?: number;
+  isHoming?: boolean;
+  homingDelay?: number;
+}
+
+// --- Weapon Pickup ---
+
+export interface WeaponPickup {
+  id: string;
+  category: 'primary' | 'secondary';
+  currentWeapon: 'laser' | 'bullet' | 'rocket' | 'missile';
+  position: Vector2D;
+  velocity: Vector2D;
+  isActive: boolean;
+  cycleTimer: number;
+  lifetime: number;
+}
+
+// --- Asteroid ---
+
+export interface Asteroid {
+  id: string;
+  size: 'small' | 'large';
+  position: Vector2D;
+  velocity: Vector2D;
+  rotation: number;
+  rotationSpeed: number;
+  health: number;
+  maxHealth: number;
+  collisionRadius: number;
+  isAlive: boolean;
+  scoreValue: number;
 }
 
 // --- Powerup ---
@@ -204,6 +243,8 @@ export interface GameState {
   enemies: Enemy[];
   projectiles: Projectile[];
   powerups: Powerup[];
+  weaponPickups: WeaponPickup[];
+  asteroids: Asteroid[];
   background: BackgroundState;
   formation: FormationState;
   menu: MenuState | null;

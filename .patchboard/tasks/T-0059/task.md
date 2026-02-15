@@ -2,9 +2,9 @@
 id: T-0059
 title: "Implement weapon pickup drop and collection system"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, engine, powerup]
 depends_on: [T-0058]
 parallel_with: []

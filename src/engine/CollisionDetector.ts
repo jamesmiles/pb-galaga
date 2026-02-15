@@ -1,7 +1,8 @@
-import type { GameState, Player, Enemy, Projectile, Vector2D } from '../types';
-import { PLAYER_COLLISION_RADIUS } from './constants';
+import type { GameState, Player, Enemy, Projectile, Asteroid, Vector2D } from '../types';
+import { PLAYER_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS, ASTEROID_DAMAGE } from './constants';
 import { damagePlayer } from '../objects/player/code/PlayerShip';
 import { damageEnemy } from '../objects/enemies/enemyA/code/EnemyA';
+import { upgradeWeapon } from './WeaponManager';
 
 function distance(a: Vector2D, b: Vector2D): number {
   const dx = a.x - b.x;
@@ -17,6 +18,9 @@ export function detectCollisions(state: GameState): void {
   detectPlayerEnemyCollisions(state);
   detectProjectileEnemyCollisions(state);
   detectEnemyProjectilePlayerCollisions(state);
+  detectPlayerPickupCollisions(state);
+  detectPlayerAsteroidCollisions(state);
+  detectProjectileAsteroidCollisions(state);
 }
 
 function detectPlayerEnemyCollisions(state: GameState): void {
@@ -73,6 +77,63 @@ function detectEnemyProjectilePlayerCollisions(state: GameState): void {
         proj.isActive = false;
         damagePlayer(player, proj.damage, state.currentTime);
         break; // One projectile hits one player
+      }
+    }
+  }
+}
+
+function detectPlayerPickupCollisions(state: GameState): void {
+  for (const pickup of state.weaponPickups) {
+    if (!pickup.isActive) continue;
+    for (const player of state.players) {
+      if (!player.isAlive) continue;
+      const dist = distance(player.position, pickup.position);
+      if (dist < PLAYER_COLLISION_RADIUS + WEAPON_PICKUP_COLLISION_RADIUS) {
+        pickup.isActive = false;
+        upgradeWeapon(player, pickup);
+        break;
+      }
+    }
+  }
+}
+
+function detectPlayerAsteroidCollisions(state: GameState): void {
+  for (const player of state.players) {
+    if (!player.isAlive || player.isInvulnerable) continue;
+    for (const asteroid of state.asteroids) {
+      if (!asteroid.isAlive) continue;
+      const dist = distance(player.position, asteroid.position);
+      if (dist < PLAYER_COLLISION_RADIUS + asteroid.collisionRadius) {
+        damagePlayer(player, ASTEROID_DAMAGE, state.currentTime);
+        asteroid.isAlive = false;
+        break;
+      }
+    }
+  }
+}
+
+function detectProjectileAsteroidCollisions(state: GameState): void {
+  for (const proj of state.projectiles) {
+    if (!proj.isActive || proj.hasCollided) continue;
+    // Only player projectiles hit asteroids
+    if (proj.owner.type !== 'player') continue;
+
+    for (const asteroid of state.asteroids) {
+      if (!asteroid.isAlive) continue;
+      const dist = distance(proj.position, asteroid.position);
+      if (dist < proj.collisionRadius + asteroid.collisionRadius) {
+        proj.hasCollided = true;
+        proj.isActive = false;
+        asteroid.health -= proj.damage;
+        if (asteroid.health <= 0) {
+          asteroid.isAlive = false;
+          // Award score
+          const scoringPlayer = state.players.find(p => p.id === proj.owner.id);
+          if (scoringPlayer) {
+            scoringPlayer.score += asteroid.scoreValue;
+          }
+        }
+        break;
       }
     }
   }

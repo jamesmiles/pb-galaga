@@ -2,9 +2,9 @@
 id: T-0062
 title: "Add rendering for new projectiles, pickups, and asteroids"
 type: task
-status: todo
+status: review
 priority: P2
-owner: null
+owner: engineer
 labels: [sprint-6, renderer, visual]
 depends_on: [T-0054, T-0055, T-0056, T-0059, T-0061]
 parallel_with: []

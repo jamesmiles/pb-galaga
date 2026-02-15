@@ -2,9 +2,9 @@
 id: T-0061
 title: "Implement asteroid system for Level 4"
 type: task
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels: [sprint-6, engine, asteroid]
 depends_on: [T-0052]
 parallel_with: [T-0058]

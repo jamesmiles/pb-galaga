@@ -3,7 +3,7 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'gameplay';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4';
 
 /**
  * Simple chiptune song data in ZzFXM format.
@@ -48,9 +48,9 @@ const MENU_SONG: ZzFXMSong = [
   90, // BPM
 ];
 
-// Gameplay theme: airy space synth, 3-channel, 105 BPM
+// Level 1 theme: airy space synth, 3-channel, 105 BPM
 // Pentatonic scale (C-D-E-G-A) for a dreamy, open feel
-const GAMEPLAY_SONG: ZzFXMSong = [
+const LEVEL1_SONG: ZzFXMSong = [
   // Instruments
   [
     // 0: Warm sine pad (slow attack, long sustain for atmospheric feel)
@@ -99,9 +99,138 @@ const GAMEPLAY_SONG: ZzFXMSong = [
   105, // BPM — spacious and airy
 ];
 
+// Level 2 theme: upbeat rock, 3-channel, 130 BPM
+// Driving rhythm with power chord melody
+const LEVEL2_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Overdriven guitar (sawtooth, punchy)
+    [0.4, 0, 220, 0.01, 0.15, 0.1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
+    // 1: Bass guitar (square, deep)
+    [0.3, 0, 110, 0.01, 0.2, 0.12, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.03, 0],
+    // 2: Drums (noise-based percussion)
+    [0.35, 0, 100, 0, 0.02, 0.05, 4, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0.3, 0.01, 0],
+  ],
+  // Patterns
+  [
+    // Pattern 0: Driving verse
+    [
+      // Channel 0: Power chord melody
+      [64, 0, 0, 67, 0, 0, 71, 0, 0, 67, 0, 0, 64, 0, 0, 69, 0, 0, 67, 0, 0, 64, 0, 0],
+      // Channel 1: Bass guitar
+      [40, 1, 0, 0, undefined, 0, 40, 1, 0, 0, undefined, 0, 45, 1, 0, 0, undefined, 0, 43, 1, 0, 0, undefined, 0],
+      // Channel 2: Drums
+      [60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0],
+    ],
+    // Pattern 1: Chorus
+    [
+      // Channel 0: Higher energy melody
+      [71, 0, 0, 72, 0, 0, 74, 0, 0, 72, 0, 0, 69, 0, 0, 67, 0, 0, 64, 0, 0, 67, 0, 0],
+      // Channel 1: Driving bass
+      [45, 1, 0, 45, 1, 0, 43, 1, 0, 0, undefined, 0, 40, 1, 0, 40, 1, 0, 43, 1, 0, 0, undefined, 0],
+      // Channel 2: Drums
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 1, 0, 1], // Channel 0
+    [0, 1, 0, 1], // Channel 1
+    [0, 1, 0, 1], // Channel 2
+  ],
+  130, // BPM
+];
+
+// Level 3 theme: crazy synth, 3-channel, 140 BPM
+// Rapid arpeggios, chromatic runs, off-beat patterns
+const LEVEL3_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Arpeggiated synth (detuned square, fast)
+    [0.3, 0.1, 440, 0, 0.08, 0.06, 2, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.01, 0],
+    // 1: Wobble bass (frequency-modulated)
+    [0.35, 0, 80, 0.02, 0.2, 0.15, 0, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0.6, 0.04, 0],
+    // 2: Fast hi-hats (noise, short)
+    [0.2, 0, 200, 0, 0.01, 0.02, 4, 1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0.2, 0, 0],
+  ],
+  // Patterns
+  [
+    // Pattern 0: Arpeggio frenzy
+    [
+      // Channel 0: Rapid arpeggios (chromatic)
+      [72, 0, 0, 75, 0, 0, 79, 0, 0, 82, 0, 0, 79, 0, 0, 75, 0, 0, 73, 0, 0, 70, 0, 0],
+      // Channel 1: Wobble bass
+      [36, 1, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 39, 1, 0, 0, undefined, 0, 34, 1, 0, 0, undefined, 0],
+      // Channel 2: Hi-hats
+      [80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0, 80, 2, 0],
+    ],
+    // Pattern 1: Chromatic run variation
+    [
+      // Channel 0: Descending chromatic run
+      [84, 0, 0, 82, 0, 0, 80, 0, 0, 78, 0, 0, 76, 0, 0, 74, 0, 0, 72, 0, 0, 75, 0, 0],
+      // Channel 1: Off-beat bass
+      [0, undefined, 0, 39, 1, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 34, 1, 0, 0, undefined, 0, 36, 1, 0],
+      // Channel 2: Hi-hat syncopation
+      [80, 2, 0, 0, undefined, 0, 80, 2, 0, 80, 2, 0, 0, undefined, 0, 80, 2, 0, 80, 2, 0, 0, undefined, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 1, 0, 1], // Channel 0
+    [0, 1, 0, 1], // Channel 1
+    [0, 1, 0, 1], // Channel 2
+  ],
+  140, // BPM
+];
+
+// Level 4 theme: drum and bass, 3-channel, 165 BPM
+// Syncopated patterns, sub bass hits, fast snare rolls
+const LEVEL4_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Stabby synth (sawtooth, sharp attack)
+    [0.35, 0, 330, 0, 0.05, 0.04, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.01, 0],
+    // 1: Deep sub bass (sine, heavy)
+    [0.4, 0, 55, 0.01, 0.25, 0.2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.05, 0],
+    // 2: Breakbeat drums (noise, varied)
+    [0.3, 0, 150, 0, 0.02, 0.03, 4, 1, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0.3, 0.01, 0],
+  ],
+  // Patterns
+  [
+    // Pattern 0: Syncopated stabs + sub bass
+    [
+      // Channel 0: Stabby synth (syncopated)
+      [72, 0, 0, 0, undefined, 0, 75, 0, 0, 72, 0, 0, 0, undefined, 0, 77, 0, 0, 72, 0, 0, 0, undefined, 0],
+      // Channel 1: Sub bass hits
+      [36, 1, 0, 0, undefined, 0, 0, undefined, 0, 36, 1, 0, 0, undefined, 0, 0, undefined, 0, 34, 1, 0, 0, undefined, 0],
+      // Channel 2: Fast breakbeat
+      [60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0],
+    ],
+    // Pattern 1: Snare roll + bass drop
+    [
+      // Channel 0: Ascending stabs
+      [75, 0, 0, 77, 0, 0, 79, 0, 0, 0, undefined, 0, 82, 0, 0, 79, 0, 0, 77, 0, 0, 75, 0, 0],
+      // Channel 1: Heavy sub bass
+      [36, 1, 0, 36, 1, 0, 0, undefined, 0, 0, undefined, 0, 34, 1, 0, 34, 1, 0, 0, undefined, 0, 36, 1, 0],
+      // Channel 2: Fast snare rolls
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 1, 0, 1], // Channel 0
+    [0, 1, 0, 1], // Channel 1
+    [0, 1, 0, 1], // Channel 2
+  ],
+  165, // BPM
+];
+
 const TRACKS: Record<MusicTrack, ZzFXMSong> = {
   menu: MENU_SONG,
-  gameplay: GAMEPLAY_SONG,
+  level1: LEVEL1_SONG,
+  level2: LEVEL2_SONG,
+  level3: LEVEL3_SONG,
+  level4: LEVEL4_SONG,
 };
 
 /**

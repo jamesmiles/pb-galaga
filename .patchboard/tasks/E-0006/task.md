@@ -2,9 +2,9 @@
 id: E-0006
 title: "Sprint 6 - Weapons, Power-ups, Asteroids, Music"
 type: epic
-status: todo
+status: review
 priority: P1
-owner: null
+owner: engineer
 labels:
   - epic
   - sprint-6
