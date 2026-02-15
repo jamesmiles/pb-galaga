@@ -2,7 +2,7 @@
 id: T-0071
 title: "Boss collision detection"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, boss, collision]

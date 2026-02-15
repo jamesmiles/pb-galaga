@@ -2,7 +2,7 @@
 id: T-0074
 title: "Level 5 configuration, backgrounds, and music"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, level-config]

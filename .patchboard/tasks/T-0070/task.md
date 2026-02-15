@@ -2,7 +2,7 @@
 id: T-0070
 title: "Boss Manager - update logic"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, boss, engine]

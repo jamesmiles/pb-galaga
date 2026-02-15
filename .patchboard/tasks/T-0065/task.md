@@ -2,7 +2,7 @@
 id: T-0065
 title: "Level end delay - clearing phase (all levels)"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, engine]

@@ -2,7 +2,7 @@
 id: T-0079
 title: "Life drop pickup with heart icon"
 type: task
-status: todo
+status: review
 priority: P1
 owner: engineer
 labels: [level-5, pickup, gameplay]
