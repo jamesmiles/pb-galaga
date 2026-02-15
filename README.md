@@ -74,4 +74,4 @@ pb-galaga/
 
 ## License
 
-ISC
+MIT — see [LICENSE](LICENSE)

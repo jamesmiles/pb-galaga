@@ -14,7 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/jamesmiles/pb-galaga.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "@playwright/test": "^1.58.2",
