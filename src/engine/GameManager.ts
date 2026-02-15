@@ -357,6 +357,7 @@ export class GameManager {
 
     // 9. Collision detection — track deaths for type-specific sounds
     const enemyAliveMap = new Map(state.enemies.map(e => [e.id, { alive: e.isAlive, type: e.type }]));
+    const asteroidHealthMap = new Map(state.asteroids.map(a => [a.id, { alive: a.isAlive, health: a.health }]));
     const alivePlayersBefore = state.players.filter(p => p.isAlive).length;
     detectCollisions(state);
     for (const enemy of state.enemies) {
@@ -368,8 +369,31 @@ export class GameManager {
         this.weaponPickupManager.maybeSpawnPickup(state, enemy.position);
       }
     }
+    for (const asteroid of state.asteroids) {
+      const before = asteroidHealthMap.get(asteroid.id);
+      if (before && before.alive) {
+        if (!asteroid.isAlive) {
+          SoundManager.play('asteroidExplode');
+        } else if (asteroid.health < before.health) {
+          SoundManager.play('asteroidHit');
+        }
+      }
+    }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
-    if (alivePlayersAfter < alivePlayersBefore) SoundManager.play('playerDeath');
+    if (alivePlayersAfter < alivePlayersBefore) {
+      SoundManager.play('playerDeath');
+      // Clear weapon powerups on death: reset to defaults, remove active pickups
+      for (const player of state.players) {
+        if (!player.isAlive && player.collisionState === 'destroyed') {
+          player.primaryWeapon = 'laser';
+          player.primaryLevel = 1;
+          player.secondaryWeapon = null;
+          player.secondaryTimer = 0;
+          player.secondaryCooldown = 0;
+        }
+      }
+      state.weaponPickups = [];
+    }
 
     // 10. Handle death sequences and delayed respawn
     for (const player of state.players) {

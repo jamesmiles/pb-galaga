@@ -35,14 +35,14 @@ export function drawProjectiles(
     } else if (proj.type === 'plasma') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff00ff', 6, 10);
     } else if (proj.type === 'rocket') {
-      drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff6600', 5, 10);
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#aa44ff', 5, 10);
     } else if (proj.type === 'missile') {
-      drawTrails(ctx, pos.x, pos.y, nx, ny, '#ffffff', 3, 6);
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#44ff44', 3, 6);
     } else if (proj.type === 'snake') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, 14);
     } else {
       const isPlayerBullet = proj.owner.type === 'player';
-      const trailColor = isPlayerBullet ? '#00ffff' : '#ff8800';
+      const trailColor = isPlayerBullet ? '#ff4444' : '#ff8800';
       drawTrails(ctx, pos.x, pos.y, nx, ny, trailColor, 4, 6);
     }
 
@@ -72,10 +72,10 @@ export function drawProjectiles(
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(pos.x - 1, pos.y - 3, 2, 6);
     } else if (proj.type === 'rocket') {
-      // Orange/red rocket with flame glow
+      // Purple rocket with flame glow
       ctx.shadowBlur = 10;
-      ctx.shadowColor = '#ff4400';
-      ctx.fillStyle = '#ff6600';
+      ctx.shadowColor = '#8800ff';
+      ctx.fillStyle = '#aa44ff';
       ctx.fillRect(pos.x - 2.5, pos.y - 5, 5, 10);
 
       // White hot tip
@@ -84,18 +84,18 @@ export function drawProjectiles(
       ctx.fillRect(pos.x - 1, pos.y - 5, 2, 3);
 
       // Flame tail
-      ctx.fillStyle = '#ffcc00';
+      ctx.fillStyle = '#cc88ff';
       ctx.fillRect(pos.x - 2, pos.y + 3, 4, 4);
     } else if (proj.type === 'missile') {
-      // Small white dart with faint trail
+      // Green homing missile
       ctx.shadowBlur = 4;
-      ctx.shadowColor = '#aaaaff';
-      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#44ff44';
+      ctx.fillStyle = '#44ff44';
       ctx.fillRect(pos.x - 1.5, pos.y - 4, 3, 8);
 
-      // Blue exhaust
+      // Bright green exhaust
       ctx.shadowBlur = 0;
-      ctx.fillStyle = '#4488ff';
+      ctx.fillStyle = '#88ffaa';
       ctx.fillRect(pos.x - 1, pos.y + 2, 2, 3);
     } else if (proj.type === 'snake') {
       // Thick cyan beam with heavy glow
@@ -111,8 +111,8 @@ export function drawProjectiles(
     } else {
       // Bullet — color depends on owner
       const isPlayerBullet = proj.owner.type === 'player';
-      const color = isPlayerBullet ? '#00ffff' : '#ffff00';
-      const glowColor = isPlayerBullet ? '#00ffff' : '#ff8800';
+      const color = isPlayerBullet ? '#ff4444' : '#ffff00';
+      const glowColor = isPlayerBullet ? '#ff4444' : '#ff8800';
 
       ctx.shadowBlur = 6;
       ctx.shadowColor = glowColor;

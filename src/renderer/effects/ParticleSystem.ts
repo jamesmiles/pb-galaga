@@ -31,6 +31,7 @@ const EXPLOSION_COLORS: Record<string, string[]> = {
   D: ['#ff00ff', '#ff66ff', '#ffffff'],
   E: ['#ffff00', '#ffff66', '#ffffff'],
   player: ['#ff3344', '#ff7755', '#ffffff'],
+  asteroid: ['#886644', '#aa8855', '#ccaa77'],
   default: ['#ffcc00', '#ff5500', '#ffffff'],
 };
 
@@ -42,6 +43,7 @@ const FLASH_COLORS: Record<string, string> = {
   D: '#ff00ff',
   E: '#ffff00',
   player: '#ff3344',
+  asteroid: '#886644',
   default: '#ffcc00',
 };
 

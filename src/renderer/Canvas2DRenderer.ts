@@ -84,8 +84,9 @@ export class Canvas2DRenderer implements GameRenderer {
       this.loadBackgrounds(current.currentLevel);
     }
 
-    // Draw background celestial bodies (behind everything)
-    this.drawBackgrounds(ctx, current.currentLevel, renderDt);
+    // Draw background celestial bodies (behind everything — freeze when paused)
+    const bgDt = current.gameStatus === 'paused' ? 0 : renderDt;
+    this.drawBackgrounds(ctx, current.currentLevel, bgDt);
 
     // Update particles (runs regardless of game status for lingering effects)
     this.particleSystem.update(renderDt);
@@ -177,6 +178,18 @@ export class Canvas2DRenderer implements GameRenderer {
           player.position.y,
           player.id,
           'player',
+        );
+      }
+    }
+
+    // Asteroid deaths — dirt explosion
+    for (const asteroid of current.asteroids) {
+      if (!asteroid.isAlive) {
+        this.particleSystem.emit(
+          asteroid.position.x,
+          asteroid.position.y,
+          asteroid.id,
+          'asteroid',
         );
       }
     }

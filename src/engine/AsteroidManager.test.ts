@@ -40,9 +40,13 @@ describe('AsteroidManager', () => {
   it('spawns multiple asteroids over time', () => {
     const mgr = new AsteroidManager();
     const state = playingState(4);
-    // Use very large dt to guarantee spawns despite jitter
+    // dt exceeds max jitter delay (interval + jitter = 4000ms) to guarantee a spawn each iteration.
+    // Reset positions after each update so asteroids don't drift off-screen and get filtered.
     for (let i = 0; i < 10; i++) {
       mgr.update(state, ASTEROID_SPAWN_INTERVAL + 2000);
+      for (const a of state.asteroids) {
+        a.position.y = 0;
+      }
     }
     expect(state.asteroids.length).toBeGreaterThanOrEqual(3);
   });
