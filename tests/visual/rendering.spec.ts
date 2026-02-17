@@ -18,7 +18,11 @@ test.describe('PB-Galaga Rendering', () => {
     await page.goto('/');
     await page.waitForTimeout(2000);
 
-    // Press Enter to start the game — hold briefly so the engine tick sees it
+    // Press Enter to select "1 Player", then again to confirm difficulty
+    await page.keyboard.down('Enter');
+    await page.waitForTimeout(200);
+    await page.keyboard.up('Enter');
+    await page.waitForTimeout(500);
     await page.keyboard.down('Enter');
     await page.waitForTimeout(200);
     await page.keyboard.up('Enter');
@@ -55,7 +59,9 @@ test.describe('PB-Galaga Rendering', () => {
     await page.goto('/');
     await page.waitForTimeout(2000);
 
-    // Start game and wait for level intro typing to finish
+    // Start game: select "1 Player" then confirm difficulty
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(500);
     await page.keyboard.press('Enter');
     await page.waitForTimeout(8000);
 
