@@ -12,10 +12,9 @@ describe('EnemyC', () => {
     expect(enemy.isAlive).toBe(true);
   });
 
-  it('has correct health (1 laser hit)', () => {
+  it('has correct health', () => {
     const enemy = createEnemyC(0, 0);
     expect(enemy.health).toBe(ENEMY_C_HEALTH);
-    expect(enemy.health).toBe(LASER_DAMAGE);
   });
 
   it('has fireMode bullet', () => {
@@ -35,8 +34,10 @@ describe('EnemyC', () => {
     expect(enemy.collisionRadius).toBe(12);
   });
 
-  it('dies on one laser hit', () => {
+  it('dies when cumulative damage reaches health', () => {
     const enemy = createEnemyC(0, 0);
+    damageEnemy(enemy, LASER_DAMAGE);
+    expect(enemy.isAlive).toBe(true);
     const killed = damageEnemy(enemy, LASER_DAMAGE);
     expect(killed).toBe(true);
     expect(enemy.isAlive).toBe(false);

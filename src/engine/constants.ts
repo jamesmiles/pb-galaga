@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.9.2';
+export const GAME_VERSION = '0.9.4';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -25,7 +25,7 @@ export const PLAYER_FIRE_COOLDOWN = 200; // ms between shots
 
 // Laser defaults
 export const LASER_SPEED = 500; // pixels per second
-export const LASER_DAMAGE = 50;
+export const LASER_DAMAGE = 40;
 export const LASER_MAX_LIFETIME = 3000; // ms
 export const LASER_COLLISION_RADIUS = 4;
 
@@ -86,7 +86,7 @@ export const BULLET_COLLISION_RADIUS = 3;
 
 // Player bullet defaults
 export const PLAYER_BULLET_SPEED = 550; // pixels per second (fastest)
-export const PLAYER_BULLET_DAMAGE = 25; // least damage
+export const PLAYER_BULLET_DAMAGE = 20; // least damage
 
 // Plasma defaults
 export const PLASMA_SPEED = 180; // pixels per second
@@ -114,18 +114,19 @@ export const MISSILE_TURN_RATE = 3.0; // rad/s
 export const MISSILE_FIRE_COOLDOWN = 800; // ms between secondary volleys
 export const MISSILE_HOMING_DELAY = 200; // ms before homing activates
 
-// Snake laser defaults (level-4 laser upgrade)
+// Snake laser defaults (level-4 rapid homing stream)
 export const SNAKE_SPEED = 400; // pixels per second
-export const SNAKE_DAMAGE = 75;
+export const SNAKE_DAMAGE = 15; // low per-shot, high fire rate
 export const SNAKE_MAX_LIFETIME = 3000; // ms
-export const SNAKE_COLLISION_RADIUS = 8;
+export const SNAKE_COLLISION_RADIUS = 4; // small stream projectile
 export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
+export const SNAKE_FIRE_COOLDOWN = 50; // ms (4x faster than normal 200ms)
 
 // Level 5 weapon upgrades
-export const PLAYER_BULLET_L5_DAMAGE = 31; // 25% more than 25
-export const SNAKE_L5_DAMAGE = 94; // 25% more than 75
+export const PLAYER_BULLET_L5_DAMAGE = 25; // L5 bullet upgrade
+export const SNAKE_L5_DAMAGE = 20; // upgraded stream damage
+export const SNAKE_L5_COLLISION_RADIUS = 8; // 2x L4 radius
 export const BULLET_L5_COLLISION_RADIUS = 6; // 2x normal (3)
-export const SNAKE_POSITION_HISTORY_MAX = 200; // Max trail points for L5 snake continuous stream
 
 // Chaos mode multipliers
 export const CHAOS_ENEMY_MULTIPLIER = 2;

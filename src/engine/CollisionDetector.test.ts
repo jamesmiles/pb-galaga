@@ -61,7 +61,7 @@ describe('CollisionDetector', () => {
   });
 
   describe('projectile-enemy collisions', () => {
-    it('laser destroys enemy and awards score', () => {
+    it('laser damages enemy and awards score on kill', () => {
       const state = createInitialState();
       const player = createPlayer('player1');
       player.isInvulnerable = false;
@@ -69,6 +69,7 @@ describe('CollisionDetector', () => {
 
       const enemy = createEnemyA(0, 0);
       enemy.position = { x: 200, y: 200 };
+      enemy.health = 30; // Ensure laser can one-shot
       state.enemies = [enemy];
 
       const laser = createLaser({ x: 200, y: 200 }, { type: 'player', id: 'player1' });
@@ -89,8 +90,10 @@ describe('CollisionDetector', () => {
 
       const enemy1 = createEnemyA(0, 0);
       enemy1.position = { x: 200, y: 200 };
+      enemy1.health = 30; // Ensure laser can one-shot
       const enemy2 = createEnemyA(0, 1);
-      enemy2.position = { x: 200, y: 200 }; // Same position
+      enemy2.position = { x: 200, y: 200 };
+      enemy2.health = 30;
       state.enemies = [enemy1, enemy2];
 
       const laser = createLaser({ x: 200, y: 200 }, { type: 'player', id: 'player1' });
@@ -99,7 +102,7 @@ describe('CollisionDetector', () => {
       detectCollisions(state);
 
       const deadCount = state.enemies.filter(e => !e.isAlive).length;
-      expect(deadCount).toBe(1);
+      expect(deadCount).toBe(1); // Laser hits only one enemy
     });
   });
 

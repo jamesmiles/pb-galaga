@@ -372,9 +372,22 @@ export class GameManager {
       }
     }
     const projCountBefore = state.projectiles.length;
+    const activeSnakesBefore = state.projectiles.filter(
+      p => p.type === 'snake' && p.isActive && p.owner.type === 'player',
+    ).length;
     spawnPlayerProjectiles(state);
     const playerProjAdded = state.projectiles.length - projCountBefore;
-    if (playerProjAdded > 0) SoundManager.play('playerFire');
+    if (playerProjAdded > 0) {
+      const newProjs = state.projectiles.slice(projCountBefore);
+      const hasNewSnake = newProjs.some(p => p.type === 'snake');
+      const hasNewNonSnake = newProjs.some(p => p.type !== 'snake');
+      if (hasNewSnake && activeSnakesBefore === 0) {
+        SoundManager.play('snakeBeam');
+      }
+      if (hasNewNonSnake) {
+        SoundManager.play('playerFire');
+      }
+    }
     updateAllProjectiles(state, dtSeconds);
 
     // 4. Update enemy formation

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { updatePlayerShip, respawnPlayer, damagePlayer } from './PlayerShip';
 import { createPlayer } from '../../../engine/StateManager';
-import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN, DEATH_SEQUENCE_DURATION } from '../../../engine/constants';
+import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN, SNAKE_FIRE_COOLDOWN, DEATH_SEQUENCE_DURATION } from '../../../engine/constants';
 
 function makeDt(ms: number = 16.667) {
   return ms / 1000;
@@ -97,6 +97,52 @@ describe('PlayerShip', () => {
       player.input = { left: false, right: false, up: false, down: false, fire: true };
       updatePlayerShip(player, makeDt());
       expect(player.isFiring).toBe(false);
+    });
+
+    it('uses snake fire cooldown for L4 laser', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.fireCooldown = 0;
+      player.primaryWeapon = 'laser';
+      player.primaryLevel = 4;
+      player.input = { left: false, right: false, up: false, down: false, fire: true };
+      updatePlayerShip(player, makeDt());
+      expect(player.isFiring).toBe(true);
+      expect(player.fireCooldown).toBe(SNAKE_FIRE_COOLDOWN);
+    });
+
+    it('uses snake fire cooldown for L5 laser', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.fireCooldown = 0;
+      player.primaryWeapon = 'laser';
+      player.primaryLevel = 5;
+      player.input = { left: false, right: false, up: false, down: false, fire: true };
+      updatePlayerShip(player, makeDt());
+      expect(player.isFiring).toBe(true);
+      expect(player.fireCooldown).toBe(SNAKE_FIRE_COOLDOWN);
+    });
+
+    it('uses normal cooldown for L3 laser', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.fireCooldown = 0;
+      player.primaryWeapon = 'laser';
+      player.primaryLevel = 3;
+      player.input = { left: false, right: false, up: false, down: false, fire: true };
+      updatePlayerShip(player, makeDt());
+      expect(player.fireCooldown).toBe(PLAYER_FIRE_COOLDOWN);
+    });
+
+    it('uses normal cooldown for bullet weapons at any level', () => {
+      const player = createPlayer('player1');
+      player.isInvulnerable = false;
+      player.fireCooldown = 0;
+      player.primaryWeapon = 'bullet';
+      player.primaryLevel = 4;
+      player.input = { left: false, right: false, up: false, down: false, fire: true };
+      updatePlayerShip(player, makeDt());
+      expect(player.fireCooldown).toBe(PLAYER_FIRE_COOLDOWN);
     });
   });
 

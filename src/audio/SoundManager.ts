@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -53,6 +53,8 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   bridgeHit: [0.6, 0.04, 350, 0, 0.04, 0.12, 3, 1, -12, -2, 0, 0, 0, 0.7, 0, 0, 0, 0.3, 0.08, 0],
   // Respawn pickup: dramatic ascending power-up fanfare (two-tone rising chime)
   respawnPickup: [0.6, 0, 500, 0.01, 0.06, 0.15, 0, 1, 15, 3, 600, 0.04, 0.08, 0, 0, 0, 0, 0.8, 0.04, 0],
+  // Snake beam: sustained energy hum (stream weapon activation)
+  snakeBeam: [0.3, 0.02, 300, 0.05, 0.3, 0.2, 0, 1, 5, 1, 0, 0, 0, 0, 0.5, 0, 0, 0.6, 0.1, 0.3],
 };
 
 /**
