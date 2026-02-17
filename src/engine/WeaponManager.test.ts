@@ -37,11 +37,11 @@ describe('upgradeWeapon', () => {
       expect(p.primaryLevel).toBe(4);
     });
 
-    it('caps at level 4', () => {
+    it('caps at level 5', () => {
       const p = createPlayer('player1');
-      p.primaryLevel = 4;
+      p.primaryLevel = 5;
       upgradeWeapon(p, makePickup('primary', 'bullet'));
-      expect(p.primaryLevel).toBe(4);
+      expect(p.primaryLevel).toBe(5);
     });
 
     it('switches primary type but keeps power level', () => {

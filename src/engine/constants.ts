@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.8.6';
+export const GAME_VERSION = '0.9.0';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -120,6 +120,15 @@ export const SNAKE_DAMAGE = 75;
 export const SNAKE_MAX_LIFETIME = 3000; // ms
 export const SNAKE_COLLISION_RADIUS = 8;
 export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
+
+// Level 5 weapon upgrades
+export const PLAYER_BULLET_L5_DAMAGE = 31; // 25% more than 25
+export const SNAKE_L5_DAMAGE = 94; // 25% more than 75
+export const BULLET_L5_COLLISION_RADIUS = 6; // 2x normal (3)
+
+// Chaos mode multipliers
+export const CHAOS_ENEMY_MULTIPLIER = 2;
+export const CHAOS_WEAPON_DROP_MULTIPLIER = 2;
 
 // Asteroid defaults (Level 4 foreground)
 export const ASTEROID_SMALL_HEALTH = 100;

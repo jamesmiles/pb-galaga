@@ -50,11 +50,11 @@ export function drawHUD(
   if (p1) {
     if (coop) {
       // Co-op: P1 left half, P2 right half
-      drawPlayerStatusBar(ctx, p1, 'left');
-      drawPlayerStatusBar(ctx, p2!, 'right');
+      drawPlayerStatusBar(ctx, p1, 'left', state.autoFire.p1);
+      drawPlayerStatusBar(ctx, p2!, 'right', state.autoFire.p2);
     } else {
       // Single player: spread across full width
-      drawPlayerStatusBar(ctx, p1, 'full');
+      drawPlayerStatusBar(ctx, p1, 'full', state.autoFire.p1);
     }
   }
 
@@ -66,6 +66,7 @@ function drawPlayerStatusBar(
   ctx: CanvasRenderingContext2D,
   player: Player,
   side: 'left' | 'right' | 'full',
+  autoFire: boolean = false,
 ): void {
   const barY = 780;
   const barHeight = 6;
@@ -116,9 +117,17 @@ function drawPlayerStatusBar(
   ctx.font = '10px monospace';
   ctx.textAlign = primaryAlign;
   const primaryColor = player.primaryWeapon === 'laser' ? '#4488ff' : '#ff4444';
-  const levelDots = '\u2588'.repeat(player.primaryLevel) + '\u2591'.repeat(4 - player.primaryLevel);
+  const levelDots = '\u2588'.repeat(player.primaryLevel) + '\u2591'.repeat(5 - player.primaryLevel);
   ctx.fillStyle = primaryColor;
   ctx.fillText(`${player.primaryWeapon.toUpperCase()} ${levelDots}`, primaryX, barY);
+
+  // Auto-fire indicator
+  if (autoFire) {
+    ctx.fillStyle = '#00ff00';
+    const autoX = side === 'right' ? primaryX - 100 : primaryX + 80;
+    ctx.textAlign = primaryAlign;
+    ctx.fillText('AUTO', autoX, barY);
+  }
 
   // Secondary weapon timer bar
   if (player.secondaryWeapon) {

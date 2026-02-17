@@ -86,6 +86,8 @@ export function respawnPlayer(player: Player): void {
   player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
   player.collisionState = 'none';
   player.deathSequence = null;
+  player.stats.respawns++;
+  player.levelStats.respawns++;
 }
 
 /**
@@ -106,6 +108,8 @@ export function damagePlayer(player: Player, damage: number, currentTime: number
       duration: DEATH_SEQUENCE_DURATION,
       position: { x: player.position.x, y: player.position.y },
     };
+    player.stats.deaths++;
+    player.levelStats.deaths++;
     return true;
   }
   player.collisionState = 'colliding';

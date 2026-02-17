@@ -1,5 +1,6 @@
 import type { Projectile } from '../../types';
 import { lerpPosition } from '../InterpolationUtils';
+import { BULLET_L5_COLLISION_RADIUS, SNAKE_L5_DAMAGE } from '../../engine/constants';
 
 /** Trail afterimage opacity levels (newest to oldest). */
 const TRAIL_OPACITIES = [0.35, 0.2, 0.1, 0.04];
@@ -39,11 +40,15 @@ export function drawProjectiles(
     } else if (proj.type === 'missile') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#44ff44', 3, 6);
     } else if (proj.type === 'snake') {
-      drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, 14);
+      const isL5Snake = proj.damage >= SNAKE_L5_DAMAGE;
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, isL5Snake ? 28 : 14);
     } else {
       const isPlayerBullet = proj.owner.type === 'player';
+      const isL5Bullet = isPlayerBullet && proj.collisionRadius >= BULLET_L5_COLLISION_RADIUS;
       const trailColor = isPlayerBullet ? '#ff4444' : '#ff8800';
-      drawTrails(ctx, pos.x, pos.y, nx, ny, trailColor, 4, 6);
+      const bw = isL5Bullet ? 8 : 4;
+      const bh = isL5Bullet ? 12 : 6;
+      drawTrails(ctx, pos.x, pos.y, nx, ny, trailColor, bw, bh);
     }
 
     // Draw main projectile
@@ -98,31 +103,40 @@ export function drawProjectiles(
       ctx.fillStyle = '#88ffaa';
       ctx.fillRect(pos.x - 1, pos.y + 2, 2, 3);
     } else if (proj.type === 'snake') {
+      const isL5Snake = proj.damage >= SNAKE_L5_DAMAGE;
+      const snakeH = isL5Snake ? 28 : 14;
+      const snakeCoreH = isL5Snake ? 20 : 10;
       // Thick cyan beam with heavy glow
-      ctx.shadowBlur = 16;
+      ctx.shadowBlur = isL5Snake ? 24 : 16;
       ctx.shadowColor = '#00ffff';
       ctx.fillStyle = '#00ffff';
-      ctx.fillRect(pos.x - 4, pos.y - 7, 8, 14);
+      ctx.fillRect(pos.x - 4, pos.y - snakeH / 2, 8, snakeH);
 
       // Bright white core
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(pos.x - 2, pos.y - 5, 4, 10);
+      ctx.fillRect(pos.x - 2, pos.y - snakeCoreH / 2, 4, snakeCoreH);
     } else {
       // Bullet — color depends on owner
       const isPlayerBullet = proj.owner.type === 'player';
+      const isL5Bullet = isPlayerBullet && proj.collisionRadius >= BULLET_L5_COLLISION_RADIUS;
       const color = isPlayerBullet ? '#ff4444' : '#ffff00';
       const glowColor = isPlayerBullet ? '#ff4444' : '#ff8800';
 
-      ctx.shadowBlur = 6;
+      const bw = isL5Bullet ? 8 : 4;
+      const bh = isL5Bullet ? 12 : 6;
+      const cw = isL5Bullet ? 4 : 2;
+      const ch = isL5Bullet ? 8 : 4;
+
+      ctx.shadowBlur = isL5Bullet ? 10 : 6;
       ctx.shadowColor = glowColor;
       ctx.fillStyle = color;
-      ctx.fillRect(pos.x - 2, pos.y - 3, 4, 6);
+      ctx.fillRect(pos.x - bw / 2, pos.y - bh / 2, bw, bh);
 
       // Bright core
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(pos.x - 1, pos.y - 2, 2, 4);
+      ctx.fillRect(pos.x - cw / 2, pos.y - ch / 2, cw, ch);
     }
 
     ctx.restore();

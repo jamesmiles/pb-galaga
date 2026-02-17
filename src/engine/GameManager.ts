@@ -1,7 +1,7 @@
 import type { GameState, GameRenderer } from '../types';
-import { GAME_WIDTH, WAVE_COMPLETE_BONUS } from './constants';
+import { GAME_WIDTH, GAME_HEIGHT, WAVE_COMPLETE_BONUS, PLAYER_INVULNERABILITY_DURATION } from './constants';
 import { GameLoop } from './GameLoop';
-import { StateManager, createPlayer } from './StateManager';
+import { StateManager, createPlayer, resetLevelStats } from './StateManager';
 import { InputHandler } from './InputHandler';
 import { updatePlayerShip, respawnPlayer } from '../objects/player/code/PlayerShip';
 import { spawnPlayerProjectiles, updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
@@ -63,6 +63,7 @@ export class GameManager {
   private lifePickupManager: LifePickupManager;
   private introTimer = 0;
   private levelCompleteTimer = 0;
+  private levelStatsTimer = 0;
 
   constructor(options: GameManagerOptions = {}) {
     this.headless = options.headless ?? false;
@@ -151,6 +152,9 @@ export class GameManager {
       case 'gamecomplete':
         this.updateGameComplete(state);
         break;
+      case 'levelstats':
+        this.updateLevelStats(state);
+        break;
     }
   }
 
@@ -202,27 +206,74 @@ export class GameManager {
       return;
     }
 
+    // Difficulty selection submenu
+    if (state.menu.type === 'difficulty') {
+      if (menuInput.back) {
+        SoundManager.play('menuSelect');
+        state.menu = {
+          type: 'start',
+          selectedOption: 0,
+          options: ['1 Player', '2 Players', 'Test Mode', '2P Test Mode'],
+        };
+        return;
+      }
+      if (menuInput.confirm) {
+        SoundManager.play('menuSelect');
+        const selected = state.menu.options[state.menu.selectedOption];
+        state.difficulty = selected === 'Chaos' ? 'chaos' : 'normal';
+        const pendingMode = state.menu.data?.pendingMode;
+        if (pendingMode === 'test') {
+          state.menu = {
+            type: 'levelselect',
+            selectedOption: 0,
+            options: this.getLevelOptions(),
+          };
+        } else if (pendingMode === 'test-coop') {
+          state.menu = {
+            type: 'levelselect',
+            selectedOption: 0,
+            options: this.getLevelOptions(),
+            data: { testCoop: true },
+          };
+        } else {
+          this.startGame(state);
+        }
+      }
+      return;
+    }
+
     if (menuInput.confirm) {
       SoundManager.play('menuSelect');
       const selected = state.menu.options[state.menu.selectedOption];
       if (selected === '1 Player') {
         state.gameMode = 'single';
-        this.startGame(state);
+        state.menu = {
+          type: 'difficulty',
+          selectedOption: 0,
+          options: ['Normal', 'Chaos'],
+          data: { pendingMode: 'single' },
+        };
       } else if (selected === '2 Players') {
         state.gameMode = 'co-op';
-        this.startGame(state);
+        state.menu = {
+          type: 'difficulty',
+          selectedOption: 0,
+          options: ['Normal', 'Chaos'],
+          data: { pendingMode: 'co-op' },
+        };
       } else if (selected === 'Test Mode') {
         state.menu = {
-          type: 'levelselect',
+          type: 'difficulty',
           selectedOption: 0,
-          options: this.getLevelOptions(),
+          options: ['Normal', 'Chaos'],
+          data: { pendingMode: 'test' },
         };
       } else if (selected === '2P Test Mode') {
         state.menu = {
-          type: 'levelselect',
+          type: 'difficulty',
           selectedOption: 0,
-          options: this.getLevelOptions(),
-          data: { testCoop: true },
+          options: ['Normal', 'Chaos'],
+          data: { pendingMode: 'test-coop' },
         };
       }
     }
@@ -292,6 +343,9 @@ export class GameManager {
       const muted = SoundManager.toggleMute();
       MusicManager.onMuteChanged(muted);
     }
+
+    // Sync auto-fire state for renderer/HUD
+    state.autoFire = this.inputHandler.getAutoFireState();
 
     // 1. Process input (skip players in death sequence)
     for (const player of state.players) {
@@ -378,6 +432,8 @@ export class GameManager {
 
       if (!hasNextLevel) {
         // Final level complete — game complete sequence
+        const p1 = state.players.find(p => p.id === 'player1');
+        const p2 = state.players.find(p => p.id === 'player2');
         state.gameStatus = 'gamecomplete';
         this.introTimer = 0;
         state.menu = {
@@ -388,6 +444,8 @@ export class GameManager {
             finalScore: totalScore,
             introText: `mission complete // ${new Date().toISOString().slice(0, 10)}\n\nspace force has defeated the mothership.\n\nbut long range sensors detect survivors\nregrouping on the martian surface...\n\n... coming soon`,
             introChars: 0,
+            p1GameStats: p1 ? { ...p1.stats } : undefined,
+            p2GameStats: p2 ? { ...p2.stats } : undefined,
           },
         };
       } else {
@@ -580,10 +638,68 @@ export class GameManager {
       }
     }
 
-    // Auto-advance to next level after 3 seconds (no menu interaction)
+    // Auto-advance to stats screen after 3 seconds
     this.levelCompleteTimer += state.deltaTime;
     if (this.levelCompleteTimer >= 3000) {
+      // Auto-respawn dead co-op players as reward
+      if (state.gameMode === 'co-op') {
+        for (const player of state.players) {
+          if (!player.isAlive && player.lives <= 0 && !player.deathSequence?.active) {
+            player.lives = 1;
+            respawnPlayer(player);
+            SoundManager.play('respawnPickup');
+          }
+        }
+      }
+
+      // Return all alive ships to starting positions
+      for (const player of state.players) {
+        if (!player.isAlive) continue;
+        if (state.gameMode === 'co-op') {
+          player.position = {
+            x: player.id === 'player1' ? GAME_WIDTH * 0.33 : GAME_WIDTH * 0.66,
+            y: GAME_HEIGHT - 60,
+          };
+        } else {
+          player.position = { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 60 };
+        }
+        player.velocity = { x: 0, y: 0 };
+        player.isInvulnerable = true;
+        player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
+      }
+
+      // Transition to level stats screen
+      const p1 = state.players.find(p => p.id === 'player1');
+      const p2 = state.players.find(p => p.id === 'player2');
+      state.gameStatus = 'levelstats';
+      this.levelStatsTimer = 0;
+      state.menu = {
+        type: 'levelstats',
+        selectedOption: 0,
+        options: [],
+        data: {
+          level: state.currentLevel,
+          finalScore: state.players.reduce((sum, p) => sum + p.score, 0),
+          p1LevelStats: p1 ? { ...p1.levelStats } : undefined,
+          p2LevelStats: p2 ? { ...p2.levelStats } : undefined,
+        },
+      };
+    }
+
+    // Update background during transition
+    if (state.background) {
+      updateBackground(state.background, state.deltaTime / 1000);
+    }
+  }
+
+  private updateLevelStats(state: GameState): void {
+    const menuInput = this.inputHandler.getMenuInput();
+    this.levelStatsTimer += state.deltaTime;
+
+    // Advance on confirm or 5s timeout
+    if (menuInput.confirm || this.levelStatsTimer >= 5000) {
       const nextLevel = state.currentLevel + 1;
+      resetLevelStats(state.players);
       state.enemies = [];
       state.projectiles = [];
       state.boss = null;
@@ -595,7 +711,7 @@ export class GameManager {
       this.startLevelIntro(state, nextLevel);
     }
 
-    // Update background during transition
+    // Update background during stats screen
     if (state.background) {
       updateBackground(state.background, state.deltaTime / 1000);
     }

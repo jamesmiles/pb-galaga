@@ -43,6 +43,13 @@ export interface DeathSequence {
   position: Vector2D;
 }
 
+export interface PlayerStats {
+  kills: number;
+  deaths: number;
+  powerupsCollected: number;
+  respawns: number;
+}
+
 export interface Player {
   id: 'player1' | 'player2';
   shipColor: 'red' | 'blue';
@@ -57,7 +64,7 @@ export interface Player {
   health: number;
   maxHealth: number;
   primaryWeapon: 'laser' | 'bullet';
-  primaryLevel: 1 | 2 | 3 | 4;
+  primaryLevel: 1 | 2 | 3 | 4 | 5;
   secondaryWeapon: 'rocket' | 'missile' | null;
   secondaryTimer: number;
   secondaryCooldown: number;
@@ -67,6 +74,8 @@ export interface Player {
   collisionState: 'none' | 'colliding' | 'destroyed';
   input: PlayerInput;
   deathSequence: DeathSequence | null;
+  stats: PlayerStats;
+  levelStats: PlayerStats;
 }
 
 // --- Enemy ---
@@ -263,7 +272,7 @@ export interface BackgroundState {
 // --- Menu ---
 
 export interface MenuState {
-  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro' | 'gamecomplete';
+  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro' | 'gamecomplete' | 'difficulty' | 'levelstats';
   selectedOption: number;
   options: string[];
   data?: {
@@ -274,6 +283,11 @@ export interface MenuState {
     introText?: string;
     introChars?: number;
     testCoop?: boolean;
+    pendingMode?: string;
+    p1LevelStats?: PlayerStats;
+    p2LevelStats?: PlayerStats;
+    p1GameStats?: PlayerStats;
+    p2GameStats?: PlayerStats;
   };
 }
 
@@ -294,13 +308,15 @@ export interface FormationState {
 
 // --- Game State ---
 
-export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete' | 'levelintro' | 'gamecomplete';
+export type GameStatus = 'menu' | 'playing' | 'paused' | 'gameover' | 'levelcomplete' | 'levelintro' | 'gamecomplete' | 'levelstats';
 export type GameMode = 'single' | 'co-op';
+export type GameDifficulty = 'normal' | 'chaos';
 
 export interface GameState {
   currentTime: number;
   deltaTime: number;
   gameMode: GameMode;
+  difficulty: GameDifficulty;
   gameStatus: GameStatus;
   currentLevel: number;
   currentWave: number;
@@ -317,6 +333,7 @@ export interface GameState {
   boss: BossState | null;
   lifePickups: LifePickup[];
   respawnPickups: RespawnPickup[];
+  autoFire: { p1: boolean; p2: boolean };
 }
 
 // --- Level Config ---
