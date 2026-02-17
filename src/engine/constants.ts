@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.9.1';
+export const GAME_VERSION = '0.9.2';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -125,7 +125,7 @@ export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
 export const PLAYER_BULLET_L5_DAMAGE = 31; // 25% more than 25
 export const SNAKE_L5_DAMAGE = 94; // 25% more than 75
 export const BULLET_L5_COLLISION_RADIUS = 6; // 2x normal (3)
-export const SNAKE_POSITION_HISTORY_MAX = 30; // Max trail points for L5 snake beam
+export const SNAKE_POSITION_HISTORY_MAX = 200; // Max trail points for L5 snake continuous stream
 
 // Chaos mode multipliers
 export const CHAOS_ENEMY_MULTIPLIER = 2;

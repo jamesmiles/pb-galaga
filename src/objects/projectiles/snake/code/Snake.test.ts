@@ -67,10 +67,13 @@ describe('snake position history', () => {
   it('position history is capped at max entries', () => {
     const s = createSnakeLaser(pos, owner);
     s.damage = SNAKE_L5_DAMAGE;
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < SNAKE_POSITION_HISTORY_MAX + 20; i++) {
+      // Keep projectile in bounds so it doesn't deactivate
+      s.position = { x: 400, y: 400 };
+      s.lifetime = 0;
       updateProjectile(s, 1 / 60);
     }
-    expect(s.positionHistory!.length).toBeLessThanOrEqual(SNAKE_POSITION_HISTORY_MAX);
+    expect(s.positionHistory!.length).toBe(SNAKE_POSITION_HISTORY_MAX);
   });
 
   it('non-L5 snake does NOT accumulate position history', () => {

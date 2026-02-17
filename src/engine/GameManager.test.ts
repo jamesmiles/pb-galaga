@@ -569,10 +569,10 @@ describe('GameManager', () => {
       gm.tickHeadless(1);
 
       const bridgeSoundCalls = playSpy.mock.calls.filter(
-        ([effect]) => effect === 'hitGClang' || effect === 'hitF'
+        ([effect]) => effect === 'bridgeHit' || effect === 'hitGClang' || effect === 'hitF'
       );
       expect(bridgeSoundCalls.length).toBeGreaterThan(0);
-      expect(bridgeSoundCalls[0][0]).toBe('hitGClang');
+      expect(bridgeSoundCalls[0][0]).toBe('bridgeHit');
 
       playSpy.mockRestore();
       gm.destroy();

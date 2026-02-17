@@ -513,7 +513,7 @@ export class GameManager {
       }
       // Boss bridge hit sound
       if (state.boss.health < bossHealthBefore && state.boss.health > 0) {
-        SoundManager.play('hitGClang');
+        SoundManager.play('bridgeHit');
       }
     }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
