@@ -157,7 +157,7 @@ export class MenuOverlay {
   /** Update the overlay based on current game state. Called each render frame. */
   update(state: GameState): void {
     const menu = state.menu;
-    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete' || state.gameStatus === 'levelintro' || state.gameStatus === 'gamecomplete';
+    const showMenu = state.gameStatus === 'menu' || state.gameStatus === 'paused' || state.gameStatus === 'gameover' || state.gameStatus === 'levelcomplete' || state.gameStatus === 'levelintro' || state.gameStatus === 'gamecomplete' || state.gameStatus === 'levelstats';
 
     if (!showMenu || !menu) {
       this.hide();
@@ -170,6 +170,7 @@ export class MenuOverlay {
       this.buildMenu(menu.type, menu.options, menu.data);
       this.lastMenuType = menu.type;
       this.lastMenuDataHash = dataHash;
+      this.lastSelectedOption = -1; // Force selection update after menu rebuild
     }
 
     // Update selected option highlighting
@@ -189,8 +190,11 @@ export class MenuOverlay {
         <div class="menu-title">PB-GALAGA</div>
         <div class="menu-subtitle">A Space Shooter</div>
         <div class="menu-controls-group">
-          <div class="menu-controls">Arrow Keys: Move Ship</div>
-          <div class="menu-controls">Spacebar: Fire Laser</div>
+          <div class="menu-controls" style="color:#aaa;margin-bottom:4px">— P1 CONTROLS —</div>
+          <div class="menu-controls">Arrows: Move  |  Space: Fire  |  NumLock: Auto-fire</div>
+          <div class="menu-controls" style="color:#4488ff;margin-top:8px;margin-bottom:4px">— P2 CONTROLS —</div>
+          <div class="menu-controls">WASD: Move  |  Q: Fire  |  CapsLock: Auto-fire</div>
+          <div class="menu-controls" style="margin-top:8px">ESC: Pause  |  M: Mute  |  Enter: Select</div>
         </div>
         ${this.buildOptions(options)}
         <div class="menu-version">v${this.version}</div>
@@ -246,6 +250,57 @@ export class MenuOverlay {
         <div class="menu-title levelcomplete">${levelLabel}</div>
         ${scoreHtml}
       `;
+    } else if (type === 'difficulty') {
+      this.overlay.innerHTML = `
+        <div class="menu-title">SELECT DIFFICULTY</div>
+        <div class="menu-controls-group">
+          <div class="menu-controls">Press ESC to go back</div>
+        </div>
+        ${this.buildOptions(options)}
+      `;
+    } else if (type === 'levelstats') {
+      const level = data?.level ?? 1;
+      let statsHtml = '';
+      const p1Stats = data?.p1LevelStats as { kills: number; deaths: number; powerupsCollected: number; respawns: number } | undefined;
+      const p2Stats = data?.p2LevelStats as { kills: number; deaths: number; powerupsCollected: number; respawns: number } | undefined;
+      if (p1Stats && p2Stats) {
+        // Co-op: side by side
+        statsHtml = `
+          <div style="display:flex;gap:60px;margin-top:16px;font-size:16px">
+            <div style="text-align:center">
+              <div style="color:#ff4444;margin-bottom:8px">— P1 —</div>
+              <div style="color:#ccc">Kills: ${p1Stats.kills}</div>
+              <div style="color:#ccc">Deaths: ${p1Stats.deaths}</div>
+              <div style="color:#ccc">Pickups: ${p1Stats.powerupsCollected}</div>
+              <div style="color:#ccc">Respawns: ${p1Stats.respawns}</div>
+            </div>
+            <div style="text-align:center">
+              <div style="color:#4488ff;margin-bottom:8px">— P2 —</div>
+              <div style="color:#ccc">Kills: ${p2Stats.kills}</div>
+              <div style="color:#ccc">Deaths: ${p2Stats.deaths}</div>
+              <div style="color:#ccc">Pickups: ${p2Stats.powerupsCollected}</div>
+              <div style="color:#ccc">Respawns: ${p2Stats.respawns}</div>
+            </div>
+          </div>`;
+      } else if (p1Stats) {
+        statsHtml = `
+          <div style="margin-top:16px;font-size:16px;text-align:center">
+            <div style="color:#ccc">Kills: ${p1Stats.kills}</div>
+            <div style="color:#ccc">Deaths: ${p1Stats.deaths}</div>
+            <div style="color:#ccc">Pickups: ${p1Stats.powerupsCollected}</div>
+            <div style="color:#ccc">Respawns: ${p1Stats.respawns}</div>
+          </div>`;
+      }
+      let scoreHtml = '';
+      if (data?.finalScore !== undefined) {
+        scoreHtml = `<div class="menu-score">Score: ${data.finalScore}</div>`;
+      }
+      this.overlay.innerHTML = `
+        <div class="menu-title levelcomplete">LEVEL ${level} STATS</div>
+        ${scoreHtml}
+        ${statsHtml}
+        <div class="menu-controls" style="margin-top:24px">Press ENTER to continue</div>
+      `;
     } else if (type === 'gamecomplete') {
       const text = (data?.introText as string) ?? '';
       const chars = (data?.introChars as number) ?? 0;
@@ -255,10 +310,37 @@ export class MenuOverlay {
       if (data?.finalScore !== undefined) {
         scoreHtml += `<div class="menu-score">Final Score: ${data.finalScore}</div>`;
       }
+      // Game stats
+      let gameStatsHtml = '';
+      const p1GameStats = data?.p1GameStats as { kills: number; deaths: number; powerupsCollected: number; respawns: number } | undefined;
+      const p2GameStats = data?.p2GameStats as { kills: number; deaths: number; powerupsCollected: number; respawns: number } | undefined;
+      if (done && p1GameStats) {
+        if (p2GameStats) {
+          gameStatsHtml = `
+            <div style="display:flex;gap:60px;margin-top:16px;font-size:14px">
+              <div style="text-align:center">
+                <div style="color:#ff4444;margin-bottom:4px">— P1 —</div>
+                <div style="color:#ccc">Kills: ${p1GameStats.kills} | Deaths: ${p1GameStats.deaths}</div>
+                <div style="color:#ccc">Pickups: ${p1GameStats.powerupsCollected} | Respawns: ${p1GameStats.respawns}</div>
+              </div>
+              <div style="text-align:center">
+                <div style="color:#4488ff;margin-bottom:4px">— P2 —</div>
+                <div style="color:#ccc">Kills: ${p2GameStats.kills} | Deaths: ${p2GameStats.deaths}</div>
+                <div style="color:#ccc">Pickups: ${p2GameStats.powerupsCollected} | Respawns: ${p2GameStats.respawns}</div>
+              </div>
+            </div>`;
+        } else {
+          gameStatsHtml = `
+            <div style="margin-top:16px;font-size:14px;text-align:center">
+              <div style="color:#ccc">Kills: ${p1GameStats.kills} | Deaths: ${p1GameStats.deaths} | Pickups: ${p1GameStats.powerupsCollected} | Respawns: ${p1GameStats.respawns}</div>
+            </div>`;
+        }
+      }
       this.overlay.innerHTML = `
         <div class="menu-title gamecomplete">MISSION COMPLETE</div>
         ${scoreHtml}
         <div class="intro-typing">${revealed}${done ? '' : '<span class="intro-cursor">_</span>'}</div>
+        ${gameStatsHtml}
         ${done ? this.buildOptions(options) : ''}
       `;
     }

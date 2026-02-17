@@ -1,5 +1,5 @@
 import type { Projectile, ProjectileOwner, Vector2D, GameState } from '../../../../types';
-import { LASER_SPEED, LASER_DAMAGE, LASER_MAX_LIFETIME, LASER_COLLISION_RADIUS, GAME_WIDTH, GAME_HEIGHT } from '../../../../engine/constants';
+import { LASER_SPEED, LASER_DAMAGE, LASER_MAX_LIFETIME, LASER_COLLISION_RADIUS, GAME_WIDTH, GAME_HEIGHT, PLAYER_BULLET_L5_DAMAGE, SNAKE_L5_DAMAGE, SNAKE_L5_COLLISION_RADIUS, BULLET_L5_COLLISION_RADIUS } from '../../../../engine/constants';
 
 let nextProjectileId = 0;
 
@@ -174,6 +174,13 @@ export function spawnPlayerProjectiles(state: GameState): void {
         case 4:
           newProjectiles.push(createSnakeLaser(basePos, owner));
           break;
+        case 5: {
+          const snake = createSnakeLaser(basePos, owner);
+          snake.damage = SNAKE_L5_DAMAGE;
+          snake.collisionRadius = SNAKE_L5_COLLISION_RADIUS;
+          newProjectiles.push(snake);
+          break;
+        }
       }
     } else {
       // Bullet primary
@@ -199,10 +206,25 @@ export function spawnPlayerProjectiles(state: GameState): void {
           break;
         }
         case 4: {
-          const angles = [0, -8, 8, -16, 16];
-          for (const deg of angles) {
+          const angles4 = [0, -8, 8, -16, 16];
+          for (const deg of angles4) {
             const rad = deg * Math.PI / 180;
             const b = createPlayerBullet(basePos, owner);
+            if (deg !== 0) {
+              b.velocity.x = Math.sin(rad) * b.speed;
+              b.velocity.y = -Math.cos(rad) * b.speed;
+            }
+            newProjectiles.push(b);
+          }
+          break;
+        }
+        case 5: {
+          const angles5 = [0, -8, 8, -16, 16];
+          for (const deg of angles5) {
+            const rad = deg * Math.PI / 180;
+            const b = createPlayerBullet(basePos, owner);
+            b.damage = PLAYER_BULLET_L5_DAMAGE;
+            b.collisionRadius = BULLET_L5_COLLISION_RADIUS;
             if (deg !== 0) {
               b.velocity.x = Math.sin(rad) * b.speed;
               b.velocity.y = -Math.cos(rad) * b.speed;

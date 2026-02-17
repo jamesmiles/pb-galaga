@@ -1,4 +1,4 @@
-import type { GameState, Player, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup, RespawnPickup } from '../types';
+import type { GameState, Player, PlayerStats, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup, RespawnPickup } from '../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_START_LIVES, PLAYER_MAX_HEALTH,
   FORMATION_BASE_SPEED, FORMATION_CELL_WIDTH, FORMATION_CELL_HEIGHT,
@@ -55,6 +55,7 @@ export function createInitialState(): GameState {
     currentTime: 0,
     deltaTime: 0,
     gameMode: 'single',
+    difficulty: 'normal',
     gameStatus: 'menu',
     currentLevel: 1,
     currentWave: 1,
@@ -75,6 +76,7 @@ export function createInitialState(): GameState {
     boss: null,
     lifePickups: [],
     respawnPickups: [],
+    autoFire: { p1: false, p2: false },
   };
 }
 
@@ -104,6 +106,7 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.currentTime = source.currentTime;
   target.deltaTime = source.deltaTime;
   target.gameMode = source.gameMode;
+  target.difficulty = source.difficulty;
   target.gameStatus = source.gameStatus;
   target.currentLevel = source.currentLevel;
   target.currentWave = source.currentWave;
@@ -120,6 +123,11 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.boss = source.boss;
   target.lifePickups = source.lifePickups;
   target.respawnPickups = source.respawnPickups;
+  target.autoFire = source.autoFire;
+}
+
+function createEmptyStats(): PlayerStats {
+  return { kills: 0, deaths: 0, powerupsCollected: 0, respawns: 0 };
 }
 
 /** Create a default player state. */
@@ -151,5 +159,14 @@ export function createPlayer(id: 'player1' | 'player2'): Player {
     collisionState: 'none',
     input: { left: false, right: false, up: false, down: false, fire: false },
     deathSequence: null,
+    stats: createEmptyStats(),
+    levelStats: createEmptyStats(),
   };
+}
+
+/** Reset per-level stats for all players. */
+export function resetLevelStats(players: Player[]): void {
+  for (const player of players) {
+    player.levelStats = createEmptyStats();
+  }
 }

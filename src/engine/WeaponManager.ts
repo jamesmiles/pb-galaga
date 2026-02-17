@@ -10,9 +10,9 @@ export function upgradeWeapon(player: Player, pickup: WeaponPickup): void {
   if (pickup.category === 'primary') {
     const weapon = pickup.currentWeapon as 'laser' | 'bullet';
     if (weapon === player.primaryWeapon) {
-      // Same type: upgrade level (cap at 4)
-      if (player.primaryLevel < 4) {
-        player.primaryLevel = (player.primaryLevel + 1) as 1 | 2 | 3 | 4;
+      // Same type: upgrade level (cap at 5)
+      if (player.primaryLevel < 5) {
+        player.primaryLevel = (player.primaryLevel + 1) as 1 | 2 | 3 | 4 | 5;
       }
     } else {
       // Different type: switch but keep current power level

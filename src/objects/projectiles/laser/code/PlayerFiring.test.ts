@@ -64,6 +64,22 @@ describe('spawnPlayerProjectiles', () => {
       expect(state.projectiles[0].type).toBe('snake');
       expect(state.projectiles[0].isHoming).toBe(true);
     });
+
+    it('level 5 spawns snake laser with larger collision radius', () => {
+      const state = createInitialState();
+      const player = createPlayer('player1');
+      player.isFiring = true;
+      player.primaryWeapon = 'laser';
+      player.primaryLevel = 5;
+      state.players = [player];
+
+      spawnPlayerProjectiles(state);
+
+      expect(state.projectiles.length).toBe(1);
+      expect(state.projectiles[0].type).toBe('snake');
+      expect(state.projectiles[0].collisionRadius).toBe(8);
+      expect(state.projectiles[0].damage).toBe(20);
+    });
   });
 
   describe('bullet primary', () => {

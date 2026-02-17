@@ -4,7 +4,7 @@ const GAME_KEYS = new Set([
   'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
   'Space', 'Enter', 'Escape',
   'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ',
-  'KeyM',
+  'KeyM', 'NumLock', 'CapsLock',
 ]);
 
 /**
@@ -16,11 +16,22 @@ const GAME_KEYS = new Set([
 export class InputHandler {
   private keyState: Record<string, boolean> = {};
   private headless: boolean;
+  private p1AutoFire = false;
+  private p2AutoFire = false;
 
   // Bound listeners (arrow functions for stable references)
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (GAME_KEYS.has(e.code)) {
       e.preventDefault();
+    }
+    // Auto-fire toggles — flip on keydown, don't store in keyState
+    if (e.code === 'NumLock') {
+      this.p1AutoFire = !this.p1AutoFire;
+      return;
+    }
+    if (e.code === 'CapsLock') {
+      this.p2AutoFire = !this.p2AutoFire;
+      return;
     }
     this.keyState[e.code] = true;
   };
@@ -29,6 +40,8 @@ export class InputHandler {
     if (GAME_KEYS.has(e.code)) {
       e.preventDefault();
     }
+    // Don't track toggle keys in keyState
+    if (e.code === 'NumLock' || e.code === 'CapsLock') return;
     this.keyState[e.code] = false;
   };
 
@@ -47,7 +60,7 @@ export class InputHandler {
       right: !!this.keyState['ArrowRight'],
       up: !!this.keyState['ArrowUp'],
       down: !!this.keyState['ArrowDown'],
-      fire: !!this.keyState['Space'],
+      fire: this.p1AutoFire || !!this.keyState['Space'],
     };
   }
 
@@ -58,8 +71,19 @@ export class InputHandler {
       right: !!this.keyState['KeyD'],
       up: !!this.keyState['KeyW'],
       down: !!this.keyState['KeyS'],
-      fire: !!this.keyState['KeyQ'],
+      fire: this.p2AutoFire || !!this.keyState['KeyQ'],
     };
+  }
+
+  /** Get auto-fire toggle state for HUD display. */
+  getAutoFireState(): { p1: boolean; p2: boolean } {
+    return { p1: this.p1AutoFire, p2: this.p2AutoFire };
+  }
+
+  /** Inject auto-fire state programmatically (for headless testing). */
+  injectAutoFire(player: 'p1' | 'p2', enabled: boolean): void {
+    if (player === 'p1') this.p1AutoFire = enabled;
+    else this.p2AutoFire = enabled;
   }
 
   /** Poll menu input (consumed on read to prevent repeat). */
@@ -112,7 +136,7 @@ export class InputHandler {
     if (input.back) this.keyState['Escape'] = true;
   }
 
-  /** Clear all key state. */
+  /** Clear all transient key state (preserves auto-fire toggles). */
   clearAll(): void {
     this.keyState = {};
   }

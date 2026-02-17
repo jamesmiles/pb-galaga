@@ -40,7 +40,11 @@ function detectPlayerEnemyCollisions(state: GameState): void {
       if (dist < PLAYER_COLLISION_RADIUS + enemy.collisionRadius) {
         // Both take damage
         damagePlayer(player, player.maxHealth, state.currentTime); // instant kill
-        damageEnemy(enemy, enemy.maxHealth); // instant kill
+        const enemyKilled = damageEnemy(enemy, enemy.maxHealth); // instant kill
+        if (enemyKilled) {
+          player.stats.kills++;
+          player.levelStats.kills++;
+        }
       }
     }
   }
@@ -63,6 +67,8 @@ function detectProjectileEnemyCollisions(state: GameState): void {
             const scoringPlayer = state.players.find(p => p.id === proj.owner.id);
             if (scoringPlayer) {
               scoringPlayer.score += enemy.scoreValue;
+              scoringPlayer.stats.kills++;
+              scoringPlayer.levelStats.kills++;
             }
           }
           break; // One projectile hits one enemy
@@ -99,6 +105,8 @@ function detectPlayerPickupCollisions(state: GameState): void {
       if (dist < PLAYER_COLLISION_RADIUS + WEAPON_PICKUP_COLLISION_RADIUS) {
         pickup.isActive = false;
         upgradeWeapon(player, pickup);
+        player.stats.powerupsCollected++;
+        player.levelStats.powerupsCollected++;
         break;
       }
     }
@@ -156,6 +164,8 @@ function detectPlayerLifePickupCollisions(state: GameState): void {
       if (dist < PLAYER_COLLISION_RADIUS + LIFE_PICKUP_COLLISION_RADIUS) {
         pickup.isActive = false;
         player.lives++;
+        player.stats.powerupsCollected++;
+        player.levelStats.powerupsCollected++;
         break;
       }
     }

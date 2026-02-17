@@ -8,7 +8,7 @@ import { createEnemyF } from '../objects/enemies/enemyF/code/EnemyF';
 import { createEnemyG } from '../objects/enemies/enemyG/code/EnemyG';
 import { initFormation } from './FormationManager';
 import { generateFlightPaths } from './FlightPathManager';
-import { LEVEL_CLEAR_DELAY } from './constants';
+import { LEVEL_CLEAR_DELAY, CHAOS_ENEMY_MULTIPLIER, CHAOS_MINIBOSS_HEALTH_MULTIPLIER, CHAOS_MINIBOSS_FIRE_RATE_DIVISOR } from './constants';
 import { createBoss } from '../objects/boss/code/Boss';
 
 /** Wave transition duration in ms. */
@@ -128,6 +128,8 @@ export class LevelManager {
       return;
     }
 
+    const chaosMultiplier = state.difficulty === 'chaos' ? CHAOS_ENEMY_MULTIPLIER : 1;
+
     if (wave.slots && wave.slots.length > 0) {
       // Explicit slot placement — derive grid size from max row/col
       let maxRow = 0;
@@ -136,18 +138,37 @@ export class LevelManager {
         if (slot.row > maxRow) maxRow = slot.row;
         if (slot.col > maxCol) maxCol = slot.col;
       }
+
+      // Chaos mode: duplicate slots with row offset (skip mini-boss Type G)
+      const allSlots = [...wave.slots];
+      if (chaosMultiplier > 1) {
+        const rowOffset = maxRow + 1;
+        for (const slot of wave.slots) {
+          if (slot.type === 'G') continue; // Mini-boss gets buffed, not duplicated
+          allSlots.push({ type: slot.type, row: slot.row + rowOffset, col: slot.col });
+        }
+        maxRow = maxRow + rowOffset;
+      }
+
       state.formation = initFormation(maxRow + 1, maxCol + 1);
 
-      for (const slot of wave.slots) {
+      for (const slot of allSlots) {
         const factory = ENEMY_FACTORY[slot.type] ?? createEnemyA;
-        state.enemies.push(factory(slot.row, slot.col));
+        const enemy = factory(slot.row, slot.col);
+        // Chaos mode: buff mini-boss with 2x health and 2x fire rate
+        if (chaosMultiplier > 1 && enemy.type === 'G') {
+          enemy.health *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
+          enemy.maxHealth *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
+          enemy.fireRate /= CHAOS_MINIBOSS_FIRE_RATE_DIVISOR;
+        }
+        state.enemies.push(enemy);
       }
     } else {
       // Auto-fill rectangular block (existing behavior)
       let totalRows = 0;
       let maxCols = 0;
       for (const spawnConfig of wave.enemies) {
-        totalRows += spawnConfig.rows;
+        totalRows += spawnConfig.rows * chaosMultiplier;
         if (spawnConfig.cols > maxCols) maxCols = spawnConfig.cols;
       }
 
@@ -156,12 +177,13 @@ export class LevelManager {
       let currentRow = 0;
       for (const spawnConfig of wave.enemies) {
         const factory = ENEMY_FACTORY[spawnConfig.type] ?? createEnemyA;
-        for (let r = 0; r < spawnConfig.rows; r++) {
+        const rows = spawnConfig.rows * chaosMultiplier;
+        for (let r = 0; r < rows; r++) {
           for (let c = 0; c < spawnConfig.cols; c++) {
             state.enemies.push(factory(currentRow + r, c));
           }
         }
-        currentRow += spawnConfig.rows;
+        currentRow += rows;
       }
     }
 

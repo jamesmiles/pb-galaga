@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.8.6';
+export const GAME_VERSION = '0.9.5';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -25,7 +25,7 @@ export const PLAYER_FIRE_COOLDOWN = 200; // ms between shots
 
 // Laser defaults
 export const LASER_SPEED = 500; // pixels per second
-export const LASER_DAMAGE = 50;
+export const LASER_DAMAGE = 40;
 export const LASER_MAX_LIFETIME = 3000; // ms
 export const LASER_COLLISION_RADIUS = 4;
 
@@ -86,7 +86,7 @@ export const BULLET_COLLISION_RADIUS = 3;
 
 // Player bullet defaults
 export const PLAYER_BULLET_SPEED = 550; // pixels per second (fastest)
-export const PLAYER_BULLET_DAMAGE = 25; // least damage
+export const PLAYER_BULLET_DAMAGE = 20; // least damage
 
 // Plasma defaults
 export const PLASMA_SPEED = 180; // pixels per second
@@ -114,12 +114,24 @@ export const MISSILE_TURN_RATE = 3.0; // rad/s
 export const MISSILE_FIRE_COOLDOWN = 800; // ms between secondary volleys
 export const MISSILE_HOMING_DELAY = 200; // ms before homing activates
 
-// Snake laser defaults (level-4 laser upgrade)
+// Snake laser defaults (level-4 rapid homing stream)
 export const SNAKE_SPEED = 400; // pixels per second
-export const SNAKE_DAMAGE = 75;
+export const SNAKE_DAMAGE = 15; // low per-shot, high fire rate
 export const SNAKE_MAX_LIFETIME = 3000; // ms
-export const SNAKE_COLLISION_RADIUS = 8;
+export const SNAKE_COLLISION_RADIUS = 4; // small stream projectile
 export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
+export const SNAKE_FIRE_COOLDOWN = 50; // ms (4x faster than normal 200ms)
+
+// Level 5 weapon upgrades
+export const PLAYER_BULLET_L5_DAMAGE = 25; // L5 bullet upgrade
+export const SNAKE_L5_DAMAGE = 20; // upgraded stream damage
+export const SNAKE_L5_COLLISION_RADIUS = 8; // 2x L4 radius
+export const BULLET_L5_COLLISION_RADIUS = 6; // 2x normal (3)
+
+// Chaos mode multipliers
+export const CHAOS_ENEMY_MULTIPLIER = 2;
+export const CHAOS_MINIBOSS_HEALTH_MULTIPLIER = 2;
+export const CHAOS_MINIBOSS_FIRE_RATE_DIVISOR = 2;
 
 // Asteroid defaults (Level 4 foreground)
 export const ASTEROID_SMALL_HEALTH = 100;
@@ -135,7 +147,7 @@ export const ASTEROID_SPEED_MAX = 80; // px/s
 export const ASTEROID_DAMAGE = 50;
 
 // Weapon pickup defaults
-export const WEAPON_PICKUP_DROP_CHANCE = 0.08; // 8% per enemy kill
+export const WEAPON_PICKUP_DROP_CHANCE = 0.04; // 4% per enemy kill
 export const WEAPON_PICKUP_CYCLE_INTERVAL = 5000; // ms between type flips
 export const WEAPON_PICKUP_SPEED = 60; // px/s downward drift
 export const WEAPON_PICKUP_LIFETIME = 10000; // ms
@@ -165,6 +177,10 @@ export const LIFE_PICKUP_COLLISION_RADIUS = 10;
 
 // Level clear delay
 export const LEVEL_CLEAR_DELAY = 3000; // ms
+
+// Level stats screen timing
+export const LEVEL_STATS_MIN_INPUT_DELAY = 3000; // ms before confirm is accepted
+export const LEVEL_STATS_TIMEOUT = 10000; // ms auto-advance
 
 // Score
 export const WAVE_COMPLETE_BONUS = 500;

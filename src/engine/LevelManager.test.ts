@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { LevelManager } from './LevelManager';
 import { createInitialState, createPlayer } from './StateManager';
 import { level1 } from '../levels/level1';
-import { FIXED_TIMESTEP, WAVE_COMPLETE_BONUS, LEVEL_CLEAR_DELAY } from './constants';
+import { level3 } from '../levels/level3';
+import { FIXED_TIMESTEP, WAVE_COMPLETE_BONUS, LEVEL_CLEAR_DELAY, ENEMY_G_HEALTH } from './constants';
 import type { GameState } from '../types';
 
 describe('LevelManager', () => {
@@ -164,6 +165,79 @@ describe('LevelManager', () => {
       expect(types.has('A')).toBe(true);
       expect(types.has('B')).toBe(true);
       expect(types.has('C')).toBe(true);
+    });
+  });
+
+  describe('chaos mode mini-boss', () => {
+    let chaosState: GameState;
+
+    beforeEach(() => {
+      manager.registerLevel(level3);
+      chaosState = createInitialState();
+      chaosState.gameStatus = 'playing';
+      chaosState.players = [createPlayer('player1')];
+      chaosState.difficulty = 'chaos';
+      chaosState.deltaTime = FIXED_TIMESTEP;
+    });
+
+    /** Advance to a specific wave of a level. */
+    function advanceToWave(st: GameState, level: number, targetWave: number): void {
+      manager.startLevel(st, level);
+      st.deltaTime = FIXED_TIMESTEP;
+      for (let w = 1; w < targetWave; w++) {
+        manager.update(st);
+        if (st.waveStatus === 'transition') {
+          st.deltaTime = 3100;
+          manager.update(st);
+        }
+        st.enemies.forEach(e => { e.isAlive = false; });
+        st.deltaTime = FIXED_TIMESTEP;
+        manager.update(st);
+      }
+      // Activate target wave
+      manager.update(st);
+      if (st.waveStatus === 'transition') {
+        st.deltaTime = 3100;
+        manager.update(st);
+      }
+    }
+
+    it('does NOT duplicate mini-boss (Type G) in chaos mode', () => {
+      advanceToWave(chaosState, 3, 7);
+      const typeG = chaosState.enemies.filter(e => e.type === 'G');
+      expect(typeG).toHaveLength(1);
+    });
+
+    it('doubles mini-boss health in chaos mode', () => {
+      advanceToWave(chaosState, 3, 7);
+      const miniBoss = chaosState.enemies.find(e => e.type === 'G')!;
+      expect(miniBoss.health).toBe(ENEMY_G_HEALTH * 2);
+      expect(miniBoss.maxHealth).toBe(ENEMY_G_HEALTH * 2);
+    });
+
+    it('halves mini-boss fire rate in chaos mode', () => {
+      advanceToWave(chaosState, 3, 7);
+      const miniBoss = chaosState.enemies.find(e => e.type === 'G')!;
+      expect(miniBoss.fireRate).toBe(900); // 1800 / 2
+    });
+
+    it('still duplicates other slot-based enemies in chaos mode', () => {
+      // Level 3 wave 1 has slot-based non-G enemies
+      advanceToWave(chaosState, 3, 1);
+      const normalState = createInitialState();
+      normalState.gameStatus = 'playing';
+      normalState.players = [createPlayer('player1')];
+      normalState.difficulty = 'normal';
+      manager.startLevel(normalState, 3);
+      normalState.deltaTime = FIXED_TIMESTEP;
+      manager.update(normalState);
+      if (normalState.waveStatus === 'transition') {
+        normalState.deltaTime = 3100;
+        manager.update(normalState);
+      }
+
+      // Chaos should have more enemies than normal for non-G waves
+      expect(chaosState.enemies.length).toBeGreaterThan(normalState.enemies.length);
     });
   });
 

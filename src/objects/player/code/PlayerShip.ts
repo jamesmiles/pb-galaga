@@ -2,7 +2,7 @@ import type { Player, PlayerInput, Vector2D } from '../../../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN,
   PLAYER_INVULNERABILITY_DURATION, PLAYER_COLLISION_RADIUS,
-  DEATH_SEQUENCE_DURATION,
+  DEATH_SEQUENCE_DURATION, SNAKE_FIRE_COOLDOWN,
 } from '../../../engine/constants';
 
 /** Player ship half-size for boundary clamping. */
@@ -71,7 +71,8 @@ function updateFireCooldown(player: Player, dtSeconds: number): void {
 function updateFiring(player: Player): void {
   player.isFiring = player.input.fire && player.fireCooldown <= 0;
   if (player.isFiring) {
-    player.fireCooldown = PLAYER_FIRE_COOLDOWN;
+    const isSnakeWeapon = player.primaryWeapon === 'laser' && player.primaryLevel >= 4;
+    player.fireCooldown = isSnakeWeapon ? SNAKE_FIRE_COOLDOWN : PLAYER_FIRE_COOLDOWN;
   }
 }
 
@@ -86,6 +87,8 @@ export function respawnPlayer(player: Player): void {
   player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
   player.collisionState = 'none';
   player.deathSequence = null;
+  player.stats.respawns++;
+  player.levelStats.respawns++;
 }
 
 /**
@@ -106,6 +109,8 @@ export function damagePlayer(player: Player, damage: number, currentTime: number
       duration: DEATH_SEQUENCE_DURATION,
       position: { x: player.position.x, y: player.position.y },
     };
+    player.stats.deaths++;
+    player.levelStats.deaths++;
     return true;
   }
   player.collisionState = 'colliding';
