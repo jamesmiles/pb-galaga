@@ -2,7 +2,6 @@ import type { GameState, WeaponPickup, Vector2D } from '../types';
 import {
   WEAPON_PICKUP_DROP_CHANCE, WEAPON_PICKUP_CYCLE_INTERVAL,
   WEAPON_PICKUP_SPEED, WEAPON_PICKUP_LIFETIME,
-  CHAOS_WEAPON_DROP_MULTIPLIER,
 } from './constants';
 
 let nextPickupId = 0;
@@ -14,10 +13,7 @@ export class WeaponPickupManager {
 
   /** Roll for a weapon pickup drop at the given position. */
   maybeSpawnPickup(state: GameState, position: Vector2D): void {
-    const dropChance = state.difficulty === 'chaos'
-      ? Math.min(WEAPON_PICKUP_DROP_CHANCE * CHAOS_WEAPON_DROP_MULTIPLIER, 1.0)
-      : WEAPON_PICKUP_DROP_CHANCE;
-    if (Math.random() >= dropChance) return;
+    if (Math.random() >= WEAPON_PICKUP_DROP_CHANCE) return;
 
     const isPrimary = Math.random() < 0.7;
     const category = isPrimary ? 'primary' : 'secondary';

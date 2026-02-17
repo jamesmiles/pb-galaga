@@ -125,10 +125,12 @@ export const SNAKE_TURN_RATE = 2.0; // rad/s (gentle curves)
 export const PLAYER_BULLET_L5_DAMAGE = 31; // 25% more than 25
 export const SNAKE_L5_DAMAGE = 94; // 25% more than 75
 export const BULLET_L5_COLLISION_RADIUS = 6; // 2x normal (3)
+export const SNAKE_POSITION_HISTORY_MAX = 30; // Max trail points for L5 snake beam
 
 // Chaos mode multipliers
 export const CHAOS_ENEMY_MULTIPLIER = 2;
-export const CHAOS_WEAPON_DROP_MULTIPLIER = 2;
+export const CHAOS_MINIBOSS_HEALTH_MULTIPLIER = 2;
+export const CHAOS_MINIBOSS_FIRE_RATE_DIVISOR = 2;
 
 // Asteroid defaults (Level 4 foreground)
 export const ASTEROID_SMALL_HEALTH = 100;
@@ -174,6 +176,10 @@ export const LIFE_PICKUP_COLLISION_RADIUS = 10;
 
 // Level clear delay
 export const LEVEL_CLEAR_DELAY = 3000; // ms
+
+// Level stats screen timing
+export const LEVEL_STATS_MIN_INPUT_DELAY = 3000; // ms before confirm is accepted
+export const LEVEL_STATS_TIMEOUT = 10000; // ms auto-advance
 
 // Score
 export const WAVE_COMPLETE_BONUS = 500;

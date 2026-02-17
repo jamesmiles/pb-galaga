@@ -1,4 +1,4 @@
-import type { Projectile } from '../../types';
+import type { Projectile, Vector2D } from '../../types';
 import { lerpPosition } from '../InterpolationUtils';
 import { BULLET_L5_COLLISION_RADIUS, SNAKE_L5_DAMAGE } from '../../engine/constants';
 
@@ -41,7 +41,10 @@ export function drawProjectiles(
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#44ff44', 3, 6);
     } else if (proj.type === 'snake') {
       const isL5Snake = proj.damage >= SNAKE_L5_DAMAGE;
-      drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, isL5Snake ? 28 : 14);
+      if (!isL5Snake) {
+        drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 8, 14);
+      }
+      // L5 snake uses curved beam rendering instead of block trails
     } else {
       const isPlayerBullet = proj.owner.type === 'player';
       const isL5Bullet = isPlayerBullet && proj.collisionRadius >= BULLET_L5_COLLISION_RADIUS;
@@ -104,18 +107,23 @@ export function drawProjectiles(
       ctx.fillRect(pos.x - 1, pos.y + 2, 2, 3);
     } else if (proj.type === 'snake') {
       const isL5Snake = proj.damage >= SNAKE_L5_DAMAGE;
-      const snakeH = isL5Snake ? 28 : 14;
-      const snakeCoreH = isL5Snake ? 20 : 10;
-      // Thick cyan beam with heavy glow
-      ctx.shadowBlur = isL5Snake ? 24 : 16;
-      ctx.shadowColor = '#00ffff';
-      ctx.fillStyle = '#00ffff';
-      ctx.fillRect(pos.x - 4, pos.y - snakeH / 2, 8, snakeH);
 
-      // Bright white core
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(pos.x - 2, pos.y - snakeCoreH / 2, 4, snakeCoreH);
+      if (isL5Snake && proj.positionHistory && proj.positionHistory.length >= 2) {
+        // L5: continuous curved beam through position history
+        ctx.restore(); // Restore before drawSnakeCurve (it manages its own save/restore)
+        drawSnakeCurve(ctx, proj.positionHistory, pos);
+        ctx.save(); // Re-save so the outer restore balances
+      } else {
+        // L1-L4: block rendering
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = '#00ffff';
+        ctx.fillStyle = '#00ffff';
+        ctx.fillRect(pos.x - 4, pos.y - 7, 8, 14);
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(pos.x - 2, pos.y - 5, 4, 10);
+      }
     } else {
       // Bullet — color depends on owner
       const isPlayerBullet = proj.owner.type === 'player';
@@ -141,6 +149,60 @@ export function drawProjectiles(
 
     ctx.restore();
   }
+}
+
+/** Draw a smooth curved beam through the snake's position history. */
+function drawSnakeCurve(
+  ctx: CanvasRenderingContext2D,
+  history: Vector2D[],
+  headPos: Vector2D,
+): void {
+  const points = [...history, headPos];
+  if (points.length < 2) return;
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Draw segments with tapering width and fading opacity
+  for (let i = 1; i < points.length; i++) {
+    const t = i / points.length; // 0 = tail, 1 = head
+
+    ctx.beginPath();
+    ctx.lineWidth = 2 + t * 6; // 2px at tail, 8px at head
+    ctx.globalAlpha = 0.3 + t * 0.7;
+    ctx.shadowBlur = 12 + t * 12;
+    ctx.shadowColor = '#00ffff';
+    ctx.strokeStyle = '#00ffff';
+
+    if (i >= 2) {
+      // Smooth curve through midpoints using quadratic Bezier
+      const prev = points[i - 2];
+      const cp = points[i - 1];
+      const curr = points[i];
+      ctx.moveTo((prev.x + cp.x) / 2, (prev.y + cp.y) / 2);
+      ctx.quadraticCurveTo(cp.x, cp.y, (cp.x + curr.x) / 2, (cp.y + curr.y) / 2);
+    } else {
+      ctx.moveTo(points[i - 1].x, points[i - 1].y);
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+  }
+
+  // Bright white core at the head (last few segments)
+  const coreStart = Math.max(0, points.length - 6);
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#ffffff';
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(points[coreStart].x, points[coreStart].y);
+  for (let i = coreStart + 1; i < points.length; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.stroke();
+
+  ctx.restore();
 }
 
 function drawTrails(

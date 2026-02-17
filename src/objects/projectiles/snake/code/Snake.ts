@@ -27,5 +27,6 @@ export function createSnakeLaser(
     hasCollided: false,
     turnRate: SNAKE_TURN_RATE,
     isHoming: true,
+    positionHistory: [],
   };
 }

@@ -1,5 +1,5 @@
 import type { GameState, GameRenderer } from '../types';
-import { GAME_WIDTH, GAME_HEIGHT, WAVE_COMPLETE_BONUS, PLAYER_INVULNERABILITY_DURATION } from './constants';
+import { GAME_WIDTH, GAME_HEIGHT, WAVE_COMPLETE_BONUS, PLAYER_INVULNERABILITY_DURATION, LEVEL_STATS_MIN_INPUT_DELAY, LEVEL_STATS_TIMEOUT } from './constants';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer, resetLevelStats } from './StateManager';
 import { InputHandler } from './InputHandler';
@@ -513,7 +513,7 @@ export class GameManager {
       }
       // Boss bridge hit sound
       if (state.boss.health < bossHealthBefore && state.boss.health > 0) {
-        SoundManager.play('hitF');
+        SoundManager.play('hitGClang');
       }
     }
     const alivePlayersAfter = state.players.filter(p => p.isAlive).length;
@@ -641,33 +641,6 @@ export class GameManager {
     // Auto-advance to stats screen after 3 seconds
     this.levelCompleteTimer += state.deltaTime;
     if (this.levelCompleteTimer >= 3000) {
-      // Auto-respawn dead co-op players as reward
-      if (state.gameMode === 'co-op') {
-        for (const player of state.players) {
-          if (!player.isAlive && player.lives <= 0 && !player.deathSequence?.active) {
-            player.lives = 1;
-            respawnPlayer(player);
-            SoundManager.play('respawnPickup');
-          }
-        }
-      }
-
-      // Return all alive ships to starting positions
-      for (const player of state.players) {
-        if (!player.isAlive) continue;
-        if (state.gameMode === 'co-op') {
-          player.position = {
-            x: player.id === 'player1' ? GAME_WIDTH * 0.33 : GAME_WIDTH * 0.66,
-            y: GAME_HEIGHT - 60,
-          };
-        } else {
-          player.position = { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 60 };
-        }
-        player.velocity = { x: 0, y: 0 };
-        player.isInvulnerable = true;
-        player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
-      }
-
       // Transition to level stats screen
       const p1 = state.players.find(p => p.id === 'player1');
       const p2 = state.players.find(p => p.id === 'player2');
@@ -696,10 +669,38 @@ export class GameManager {
     const menuInput = this.inputHandler.getMenuInput();
     this.levelStatsTimer += state.deltaTime;
 
-    // Advance on confirm or 5s timeout
-    if (menuInput.confirm || this.levelStatsTimer >= 5000) {
+    // Advance on confirm (after min delay) or timeout
+    if ((menuInput.confirm && this.levelStatsTimer >= LEVEL_STATS_MIN_INPUT_DELAY) || this.levelStatsTimer >= LEVEL_STATS_TIMEOUT) {
       const nextLevel = state.currentLevel + 1;
       resetLevelStats(state.players);
+
+      // Auto-respawn dead co-op players as reward for completing the level
+      if (state.gameMode === 'co-op') {
+        for (const player of state.players) {
+          if (!player.isAlive && player.lives <= 0 && !player.deathSequence?.active) {
+            player.lives = 1;
+            respawnPlayer(player);
+            SoundManager.play('respawnPickup');
+          }
+        }
+      }
+
+      // Return all alive ships to starting positions for the new level
+      for (const player of state.players) {
+        if (!player.isAlive) continue;
+        if (state.gameMode === 'co-op') {
+          player.position = {
+            x: player.id === 'player1' ? GAME_WIDTH * 0.33 : GAME_WIDTH * 0.66,
+            y: GAME_HEIGHT - 60,
+          };
+        } else {
+          player.position = { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 60 };
+        }
+        player.velocity = { x: 0, y: 0 };
+        player.isInvulnerable = true;
+        player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
+      }
+
       state.enemies = [];
       state.projectiles = [];
       state.boss = null;

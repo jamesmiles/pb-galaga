@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { GameManager } from './GameManager';
-import { WAVE_COMPLETE_BONUS } from './constants';
+import { WAVE_COMPLETE_BONUS, GAME_WIDTH, GAME_HEIGHT, LEVEL_STATS_MIN_INPUT_DELAY, LEVEL_STATS_TIMEOUT } from './constants';
+import { SoundManager } from '../audio/SoundManager';
 
 /** Tick past the level intro typing animation (~6s for longest intro). */
 function skipIntro(gm: GameManager): void {
@@ -85,6 +86,16 @@ describe('GameManager', () => {
       // Skip through intro to playing
       skipIntro(gm);
       expect(gm.getState().gameStatus).toBe('playing');
+      gm.destroy();
+    });
+
+    it('difficulty menu starts with selectedOption 0 (Normal)', () => {
+      const gm = new GameManager({ headless: true });
+      gm.inputHandler.injectMenuInput({ confirm: true }); // Select "1 Player"
+      gm.tickHeadless(1);
+      expect(gm.getState().menu?.type).toBe('difficulty');
+      expect(gm.getState().menu?.selectedOption).toBe(0);
+      expect(gm.getState().menu?.options[0]).toBe('Normal');
       gm.destroy();
     });
 
@@ -475,7 +486,8 @@ describe('GameManager', () => {
       gm.tickHeadless(200);
       expect(gm.getState().gameStatus).toBe('levelstats');
 
-      // Press Enter to advance past stats (or wait 5s)
+      // Wait past minimum input delay (3s = 180 ticks) then confirm
+      gm.tickHeadless(200);
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
       expect(gm.getState().gameStatus).toBe('levelintro');
@@ -510,6 +522,170 @@ describe('GameManager', () => {
       // Tick should detect game over instead of auto-advancing
       gm.tickHeadless(200);
       expect(gm.getState().gameStatus).toBe('gameover');
+      gm.destroy();
+    });
+  });
+
+  describe('boss bridge sound', () => {
+    it('plays hitGClang when boss bridge takes damage', () => {
+      const gm = new GameManager({ headless: true });
+      startSinglePlayer(gm);
+
+      const state = gm.getState();
+      // Set up a boss with all turrets dead (bridge exposed)
+      state.boss = {
+        position: { x: 400, y: 100 },
+        velocity: { x: 0, y: 0 },
+        width: 720,
+        height: 200,
+        isAlive: true,
+        health: 500,
+        maxHealth: 1000,
+        turrets: [],
+        layer: 'active',
+        deathSequence: null,
+        scoreValue: 5000,
+        upperCollisionZones: [],
+      };
+
+      // Place a player projectile on the bridge
+      state.projectiles.push({
+        id: 'test-proj',
+        type: 'laser',
+        owner: { type: 'player', id: 'player1' },
+        position: { x: 400, y: 100 },
+        velocity: { x: 0, y: -500 },
+        rotation: 0,
+        speed: 500,
+        damage: 50,
+        isActive: true,
+        lifetime: 0,
+        maxLifetime: 3000,
+        collisionRadius: 4,
+        hasCollided: false,
+      });
+
+      const playSpy = vi.spyOn(SoundManager, 'play');
+      gm.tickHeadless(1);
+
+      const bridgeSoundCalls = playSpy.mock.calls.filter(
+        ([effect]) => effect === 'hitGClang' || effect === 'hitF'
+      );
+      expect(bridgeSoundCalls.length).toBeGreaterThan(0);
+      expect(bridgeSoundCalls[0][0]).toBe('hitGClang');
+
+      playSpy.mockRestore();
+      gm.destroy();
+    });
+  });
+
+  describe('ship repositioning timing', () => {
+    it('does NOT change player position during levelcomplete→levelstats', () => {
+      const gm = new GameManager({ headless: true });
+      startSinglePlayer(gm);
+
+      // Clear all waves but DON'T tick past 3s on the last wave
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        if (wave < 4) gm.tickHeadless(200);
+      }
+      // Tick through clearing delay (3s) to reach levelcomplete
+      gm.tickHeadless(200);
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+
+      // NOW set a custom position after reaching levelcomplete
+      gm.getState().players[0].position = { x: 200, y: 600 };
+
+      // Tick through levelcomplete timer (3s) to reach levelstats
+      gm.tickHeadless(200);
+      expect(gm.getState().gameStatus).toBe('levelstats');
+
+      // Position should NOT have changed during this transition
+      expect(gm.getState().players[0].position.x).toBe(200);
+      expect(gm.getState().players[0].position.y).toBe(600);
+      gm.destroy();
+    });
+
+    it('resets player position when advancing from levelstats to levelintro', () => {
+      const gm = new GameManager({ headless: true });
+      startSinglePlayer(gm);
+
+      // Clear all waves
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        if (wave < 4) gm.tickHeadless(200);
+      }
+      gm.tickHeadless(200); // clearing delay → levelcomplete
+      gm.getState().players[0].position = { x: 200, y: 600 };
+      gm.tickHeadless(200); // → levelstats
+      expect(gm.getState().gameStatus).toBe('levelstats');
+
+      // Wait past min delay then confirm
+      gm.tickHeadless(200);
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+      expect(gm.getState().gameStatus).toBe('levelintro');
+
+      // Position should now be reset to center
+      const pos = gm.getState().players[0].position;
+      expect(pos.x).toBe(GAME_WIDTH / 2);
+      expect(pos.y).toBe(GAME_HEIGHT - 60);
+      gm.destroy();
+    });
+  });
+
+  describe('level stats timing', () => {
+    /** Clear all waves and advance to levelstats screen. */
+    function advanceToLevelStats(gm: GameManager): void {
+      startSinglePlayer(gm);
+      for (let wave = 0; wave < 5; wave++) {
+        gm.getState().enemies.forEach(e => { e.isAlive = false; });
+        gm.tickHeadless(1);
+        gm.tickHeadless(200);
+      }
+      expect(gm.getState().gameStatus).toBe('levelcomplete');
+      gm.tickHeadless(200); // 3s → levelstats
+      expect(gm.getState().gameStatus).toBe('levelstats');
+    }
+
+    it('does NOT advance when confirm pressed before minimum delay', () => {
+      const gm = new GameManager({ headless: true });
+      advanceToLevelStats(gm);
+
+      // Press confirm at ~1 second (60 ticks)
+      gm.tickHeadless(60);
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      expect(gm.getState().gameStatus).toBe('levelstats');
+      gm.destroy();
+    });
+
+    it('advances when confirm pressed after minimum delay', () => {
+      const gm = new GameManager({ headless: true });
+      advanceToLevelStats(gm);
+
+      // Wait past 3s minimum (210 ticks at 60Hz = 3.5s)
+      gm.tickHeadless(210);
+      gm.inputHandler.injectMenuInput({ confirm: true });
+      gm.tickHeadless(1);
+
+      expect(gm.getState().gameStatus).toBe('levelintro');
+      expect(gm.getState().currentLevel).toBe(2);
+      gm.destroy();
+    });
+
+    it('auto-advances after timeout', () => {
+      const gm = new GameManager({ headless: true });
+      advanceToLevelStats(gm);
+
+      // Wait past 10s timeout (610 ticks at 60Hz)
+      gm.tickHeadless(610);
+
+      expect(gm.getState().gameStatus).toBe('levelintro');
+      expect(gm.getState().currentLevel).toBe(2);
       gm.destroy();
     });
   });

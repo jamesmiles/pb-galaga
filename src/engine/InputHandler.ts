@@ -136,11 +136,9 @@ export class InputHandler {
     if (input.back) this.keyState['Escape'] = true;
   }
 
-  /** Clear all key state and auto-fire flags. */
+  /** Clear all transient key state (preserves auto-fire toggles). */
   clearAll(): void {
     this.keyState = {};
-    this.p1AutoFire = false;
-    this.p2AutoFire = false;
   }
 
   destroy(): void {

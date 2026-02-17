@@ -170,6 +170,7 @@ export class MenuOverlay {
       this.buildMenu(menu.type, menu.options, menu.data);
       this.lastMenuType = menu.type;
       this.lastMenuDataHash = dataHash;
+      this.lastSelectedOption = -1; // Force selection update after menu rebuild
     }
 
     // Update selected option highlighting

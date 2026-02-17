@@ -1,5 +1,5 @@
 import type { Projectile, ProjectileOwner, Vector2D, GameState } from '../../../../types';
-import { LASER_SPEED, LASER_DAMAGE, LASER_MAX_LIFETIME, LASER_COLLISION_RADIUS, GAME_WIDTH, GAME_HEIGHT, PLAYER_BULLET_L5_DAMAGE, SNAKE_L5_DAMAGE, BULLET_L5_COLLISION_RADIUS } from '../../../../engine/constants';
+import { LASER_SPEED, LASER_DAMAGE, LASER_MAX_LIFETIME, LASER_COLLISION_RADIUS, GAME_WIDTH, GAME_HEIGHT, PLAYER_BULLET_L5_DAMAGE, SNAKE_L5_DAMAGE, BULLET_L5_COLLISION_RADIUS, SNAKE_POSITION_HISTORY_MAX } from '../../../../engine/constants';
 
 let nextProjectileId = 0;
 
@@ -113,6 +113,14 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
   // Move
   proj.position.x += proj.velocity.x * dtSeconds;
   proj.position.y += proj.velocity.y * dtSeconds;
+
+  // Track position history for L5 snake curved beam rendering
+  if (proj.type === 'snake' && proj.positionHistory && proj.damage >= SNAKE_L5_DAMAGE) {
+    proj.positionHistory.push({ x: proj.position.x, y: proj.position.y });
+    if (proj.positionHistory.length > SNAKE_POSITION_HISTORY_MAX) {
+      proj.positionHistory.shift();
+    }
+  }
 
   // Lifetime
   proj.lifetime += dtMs;

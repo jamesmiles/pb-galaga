@@ -80,6 +80,27 @@ describe('InputHandler', () => {
 
       handler.destroy();
     });
+
+    it('preserves auto-fire state across clearAll', () => {
+      const handler = new InputHandler(true);
+      handler.injectAutoFire('p1', true);
+      handler.injectAutoFire('p2', true);
+
+      handler.clearAll();
+
+      const autoFire = handler.getAutoFireState();
+      expect(autoFire.p1).toBe(true);
+      expect(autoFire.p2).toBe(true);
+
+      // Regular keys should still be cleared
+      handler.injectPlayerInput({ left: true });
+      handler.clearAll();
+      expect(handler.getPlayerInput().left).toBe(false);
+      // But auto-fire still preserved
+      expect(handler.getAutoFireState().p1).toBe(true);
+
+      handler.destroy();
+    });
   });
 
   describe('player 2 input', () => {

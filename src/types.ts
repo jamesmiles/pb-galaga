@@ -144,6 +144,7 @@ export interface Projectile {
   turnRate?: number;
   isHoming?: boolean;
   homingDelay?: number;
+  positionHistory?: Vector2D[];  // Trail of recent positions for curved beam rendering
 }
 
 // --- Boss ---
