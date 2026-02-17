@@ -13,7 +13,7 @@ describe('WeaponPickupManager', () => {
   describe('maybeSpawnPickup', () => {
     it('spawns a pickup when random rolls below drop chance', () => {
       const state = createInitialState();
-      vi.spyOn(Math, 'random').mockReturnValue(0.05); // Below 0.15 threshold
+      vi.spyOn(Math, 'random').mockReturnValue(0.02); // Below drop chance threshold
 
       manager.maybeSpawnPickup(state, { x: 200, y: 300 });
 
