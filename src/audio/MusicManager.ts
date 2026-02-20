@@ -3,7 +3,7 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5' | 'level6';
 
 /**
  * Simple chiptune song data in ZzFXM format.
@@ -267,6 +267,40 @@ const LEVEL5_SONG: ZzFXMSong = [
   145, // BPM — heavy boss rock
 ];
 
+const LEVEL6_SONG: ZzFXMSong = [
+  // Instruments
+  [
+    // 0: Distorted lead (sawtooth, aggressive — Mars combat)
+    [0.5, 0, 196, 0.01, 0.1, 0.06, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.65, 0.02, 0],
+    // 1: Heavy bass (square, rumbling ground feel)
+    [0.4, 0, 98, 0.01, 0.22, 0.18, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.04, 0],
+    // 2: Industrial drums (noise, heavy mechanical hits)
+    [0.4, 0, 80, 0, 0.03, 0.06, 4, 1, 0, 0, 0, 0, 0, 2.5, 0, 0, 0, 0.35, 0.01, 0],
+  ],
+  // Patterns — G minor (ground assault: G=55, Bb=58, C=60, D=62, F=65)
+  [
+    // Pattern 0: Ground assault riff
+    [
+      [55, 0, 0, 58, 0, 0, 60, 0, 0, 58, 0, 0, 55, 0, 0, 62, 0, 0, 60, 0, 0, 58, 0, 0],
+      [31, 1, 0, 0, undefined, 0, 31, 1, 0, 0, undefined, 0, 36, 1, 0, 36, 1, 0, 38, 1, 0, 0, undefined, 0],
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 0, undefined, 0, 60, 2, 0, 60, 2, 0],
+    ],
+    // Pattern 1: Heavy chorus
+    [
+      [62, 0, 0, 60, 0, 0, 58, 0, 0, 60, 0, 0, 62, 0, 0, 65, 0, 0, 62, 0, 0, 60, 0, 0],
+      [38, 1, 0, 38, 1, 0, 36, 1, 0, 0, undefined, 0, 34, 1, 0, 34, 1, 0, 31, 1, 0, 0, undefined, 0],
+      [60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 60, 2, 0, 0, undefined, 0],
+    ],
+  ],
+  // Sequence
+  [
+    [0, 0, 1, 1], // Channel 0
+    [0, 0, 1, 1], // Channel 1
+    [0, 0, 1, 1], // Channel 2
+  ],
+  135, // BPM — heavy mechanical
+];
+
 const TRACKS: Record<MusicTrack, ZzFXMSong> = {
   menu: MENU_SONG,
   level1: LEVEL1_SONG,
@@ -274,6 +308,7 @@ const TRACKS: Record<MusicTrack, ZzFXMSong> = {
   level3: LEVEL3_SONG,
   level4: LEVEL4_SONG,
   level5: LEVEL5_SONG,
+  level6: LEVEL6_SONG,
 };
 
 /**

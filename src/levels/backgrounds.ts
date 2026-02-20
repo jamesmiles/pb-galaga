@@ -37,4 +37,5 @@ export const LEVEL_BACKGROUNDS: Record<number, BackgroundObjectConfig[]> = {
     { url: marsUrl, x: 350, y: 80, scale: 1.6, alpha: 0.18, scrollSpeed: 8 },
     { url: moonSmallUrl, x: 620, y: 500, scale: 0.5, alpha: 0.12, scrollSpeed: 12 },
   ],
+  6: [], // Mars terrain is procedurally drawn, no background objects
 };

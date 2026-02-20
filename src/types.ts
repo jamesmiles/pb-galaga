@@ -52,6 +52,7 @@ export interface PlayerStats {
 
 export interface Player {
   id: 'player1' | 'player2';
+  movementMode: 'ship' | 'tank';
   shipColor: 'red' | 'blue';
   position: Vector2D;
   velocity: Vector2D;
@@ -96,7 +97,8 @@ export interface FlightPathState {
 
 export interface Enemy {
   id: string;
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K';
+  isStationary?: boolean;
   position: Vector2D;
   velocity: Vector2D;
   rotation: number;
@@ -176,6 +178,7 @@ export interface CollisionZone {
 }
 
 export interface BossState {
+  variant?: 'mothership' | 'tank';
   position: Vector2D;
   velocity: Vector2D;
   width: number;
@@ -347,9 +350,10 @@ export interface LevelConfig {
 }
 
 export interface WaveSlot {
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K';
   row: number;
   col: number;
+  fixedPosition?: Vector2D;
 }
 
 export interface WaveConfig {
@@ -359,10 +363,11 @@ export interface WaveConfig {
   formation?: FormationType;  // Wave-level formation type (used with slots)
   slots?: WaveSlot[];         // Explicit enemy placement; overrides enemies array
   bossSpawn?: boolean;        // If true, spawn boss instead of formation enemies
+  bossVariant?: 'mothership' | 'tank'; // Boss type to spawn (defaults to mothership)
 }
 
 export interface EnemySpawnConfig {
-  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  type: 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K';
   count: number;
   formation: FormationType;
   rows: number;

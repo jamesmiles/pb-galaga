@@ -3,7 +3,7 @@ import { createEnemyLaser } from '../objects/projectiles/laser/code/Laser';
 import { createBullet } from '../objects/projectiles/bullet/code/Bullet';
 import { createPlasma } from '../objects/projectiles/plasma/code/Plasma';
 import { createEnemyHomingMissile } from '../objects/projectiles/missile/code/EnemyHoming';
-import { BULLET_SPEED } from './constants';
+import { BULLET_SPEED, PLASMA_SPEED } from './constants';
 
 /** Fire rate config per enemy fire mode (ms). */
 const FIRE_RATE_CONFIG: Record<string, { base: number; jitter: number }> = {
@@ -29,7 +29,8 @@ export class EnemyFiringManager {
 
     for (const enemy of aliveEnemies) {
       if (enemy.fireMode === 'none') continue;
-      if (!frontRowIds.has(enemy.id)) continue;
+      // Stationary enemies always fire (bypass front-row filter)
+      if (!enemy.isStationary && !frontRowIds.has(enemy.id)) continue;
 
       // Initialize cooldown if not set
       if (!this.cooldowns.has(enemy.id)) {
@@ -75,6 +76,31 @@ export class EnemyFiringManager {
     const owner = { type: 'enemy' as const, id: enemy.id };
     const position = { x: enemy.position.x, y: enemy.position.y + 16 };
 
+    // Aimed firing for stationary turret types (H, I) — fire toward nearest player
+    if (enemy.isStationary && (enemy.type === 'H' || enemy.type === 'I')) {
+      const target = this.getNearestPlayerPosition(state);
+      if (target) {
+        const dx = target.x - position.x;
+        const dy = target.y - position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 0) {
+          const speed = enemy.type === 'H' ? BULLET_SPEED : PLASMA_SPEED;
+          const vx = (dx / dist) * speed;
+          const vy = (dy / dist) * speed;
+          let projectile;
+          if (enemy.type === 'H') {
+            projectile = createBullet(position, owner);
+          } else {
+            projectile = createPlasma(position, owner);
+          }
+          projectile.velocity.x = vx;
+          projectile.velocity.y = vy;
+          state.projectiles = [...state.projectiles, projectile];
+          return;
+        }
+      }
+    }
+
     if (enemy.fireMode === 'spread') {
       // 4-bullet fan pattern: -12°, -4°, +4°, +12° from vertical
       const angles = [-12, -4, 4, 12];
@@ -109,6 +135,13 @@ export class EnemyFiringManager {
     }
 
     state.projectiles = [...state.projectiles, projectile];
+  }
+
+  private getNearestPlayerPosition(state: GameState): { x: number; y: number } | null {
+    const alivePlayers = state.players.filter(p => p.isAlive);
+    if (alivePlayers.length === 0) return null;
+    // Pick random alive player as target
+    return alivePlayers[Math.floor(Math.random() * alivePlayers.length)].position;
   }
 
   private randomCooldown(fireMode: string): number {

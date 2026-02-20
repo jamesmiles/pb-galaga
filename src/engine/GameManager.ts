@@ -1,5 +1,5 @@
 import type { GameState, GameRenderer } from '../types';
-import { GAME_WIDTH, GAME_HEIGHT, WAVE_COMPLETE_BONUS, PLAYER_INVULNERABILITY_DURATION, LEVEL_STATS_MIN_INPUT_DELAY, LEVEL_STATS_TIMEOUT } from './constants';
+import { GAME_WIDTH, GAME_HEIGHT, WAVE_COMPLETE_BONUS, PLAYER_INVULNERABILITY_DURATION, LEVEL_STATS_MIN_INPUT_DELAY, LEVEL_STATS_TIMEOUT, TANK_GROUND_Y } from './constants';
 import { GameLoop } from './GameLoop';
 import { StateManager, createPlayer, resetLevelStats } from './StateManager';
 import { InputHandler } from './InputHandler';
@@ -26,6 +26,7 @@ const LEVEL_INTRO_TEXT: Record<number, string> = {
   3: '// 12:08 UTC\nenemy stronghold detected on the far side of the moon. space force moves to intercept.',
   4: '// 18:32 UTC\nhostile signatures in the asteroid belt. space force navigates the debris field.',
   5: '// 23:00 UTC\nenemy command has seized the mars colony. space force begins final assault on the mothership.',
+  6: '// 06:12 UTC\ninitiating mars landing sequence...',
 };
 
 /** Milliseconds between each typed character. */
@@ -38,6 +39,7 @@ import { level2 } from '../levels/level2';
 import { level3 } from '../levels/level3';
 import { level4 } from '../levels/level4';
 import { level5 } from '../levels/level5';
+import { level6 } from '../levels/level6';
 
 export interface GameManagerOptions {
   renderer?: GameRenderer;
@@ -80,6 +82,7 @@ export class GameManager {
     this.levelManager.registerLevel(level3);
     this.levelManager.registerLevel(level4);
     this.levelManager.registerLevel(level5);
+    this.levelManager.registerLevel(level6);
     this.enemyFiringManager = new EnemyFiringManager();
     this.diveManager = new DiveManager();
     this.asteroidManager = new AsteroidManager();
@@ -455,7 +458,7 @@ export class GameManager {
           options: ['Main Menu'],
           data: {
             finalScore: totalScore,
-            introText: `mission complete // ${new Date().toISOString().slice(0, 10)}\n\nspace force has defeated the mothership.\n\nbut long range sensors detect survivors\nregrouping on the martian surface...\n\n... coming soon`,
+            introText: `mission complete // ${new Date().toISOString().slice(0, 10)}\n\nspace force has secured mars.\nthe alien threat has been neutralized.\n\n... for now.`,
             introChars: 0,
             p1GameStats: p1 ? { ...p1.stats } : undefined,
             p2GameStats: p2 ? { ...p2.stats } : undefined,
@@ -801,8 +804,19 @@ export class GameManager {
       if (this.introTimer >= holdStart + TYPING_HOLD_DURATION) {
         state.gameStatus = 'playing';
         state.menu = null;
-        MusicManager.play(('level' + (data.level ?? 1)) as import('../audio/MusicManager').MusicTrack);
-        this.levelManager.startLevel(state, data.level ?? 1);
+        const levelNum = data.level ?? 1;
+        MusicManager.play(('level' + levelNum) as import('../audio/MusicManager').MusicTrack);
+
+        // Set movement mode based on level type
+        const isTankLevel = levelNum === 6;
+        for (const player of state.players) {
+          player.movementMode = isTankLevel ? 'tank' : 'ship';
+          if (isTankLevel) {
+            player.position.y = TANK_GROUND_Y;
+          }
+        }
+
+        this.levelManager.startLevel(state, levelNum);
       }
     }
 
