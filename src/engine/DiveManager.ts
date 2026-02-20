@@ -16,6 +16,8 @@ const DIVE_SPEED_MULTIPLIER: Record<string, number> = {
   B: 0.7,
   C: 1.5,
   F: 0.8,
+  J: 0.8,
+  K: 1.2,
 };
 
 /** How far below screen before re-entry. */
@@ -61,7 +63,7 @@ export class DiveManager {
 
   private initiateDive(state: GameState, aliveEnemies: Enemy[]): void {
     // Get candidates: alive, not diving
-    const candidates = aliveEnemies.filter(e => !e.diveState && !e.flightPathState && !this.activeDivers.has(e.id) && e.type !== 'G');
+    const candidates = aliveEnemies.filter(e => !e.diveState && !e.flightPathState && !this.activeDivers.has(e.id) && e.type !== 'G' && !e.isStationary);
     if (candidates.length === 0) return;
 
     // Pick a random candidate

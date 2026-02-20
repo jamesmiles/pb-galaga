@@ -10,6 +10,10 @@ const ENEMY_COLORS: Record<string, { fill: string; glow: string; accent: string 
   E: { fill: '#ffff00', glow: '#ffff00', accent: '#ffff66' },
   F: { fill: '#00ff88', glow: '#00ff88', accent: '#44ffaa' },
   G: { fill: '#00ff88', glow: '#00ff88', accent: '#44ffaa' }, // Same green as F
+  H: { fill: '#cc6633', glow: '#ff8844', accent: '#ffaa66' }, // Rust orange (ground turret)
+  I: { fill: '#aa4422', glow: '#cc5533', accent: '#dd7744' }, // Dark rust (artillery)
+  J: { fill: '#88cc44', glow: '#88cc44', accent: '#aadd66' }, // Olive green (mech)
+  K: { fill: '#cc44aa', glow: '#cc44aa', accent: '#dd66cc' }, // Purple-pink (missile launcher)
 };
 
 /**
@@ -45,6 +49,14 @@ export function drawEnemies(
       drawEnemyF(ctx, pos.x, pos.y, colors);
     } else if (enemy.type === 'G') {
       drawEnemyG(ctx, pos.x, pos.y, colors, enemy.health, enemy.maxHealth);
+    } else if (enemy.type === 'H') {
+      drawEnemyH(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'I') {
+      drawEnemyI(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'J') {
+      drawEnemyJ(ctx, pos.x, pos.y, colors);
+    } else if (enemy.type === 'K') {
+      drawEnemyK(ctx, pos.x, pos.y, colors);
     } else {
       drawEnemyE(ctx, pos.x, pos.y, colors);
     }
@@ -325,4 +337,133 @@ function drawEnemyG(
   ctx.fillRect(x - barW / 2, y - 14 * s, barW, 4);
   ctx.fillStyle = healthPct > 0.5 ? '#44ff44' : healthPct > 0.25 ? '#ffff00' : '#ff4444';
   ctx.fillRect(x - barW / 2, y - 14 * s, barW * healthPct, 4);
+}
+
+/** Type H: Turret Cannon — squat ground turret with rotating barrel */
+function drawEnemyH(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Base platform
+  ctx.fillRect(x - 14, y + 4, 28, 8);
+
+  // Turret body (dome)
+  ctx.beginPath();
+  ctx.arc(x, y, 10, Math.PI, 0);
+  ctx.fill();
+  ctx.fillRect(x - 10, y, 20, 6);
+
+  // Barrel
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 2, y - 14, 4, 14);
+
+  // Red targeting eye
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff2222';
+  ctx.fillRect(x - 3, y - 3, 6, 3);
+}
+
+/** Type I: Artillery — tall heavy gun emplacement */
+function drawEnemyI(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Wide base
+  ctx.fillRect(x - 16, y + 6, 32, 8);
+
+  // Body (boxy)
+  ctx.fillRect(x - 12, y - 4, 24, 12);
+
+  // Upper turret
+  ctx.fillRect(x - 8, y - 10, 16, 8);
+
+  // Heavy barrel
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 3, y - 18, 6, 12);
+  // Barrel tip
+  ctx.fillRect(x - 4, y - 20, 8, 3);
+
+  // Targeting visor (orange)
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffaa22';
+  ctx.fillRect(x - 5, y - 7, 10, 3);
+}
+
+/** Type J: Mech Warrior — bipedal walker shape */
+function drawEnemyJ(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Torso
+  ctx.fillRect(x - 8, y - 10, 16, 12);
+
+  // Head/cockpit
+  ctx.fillRect(x - 4, y - 14, 8, 5);
+
+  // Left arm/gun
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 14, y - 8, 6, 4);
+  ctx.fillRect(x - 16, y - 10, 4, 3);
+
+  // Right arm/gun
+  ctx.fillRect(x + 8, y - 8, 6, 4);
+  ctx.fillRect(x + 12, y - 10, 4, 3);
+
+  // Legs
+  ctx.fillStyle = colors.fill;
+  ctx.fillRect(x - 6, y + 2, 4, 8);
+  ctx.fillRect(x + 2, y + 2, 4, 8);
+
+  // Feet
+  ctx.fillRect(x - 8, y + 8, 6, 3);
+  ctx.fillRect(x + 2, y + 8, 6, 3);
+
+  // Eye visor (green)
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#44ff44';
+  ctx.fillRect(x - 3, y - 13, 6, 2);
+}
+
+/** Type K: Missile Launcher — compact vehicle with missile rack */
+function drawEnemyK(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  colors: { fill: string; accent: string },
+): void {
+  ctx.fillStyle = colors.fill;
+
+  // Hull
+  ctx.fillRect(x - 10, y - 2, 20, 10);
+
+  // Cab (front)
+  ctx.fillRect(x - 6, y - 8, 12, 8);
+
+  // Missile rack (top)
+  ctx.fillStyle = colors.accent;
+  ctx.fillRect(x - 8, y - 12, 16, 5);
+
+  // Individual missiles (3 tubes)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x - 5, y - 11, 2, 3);
+  ctx.fillRect(x - 1, y - 11, 2, 3);
+  ctx.fillRect(x + 3, y - 11, 2, 3);
+
+  // Wheels/tracks
+  ctx.fillStyle = '#444444';
+  ctx.fillRect(x - 10, y + 6, 6, 4);
+  ctx.fillRect(x + 4, y + 6, 6, 4);
+
+  // Windshield
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#6644cc';
+  ctx.fillRect(x - 4, y - 6, 8, 3);
 }

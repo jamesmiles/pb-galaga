@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.9.5';
+export const GAME_VERSION = '0.10.0';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -63,6 +63,39 @@ export const ENEMY_F_COLLISION_RADIUS = 16;
 export const ENEMY_G_HEALTH = 1250; // 10x normal F health
 export const ENEMY_G_SCORE_VALUE = 1000;
 export const ENEMY_G_COLLISION_RADIUS = 40; // ~2.5x F radius
+
+// Enemy Type H defaults (Turret Cannon — stationary, aimed bullets)
+export const ENEMY_H_HEALTH = 120;
+export const ENEMY_H_SCORE_VALUE = 200;
+export const ENEMY_H_COLLISION_RADIUS = 16;
+
+// Enemy Type I defaults (Artillery — stationary, aimed plasma)
+export const ENEMY_I_HEALTH = 150;
+export const ENEMY_I_SCORE_VALUE = 300;
+export const ENEMY_I_COLLISION_RADIUS = 18;
+
+// Enemy Type J defaults (Mech Warrior — mobile, spread fire)
+export const ENEMY_J_HEALTH = 100;
+export const ENEMY_J_SCORE_VALUE = 250;
+export const ENEMY_J_COLLISION_RADIUS = 16;
+
+// Enemy Type K defaults (Missile Launcher — mobile, homing)
+export const ENEMY_K_HEALTH = 80;
+export const ENEMY_K_SCORE_VALUE = 350;
+export const ENEMY_K_COLLISION_RADIUS = 14;
+
+// Tank ground Y (player tank mode)
+export const TANK_GROUND_Y = GAME_HEIGHT - 40;
+
+// Tank Boss defaults
+export const TANK_BOSS_WIDTH = 400;
+export const TANK_BOSS_HEIGHT = 150;
+export const TANK_BOSS_BRIDGE_HEALTH = 800;
+export const TANK_BOSS_TREAD_HEALTH = 250;
+export const TANK_BOSS_DOME_FIRE_RATE = 1000;
+export const TANK_BOSS_TREAD_FIRE_RATE = 800;
+export const TANK_BOSS_SCORE_VALUE = 7500;
+export const TANK_BOSS_ENTRY_SPEED = 60;
 
 // Enemy homing missile defaults (enemy-fired)
 export const ENEMY_HOMING_SPEED = 200;

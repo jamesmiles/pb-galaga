@@ -8,6 +8,7 @@ import {
   BOSS_FIGHTER_SPAWN_INTERVAL,
   ROCKET_LAUNCH_SPEED, ROCKET_DAMAGE, ROCKET_MAX_LIFETIME,
   ROCKET_COLLISION_RADIUS, ROCKET_ACCELERATION, ROCKET_MAX_SPEED,
+  TANK_BOSS_ENTRY_SPEED,
 } from './constants';
 
 /**
@@ -29,10 +30,18 @@ export class BossManager {
 
     switch (boss.layer) {
       case 'entering':
-        this.updateEntry(boss, dtSeconds);
+        if (boss.variant === 'tank') {
+          this.updateTankEntry(boss, dtSeconds);
+        } else {
+          this.updateEntry(boss, dtSeconds);
+        }
         break;
       case 'active':
-        this.updateActive(boss, state, dtSeconds);
+        if (boss.variant === 'tank') {
+          this.updateTankActive(boss, state, dtSeconds);
+        } else {
+          this.updateActive(boss, state, dtSeconds);
+        }
         break;
       case 'dying':
         this.updateDeathSequence(boss, state, dtSeconds);
@@ -41,6 +50,67 @@ export class BossManager {
 
     // Update turret absolute positions
     this.updateTurretPositions(boss);
+  }
+
+  /** Tank boss enters from the right side. */
+  private updateTankEntry(boss: BossState, dtSeconds: number): void {
+    const targetX = GAME_WIDTH / 2;
+    boss.position.x -= TANK_BOSS_ENTRY_SPEED * dtSeconds;
+
+    if (boss.position.x <= targetX) {
+      boss.position.x = targetX;
+      boss.layer = 'active';
+    }
+  }
+
+  /** Tank boss active phase: oscillate horizontally, fire from treads; when all treads dead, activate dome. */
+  private updateTankActive(boss: BossState, state: GameState, dtSeconds: number): void {
+    // Slow horizontal oscillation
+    const oscillationSpeed = 0.3;
+    const amplitude = 80;
+    boss.position.x = GAME_WIDTH / 2 + Math.sin(state.currentTime * 0.001 * oscillationSpeed * Math.PI * 2) * amplitude;
+
+    // Count alive tread turrets (first 4)
+    const treadTurrets = boss.turrets.slice(0, 4);
+    const aliveTreads = treadTurrets.filter(t => t.isAlive);
+    const allTreadsDead = aliveTreads.length === 0;
+
+    // Fire from alive tread turrets
+    for (const turret of treadTurrets) {
+      if (!turret.isAlive) continue;
+
+      turret.fireCooldown -= dtSeconds * 1000;
+      if (turret.fireCooldown <= 0) {
+        const owner = { type: 'enemy' as const, id: turret.id };
+        const spawnPos = { x: turret.position.x, y: turret.position.y + 20 };
+        const bullet = createBullet(spawnPos, owner);
+        state.projectiles = [...state.projectiles, bullet];
+        turret.fireCooldown = turret.fireRate;
+      }
+    }
+
+    // Phase 2: All treads destroyed — activate dome, stop horizontal movement
+    if (allTreadsDead) {
+      // Immobilize (hold center)
+      boss.position.x = GAME_WIDTH / 2;
+
+      const dome = boss.turrets.find(t => t.id === 'tank-dome');
+      if (dome) {
+        // Activate dome if not yet active
+        if (!dome.isAlive) {
+          dome.isAlive = true;
+        }
+
+        dome.fireCooldown -= dtSeconds * 1000;
+        if (dome.fireCooldown <= 0) {
+          const owner = { type: 'enemy' as const, id: dome.id };
+          const spawnPos = { x: dome.position.x, y: dome.position.y + 20 };
+          const missile = createEnemyHomingMissile(spawnPos, owner);
+          state.projectiles = [...state.projectiles, missile];
+          dome.fireCooldown = dome.fireRate;
+        }
+      }
+    }
   }
 
   private updateEntry(boss: BossState, dtSeconds: number): void {

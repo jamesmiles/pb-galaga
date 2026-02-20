@@ -2,7 +2,7 @@ import type { Player, PlayerInput, Vector2D } from '../../../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_FIRE_COOLDOWN,
   PLAYER_INVULNERABILITY_DURATION, PLAYER_COLLISION_RADIUS,
-  DEATH_SEQUENCE_DURATION, SNAKE_FIRE_COOLDOWN,
+  DEATH_SEQUENCE_DURATION, SNAKE_FIRE_COOLDOWN, TANK_GROUND_Y,
 } from '../../../engine/constants';
 
 /** Player ship half-size for boundary clamping. */
@@ -31,6 +31,16 @@ function updateMovement(player: Player, dtSeconds: number): void {
 
   if (input.left) player.velocity.x = -speed;
   if (input.right) player.velocity.x = speed;
+
+  // Tank mode: horizontal only, locked to ground
+  if (player.movementMode === 'tank') {
+    player.position.x += player.velocity.x;
+    player.position.x = Math.max(PLAYER_HALF_SIZE, Math.min(GAME_WIDTH - PLAYER_HALF_SIZE, player.position.x));
+    player.position.y = TANK_GROUND_Y;
+    player.isThrusting = player.velocity.x !== 0;
+    return;
+  }
+
   if (input.up) player.velocity.y = -speed;
   if (input.down) player.velocity.y = speed;
 
@@ -81,7 +91,8 @@ export function respawnPlayer(player: Player): void {
   if (player.lives <= 0) return;
   player.isAlive = true;
   player.health = player.maxHealth;
-  player.position = { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 60 };
+  const respawnY = player.movementMode === 'tank' ? TANK_GROUND_Y : GAME_HEIGHT - 60;
+  player.position = { x: GAME_WIDTH / 2, y: respawnY };
   player.velocity = { x: 0, y: 0 };
   player.isInvulnerable = true;
   player.invulnerabilityTimer = PLAYER_INVULNERABILITY_DURATION;
