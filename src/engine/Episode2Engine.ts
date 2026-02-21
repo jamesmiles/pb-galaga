@@ -4,7 +4,7 @@ import {
   TANK_BODY_WIDTH, TANK_BODY_HEIGHT,
   GAME_WIDTH, LEVEL6_MAP_WIDTH,
   TANK_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS,
-  TANK_MAX_ARMOUR,
+  LIFE_PICKUP_COLLISION_RADIUS, TANK_MAX_ARMOUR,
 } from './constants';
 import { InputHandler } from './InputHandler';
 import { SoundManager } from '../audio/SoundManager';
@@ -27,6 +27,7 @@ import { drawMapSurface, drawMapObjects, drawClouds, drawDustEffects, drawFinish
 import { drawCliffStructures } from '../renderer/drawing/drawCliffs';
 import { drawMapEnemies } from '../renderer/drawing/drawMapEnemies';
 import { drawProjectiles } from '../renderer/drawing/drawProjectiles';
+import { drawLifePickups } from '../renderer/drawing/drawBoss';
 import type { TankTrailEffect } from '../renderer/effects/TankTrailEffect';
 
 /**
@@ -257,6 +258,7 @@ export class Episode2Engine implements EpisodeEngine {
       for (const enemy of state.mapEnemies) {
         if (enemyAliveSnapshot.get(enemy.id) && !enemy.isAlive) {
           this.weaponPickupManager.maybeSpawnEp2Pickup(state, enemy.position);
+          this.weaponPickupManager.maybeSpawnEp2LifePickup(state, enemy.position);
         }
       }
     }
@@ -269,7 +271,7 @@ export class Episode2Engine implements EpisodeEngine {
     // 7g. Update weapon pickups (cycling + despawn)
     this.weaponPickupManager.updatePickups(state, dtMs);
 
-    // 7h. Pickup collection (tank vs pickup world-space circle collision)
+    // 7h. Weapon pickup collection (tank vs pickup world-space circle collision)
     for (const player of state.players) {
       if (!player.isAlive) continue;
       for (const pickup of state.weaponPickups) {
@@ -279,16 +281,32 @@ export class Episode2Engine implements EpisodeEngine {
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < TANK_COLLISION_RADIUS + WEAPON_PICKUP_COLLISION_RADIUS) {
           pickup.isActive = false;
-          if (pickup.currentWeapon === 'armour') {
-            // Refill tank armour to max
-            player.health = TANK_MAX_ARMOUR;
-          } else {
-            upgradeWeapon(player, pickup);
-          }
+          upgradeWeapon(player, pickup);
           SoundManager.play('lifePickup');
         }
       }
     }
+
+    // 7i. Life pickup (heart) collection — refills tank armour
+    for (const player of state.players) {
+      if (!player.isAlive) continue;
+      for (const pickup of state.lifePickups) {
+        if (!pickup.isActive) continue;
+        const dx = player.position.x - pickup.position.x;
+        const dy = player.position.y - pickup.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < TANK_COLLISION_RADIUS + LIFE_PICKUP_COLLISION_RADIUS) {
+          pickup.isActive = false;
+          player.health = TANK_MAX_ARMOUR;
+          player.stats.powerupsCollected++;
+          player.levelStats.powerupsCollected++;
+          SoundManager.play('lifePickup');
+        }
+      }
+    }
+
+    // 7j. Update life pickup lifetimes
+    this.weaponPickupManager.updateEp2LifePickups(state, dtMs);
 
     // 8. Update camera to follow players
     updateCamera(state.camera, state.players, dtSeconds, LEVEL6_MAP_WIDTH);
@@ -368,6 +386,17 @@ export class Episode2Engine implements EpisodeEngine {
 
     // 4c. Weapon pickups (world→screen)
     this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime, camera);
+
+    // 4d. Life pickups (hearts) — world→screen
+    if (current.lifePickups.length > 0) {
+      const screenPickups = current.lifePickups
+        .filter(p => p.isActive)
+        .map(p => ({
+          position: { x: p.position.x - camera.worldX, y: p.position.y - camera.worldY },
+          isActive: true,
+        }));
+      drawLifePickups(ctx, screenPickups, current.currentTime);
+    }
 
     // 5. Tanks (world→screen) — sorted by elevation (low ground first, painter's algorithm)
     const sortedPlayers = [...current.players]
@@ -456,7 +485,6 @@ export class Episode2Engine implements EpisodeEngine {
       'plasma-artillery': '#44ccff',
       rocket: '#aa44ff',
       missile: '#44ff44',
-      armour: '#ff4444',
     };
 
     for (const pickup of pickups) {

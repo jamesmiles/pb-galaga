@@ -70,6 +70,10 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
       targets = state.players.filter(p => p.isAlive);
     } else {
       targets = [...state.enemies.filter(e => e.isAlive)];
+      // Episode 2 map enemies
+      if (state.mapEnemies) {
+        targets.push(...state.mapEnemies.filter(e => e.isAlive));
+      }
       if (state.boss?.isAlive) {
         targets.push(...state.boss.turrets.filter(t => t.isAlive));
       }

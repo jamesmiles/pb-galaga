@@ -1,11 +1,12 @@
-import type { GameState, WeaponPickup, Vector2D } from '../types';
+import type { GameState, WeaponPickup, LifePickup, Vector2D } from '../types';
 import {
   WEAPON_PICKUP_DROP_CHANCE, WEAPON_PICKUP_CYCLE_INTERVAL,
   WEAPON_PICKUP_SPEED, WEAPON_PICKUP_LIFETIME,
-  EP2_PICKUP_DROP_CHANCE,
+  EP2_PICKUP_DROP_CHANCE, EP2_LIFE_PICKUP_DROP_CHANCE,
 } from './constants';
 
 let nextPickupId = 0;
+let nextLifeId = 0;
 
 /**
  * Manages weapon pickup spawning, cycling, and despawning.
@@ -40,21 +41,11 @@ export class WeaponPickupManager {
   maybeSpawnEp2Pickup(state: GameState, position: Vector2D): void {
     if (Math.random() >= EP2_PICKUP_DROP_CHANCE) return;
 
-    // 20% chance of armour pickup, 80% weapon
-    const roll = Math.random();
-    let category: WeaponPickup['category'];
-    let currentWeapon: WeaponPickup['currentWeapon'];
-
-    if (roll < 0.2) {
-      category = 'primary'; // category doesn't matter for armour, but field is required
-      currentWeapon = 'armour';
-    } else {
-      const isPrimary = Math.random() < 0.7;
-      category = isPrimary ? 'primary' : 'secondary';
-      currentWeapon = isPrimary
-        ? (Math.random() < 0.5 ? 'cannon' : 'plasma-artillery')
-        : (Math.random() < 0.5 ? 'rocket' : 'missile');
-    }
+    const isPrimary = Math.random() < 0.7;
+    const category = isPrimary ? 'primary' : 'secondary';
+    const currentWeapon: WeaponPickup['currentWeapon'] = isPrimary
+      ? (Math.random() < 0.5 ? 'cannon' : 'plasma-artillery')
+      : (Math.random() < 0.5 ? 'rocket' : 'missile');
 
     const pickup: WeaponPickup = {
       id: `wp-${nextPickupId++}`,
@@ -68,6 +59,32 @@ export class WeaponPickupManager {
     };
 
     state.weaponPickups = [...state.weaponPickups, pickup];
+  }
+
+  /** Roll for a life pickup (heart) at the given position (Episode 2 — stationary, refills armour). */
+  maybeSpawnEp2LifePickup(state: GameState, position: Vector2D): void {
+    if (Math.random() >= EP2_LIFE_PICKUP_DROP_CHANCE) return;
+
+    const pickup: LifePickup = {
+      id: `life-ep2-${nextLifeId++}`,
+      position: { x: position.x, y: position.y },
+      velocity: { x: 0, y: 0 }, // Stationary — sits at death position
+      isActive: true,
+      lifetime: 0,
+    };
+    state.lifePickups = [...state.lifePickups, pickup];
+  }
+
+  /** Update EP2 life pickups (stationary, despawn after timeout). */
+  updateEp2LifePickups(state: GameState, dtMs: number): void {
+    for (const pickup of state.lifePickups) {
+      if (!pickup.isActive) continue;
+      pickup.lifetime += dtMs;
+      if (pickup.lifetime >= WEAPON_PICKUP_LIFETIME) {
+        pickup.isActive = false;
+      }
+    }
+    state.lifePickups = state.lifePickups.filter(p => p.isActive);
   }
 
   /** Update all active pickups: movement, cycling, despawn. */
@@ -88,8 +105,7 @@ export class WeaponPickupManager {
         continue;
       }
 
-      // Cycle weapon type (armour pickups don't cycle)
-      if (pickup.currentWeapon === 'armour') continue;
+      // Cycle weapon type
       pickup.cycleTimer -= dtMs;
       if (pickup.cycleTimer <= 0) {
         pickup.cycleTimer = WEAPON_PICKUP_CYCLE_INTERVAL;
