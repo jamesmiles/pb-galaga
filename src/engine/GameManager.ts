@@ -371,7 +371,7 @@ export class GameManager {
       options.push(`Level ${i}: ${this.episode1Engine.levelManager.getLevelName(i)}`);
     }
     // Episode 2 levels
-    options.push('Level 6: Mars Landing');
+    options.push('Level 6: Express Elevator');
     options.push('Back');
     return options;
   }
