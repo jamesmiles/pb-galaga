@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.5.3
+- Fix boulder blocking cliff ramp in Level 7 (b7-19 on cliff7-03's south ramp)
+- Nudge second boulder marginally clipping cliff7-02's ramp edge
+
+## v1.5.2
+- Heart pickup uses Episode 1 heart icon (red pulsing heart) instead of weapon orb
+- Heart pickups spawn at 8% per enemy kill, refill tank armour to max on collection
+- Remove incorrect `armour` weapon pickup type
+- Fix homing missiles not targeting Episode 2 map enemies
+- Reduce EP2 powerup spawn rate to 20%
+
+## v1.5.1
+- 5 new Episode 2 enemy types: rocket copter, laser copter, spread bomber, homing bomber, hover tank
+- Level 7 "Get to the Chopper": 1200x8000 Mars map with 39 enemy placements
+- Homing missiles render green
+- Louder tank hit SFX
+- Hover tank boulder collision push-out
+- Bomber camera-relative re-entry
+- Co-op finish line requires all alive players to reach it
+- EP2 powerup drop rate doubled to 30%
+- Level 7 "Sector Assault" MP3 music track
+- EP2 music volume lowered to 66%
+
 ## v1.4.6
 - Lower MP3 music volume to 80%
 
