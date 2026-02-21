@@ -42,7 +42,7 @@ export const level7Map: MapConfig = {
     { id: 'b7-11', type: 'boulder', position: { x: 600, y: 4900 }, width: 200, height: 200, collisionRadius: 80, sprite: 'rocks-2' },
 
     // --- Section 5 (Y 4800-4000): hover tank territory ---
-    { id: 'b7-12', type: 'boulder', position: { x: 250, y: 4700 }, width: 230, height: 230, collisionRadius: 92, sprite: 'rocks-1' },
+    { id: 'b7-12', type: 'boulder', position: { x: 230, y: 4720 }, width: 230, height: 230, collisionRadius: 92, sprite: 'rocks-1' },
     { id: 'b7-13', type: 'boulder', position: { x: 950, y: 4500 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-2' },
     { id: 'r7-09', type: 'destructible-rock', position: { x: 600, y: 4400 }, width: 50, height: 50, health: 300, maxHealth: 300, collisionRadius: 25, sprite: 'rocks-3' },
     { id: 'r7-10', type: 'destructible-rock', position: { x: 400, y: 4200 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
@@ -57,7 +57,7 @@ export const level7Map: MapConfig = {
 
     // --- Section 7 (Y 3200-2400): homing bomber gauntlet ---
     { id: 'b7-18', type: 'boulder', position: { x: 200, y: 3100 }, width: 240, height: 240, collisionRadius: 96, sprite: 'rocks-1' },
-    { id: 'b7-19', type: 'boulder', position: { x: 900, y: 2900 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-2' },
+    { id: 'b7-19', type: 'boulder', position: { x: 550, y: 2900 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-2' },
     { id: 'r7-13', type: 'destructible-rock', position: { x: 550, y: 2800 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
     { id: 'b7-20', type: 'boulder', position: { x: 400, y: 2600 }, width: 200, height: 200, collisionRadius: 80, sprite: 'rocks-1' },
     { id: 'r7-14', type: 'destructible-rock', position: { x: 750, y: 2500 }, width: 45, height: 45, health: 250, maxHealth: 250, collisionRadius: 22, sprite: 'rocks-3' },
