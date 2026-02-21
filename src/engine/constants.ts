@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.5.1';
+export const GAME_VERSION = '1.5.2';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -314,6 +314,7 @@ export const PLASMA_BOLT_L5_RADIUS = 14;
 
 // Episode 2 weapon pickup
 export const EP2_PICKUP_DROP_CHANCE = 0.30;     // 30% per enemy kill
+export const EP2_LIFE_PICKUP_DROP_CHANCE = 0.08; // 8% chance of heart (armour refill) per kill
 
 // Rocket Copter (aerial patrol + engage, slow rockets, high damage)
 export const ROCKET_COPTER_HEALTH = 120;

@@ -87,30 +87,46 @@ describe('Episode2Engine', () => {
     });
   });
 
-  describe('armour pickup', () => {
-    it('refills player health when armour pickup collected', () => {
+  describe('heart pickup (armour refill)', () => {
+    it('refills player health to max when heart pickup collected', () => {
       const state = makeCoOpState();
       engine.onLevelStart(state, 6);
 
       // Reduce player health
       state.players[0].health = 100;
 
-      // Create an armour pickup at the player position
-      state.weaponPickups = [{
-        id: 'wp-armour-test',
-        category: 'primary',
-        currentWeapon: 'armour',
+      // Create a heart (life pickup) at the player position
+      state.lifePickups = [{
+        id: 'life-test',
         position: { x: state.players[0].position.x, y: state.players[0].position.y },
         velocity: { x: 0, y: 0 },
         isActive: true,
-        cycleTimer: 5000,
         lifetime: 0,
       }];
 
       engine.update(state, 0.016);
 
       expect(state.players[0].health).toBe(TANK_MAX_ARMOUR);
-      expect(state.weaponPickups.filter(p => p.isActive).length).toBe(0);
+      expect(state.lifePickups.filter(p => p.isActive).length).toBe(0);
+    });
+
+    it('increments powerupsCollected stat on collection', () => {
+      const state = makeCoOpState();
+      engine.onLevelStart(state, 6);
+
+      state.players[0].health = 100;
+      state.lifePickups = [{
+        id: 'life-test',
+        position: { x: state.players[0].position.x, y: state.players[0].position.y },
+        velocity: { x: 0, y: 0 },
+        isActive: true,
+        lifetime: 0,
+      }];
+
+      const before = state.players[0].stats.powerupsCollected;
+      engine.update(state, 0.016);
+
+      expect(state.players[0].stats.powerupsCollected).toBe(before + 1);
     });
   });
 });
