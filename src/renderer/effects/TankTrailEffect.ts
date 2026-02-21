@@ -17,7 +17,7 @@ const TRACK_BUFFER_SIZE = 200;
 const TRACK_SPACING = 15;          // px between track marks
 const TRACK_LIFETIME = 5000;       // ms before fully faded
 const TRACK_START_ALPHA = 0.25;
-const TRACK_COLOR = '#554433';
+const TRACK_COLOR = '#3a2a1a';
 const TRACK_WIDTH = 5;             // px width of each tread mark
 const TRACK_LENGTH = 6;            // px length along heading
 const TREAD_OFFSET = TANK_BODY_WIDTH / 2 - 2; // match tread stripe position in drawTank
@@ -42,7 +42,7 @@ const DUST_MIN_LIFE = 400;         // ms
 const DUST_MAX_LIFE = 800;         // ms
 const DUST_MIN_SIZE = 1;           // radius
 const DUST_MAX_SIZE = 3;
-const DUST_COLOR = '#aa8866';
+const DUST_COLOR = '#7a5533';
 const DUST_MAX_ALPHA = 0.3;
 const MAX_DT = 100;                // ms — clamp for tab backgrounding
 
