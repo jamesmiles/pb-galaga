@@ -123,16 +123,24 @@ export class Episode2Engine implements EpisodeEngine {
     }
     const projCountBefore = state.projectiles.length;
     spawnTankProjectiles(state);
-    // Tag newly spawned projectiles with firing tank's elevation
+    // Tag newly spawned projectiles with firing tank's elevation + play weapon SFX
     if (state.projectiles.length > projCountBefore) {
+      let firedType: string | undefined;
       for (let i = projCountBefore; i < state.projectiles.length; i++) {
         const proj = state.projectiles[i];
         if (proj.owner.type === 'player') {
           const tank = state.tankStates[proj.owner.id];
           if (tank) proj.elevation = tank.elevation;
+          if (!firedType) firedType = proj.type;
         }
       }
-      SoundManager.play('playerFire');
+      if (firedType === 'cannon-shell') {
+        SoundManager.play('cannonFire');
+      } else if (firedType === 'plasma-bolt') {
+        SoundManager.play('plasmaFire');
+      } else {
+        SoundManager.play('playerFire');
+      }
     }
 
     // 6. Update all projectiles

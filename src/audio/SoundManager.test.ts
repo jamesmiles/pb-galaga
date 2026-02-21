@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SoundManager, type SoundEffect } from './SoundManager';
 
 // Mock zzfx to avoid AudioContext in tests
@@ -9,10 +9,31 @@ vi.mock('./zzfx', () => ({
 import { zzfx } from './zzfx';
 const mockZzfx = vi.mocked(zzfx);
 
+// Mock Audio for MP3 SFX tests
+const audioInstances: MockAudio[] = [];
+
+class MockAudio {
+  src = '';
+  volume = 1;
+  currentTime = 0;
+  play = vi.fn(() => Promise.resolve());
+  pause = vi.fn();
+  constructor(url?: string) {
+    if (url) this.src = url;
+    audioInstances.push(this);
+  }
+}
+
 describe('SoundManager', () => {
   beforeEach(() => {
     SoundManager.reset();
     mockZzfx.mockClear();
+    audioInstances.length = 0;
+    vi.stubGlobal('Audio', MockAudio);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('plays a sound effect by calling zzfx', () => {
@@ -121,5 +142,47 @@ describe('SoundManager', () => {
     const hitD = SoundManager.getPreset('hitD')!;
     const hitE = SoundManager.getPreset('hitE')!;
     expect(hitE[0]).toBeGreaterThan(hitD[0] as number);
+  });
+
+  // --- MP3 SFX tests ---
+
+  it('cannonFire plays via MP3 (not zzfx)', () => {
+    SoundManager.play('cannonFire');
+    expect(mockZzfx).not.toHaveBeenCalled();
+    expect(audioInstances).toHaveLength(1);
+    expect(audioInstances[0].src).toBe('audio/cannon-fire.mp3');
+    expect(audioInstances[0].play).toHaveBeenCalled();
+  });
+
+  it('plasmaFire plays via MP3 (not zzfx)', () => {
+    SoundManager.play('plasmaFire');
+    expect(mockZzfx).not.toHaveBeenCalled();
+    expect(audioInstances).toHaveLength(1);
+    expect(audioInstances[0].src).toBe('audio/plasma-fire.mp3');
+    expect(audioInstances[0].play).toHaveBeenCalled();
+  });
+
+  it('MP3 SFX reuses cached Audio element on repeated plays', () => {
+    SoundManager.play('cannonFire');
+    SoundManager.play('cannonFire');
+    // Only one Audio element created, reused on second play
+    expect(audioInstances).toHaveLength(1);
+    expect(audioInstances[0].play).toHaveBeenCalledTimes(2);
+    expect(audioInstances[0].currentTime).toBe(0);
+  });
+
+  it('MP3 SFX respects mute', () => {
+    SoundManager.setMuted(true);
+    SoundManager.play('cannonFire');
+    expect(audioInstances).toHaveLength(0);
+  });
+
+  it('MP3 SFX cache cleared on reset', () => {
+    SoundManager.play('cannonFire');
+    expect(audioInstances).toHaveLength(1);
+    SoundManager.reset();
+    SoundManager.play('cannonFire');
+    // New Audio element after reset
+    expect(audioInstances).toHaveLength(2);
   });
 });
