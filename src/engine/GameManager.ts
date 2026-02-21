@@ -18,6 +18,7 @@ const LEVEL_NAMES: Record<number, string> = {
   4: 'Asteroid Belt',
   5: 'Defeat Mars Colony',
   6: 'Express Elevator',
+  7: 'Get to the Chopper',
 };
 
 /** Intro text per level number. */
@@ -28,6 +29,7 @@ const LEVEL_INTRO_TEXT: Record<number, string> = {
   4: '// 18:32 UTC\nhostile signatures in the asteroid belt. space force navigates the debris field.',
   5: '// 23:00 UTC\nenemy command has seized the mars colony. space force begins final assault on the mothership.',
   6: '2029.07.05 // 06:00 UTC\nspace force touches down on mars. ground assault begins.',
+  7: '// 09:30 UTC\nhostile air support inbound. push through to the extraction point.',
 };
 
 /** Milliseconds between each typed character. */
@@ -384,6 +386,7 @@ export class GameManager {
     }
     // Episode 2 levels
     options.push(`Level 6: ${LEVEL_NAMES[6]}`);
+    options.push(`Level 7: ${LEVEL_NAMES[7]}`);
     options.push('Back');
     return options;
   }

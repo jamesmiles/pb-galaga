@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.4.6';
+export const GAME_VERSION = '1.5.1';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -313,7 +313,66 @@ export const PLASMA_BOLT_L5_RANGE = 350;
 export const PLASMA_BOLT_L5_RADIUS = 14;
 
 // Episode 2 weapon pickup
-export const EP2_PICKUP_DROP_CHANCE = 0.15;     // 15% per enemy kill
+export const EP2_PICKUP_DROP_CHANCE = 0.30;     // 30% per enemy kill
+
+// Rocket Copter (aerial patrol + engage, slow rockets, high damage)
+export const ROCKET_COPTER_HEALTH = 120;
+export const ROCKET_COPTER_SPEED = 80;            // px/s patrol speed
+export const ROCKET_COPTER_FIRE_RATE = 2000;       // ms between rockets
+export const ROCKET_COPTER_DAMAGE = 50;
+export const ROCKET_COPTER_PROJECTILE_SPEED = 180; // px/s (slow rockets)
+export const ROCKET_COPTER_COLLISION_RADIUS = 16;
+export const ROCKET_COPTER_SCORE_VALUE = 300;
+export const ROCKET_COPTER_ENGAGE_RANGE = 400;     // px to switch patrol→engage
+export const ROCKET_COPTER_AIM_SPEED = 1.5;        // rad/s
+export const ROCKET_COPTER_PATROL_RANGE = 200;     // px from spawn
+
+// Laser Copter (aerial patrol + engage, rapid laser, low damage)
+export const LASER_COPTER_HEALTH = 100;
+export const LASER_COPTER_SPEED = 100;             // px/s patrol speed (faster)
+export const LASER_COPTER_FIRE_RATE = 400;         // ms between laser shots (rapid)
+export const LASER_COPTER_DAMAGE = 12;
+export const LASER_COPTER_PROJECTILE_SPEED = 320;  // px/s (fast laser)
+export const LASER_COPTER_COLLISION_RADIUS = 14;
+export const LASER_COPTER_SCORE_VALUE = 250;
+export const LASER_COPTER_ENGAGE_RANGE = 350;      // px
+export const LASER_COPTER_AIM_SPEED = 2.5;         // rad/s (fast aim)
+export const LASER_COPTER_PATROL_RANGE = 200;      // px from spawn
+
+// Spread Bomber (aerial fly-through, spread bomb drop)
+export const SPREAD_BOMBER_HEALTH = 200;
+export const SPREAD_BOMBER_SPEED = 120;            // px/s fly-through speed
+export const SPREAD_BOMBER_FIRE_RATE = 1500;       // ms between bomb drops
+export const SPREAD_BOMBER_DAMAGE = 30;            // per spread projectile
+export const SPREAD_BOMBER_SPREAD_COUNT = 5;       // projectiles per drop
+export const SPREAD_BOMBER_PROJECTILE_SPEED = 150; // px/s (downward bombs)
+export const SPREAD_BOMBER_COLLISION_RADIUS = 18;
+export const SPREAD_BOMBER_SCORE_VALUE = 400;
+
+// Homing Bomber (aerial fly-through, homing missiles)
+export const HOMING_BOMBER_HEALTH = 250;
+export const HOMING_BOMBER_SPEED = 100;            // px/s fly-through speed
+export const HOMING_BOMBER_FIRE_RATE = 2000;       // ms between missile launches
+export const HOMING_BOMBER_DAMAGE = 35;
+export const HOMING_BOMBER_MISSILE_SPEED = 160;    // px/s
+export const HOMING_BOMBER_MISSILE_TURN_RATE = 2.0;// rad/s
+export const HOMING_BOMBER_COLLISION_RADIUS = 20;
+export const HOMING_BOMBER_SCORE_VALUE = 500;
+
+// Hover Tank (ground, slow patrol, plasma cannon)
+export const HOVER_TANK_HEALTH = 200;
+export const HOVER_TANK_SPEED = 40;                // px/s (very slow)
+export const HOVER_TANK_FIRE_RATE = 2500;          // ms between shots
+export const HOVER_TANK_DAMAGE = 55;
+export const HOVER_TANK_PROJECTILE_SPEED = 200;    // px/s
+export const HOVER_TANK_COLLISION_RADIUS = 18;
+export const HOVER_TANK_SCORE_VALUE = 350;
+export const HOVER_TANK_AIM_SPEED = 1.2;           // rad/s (slow aim)
+export const HOVER_TANK_PATROL_RANGE = 150;        // px from spawn
+
+// Level 7 map dimensions
+export const LEVEL7_MAP_WIDTH = 1200;
+export const LEVEL7_MAP_HEIGHT = 8000;
 
 // Shared Episode 2 enemy constants
 export const EP2_ENEMY_FIRE_RANGE = 600;        // px max distance to fire

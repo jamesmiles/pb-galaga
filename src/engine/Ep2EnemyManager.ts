@@ -12,11 +12,30 @@ import {
   POPUP_MINE_BURST_PROJECTILES, POPUP_MINE_BURST_DAMAGE, POPUP_MINE_BURST_SPEED,
   POPUP_MINE_POPUP_DURATION, POPUP_MINE_COOLDOWN, POPUP_MINE_COLLISION_RADIUS,
   POPUP_MINE_SCORE_VALUE,
+  ROCKET_COPTER_HEALTH, ROCKET_COPTER_SPEED, ROCKET_COPTER_FIRE_RATE,
+  ROCKET_COPTER_DAMAGE, ROCKET_COPTER_PROJECTILE_SPEED,
+  ROCKET_COPTER_COLLISION_RADIUS, ROCKET_COPTER_SCORE_VALUE,
+  ROCKET_COPTER_ENGAGE_RANGE, ROCKET_COPTER_AIM_SPEED, ROCKET_COPTER_PATROL_RANGE,
+  LASER_COPTER_HEALTH, LASER_COPTER_SPEED, LASER_COPTER_FIRE_RATE,
+  LASER_COPTER_DAMAGE, LASER_COPTER_PROJECTILE_SPEED,
+  LASER_COPTER_COLLISION_RADIUS, LASER_COPTER_SCORE_VALUE,
+  LASER_COPTER_ENGAGE_RANGE, LASER_COPTER_AIM_SPEED, LASER_COPTER_PATROL_RANGE,
+  SPREAD_BOMBER_HEALTH, SPREAD_BOMBER_SPEED, SPREAD_BOMBER_FIRE_RATE,
+  SPREAD_BOMBER_DAMAGE, SPREAD_BOMBER_SPREAD_COUNT, SPREAD_BOMBER_PROJECTILE_SPEED,
+  SPREAD_BOMBER_COLLISION_RADIUS, SPREAD_BOMBER_SCORE_VALUE,
+  HOMING_BOMBER_HEALTH, HOMING_BOMBER_SPEED, HOMING_BOMBER_FIRE_RATE,
+  HOMING_BOMBER_DAMAGE, HOMING_BOMBER_MISSILE_SPEED, HOMING_BOMBER_MISSILE_TURN_RATE,
+  HOMING_BOMBER_COLLISION_RADIUS, HOMING_BOMBER_SCORE_VALUE,
+  HOVER_TANK_HEALTH, HOVER_TANK_SPEED, HOVER_TANK_FIRE_RATE,
+  HOVER_TANK_DAMAGE, HOVER_TANK_PROJECTILE_SPEED,
+  HOVER_TANK_COLLISION_RADIUS, HOVER_TANK_SCORE_VALUE,
+  HOVER_TANK_AIM_SPEED, HOVER_TANK_PATROL_RANGE,
   EP2_ENEMY_FIRE_RANGE, TANK_COLLISION_RADIUS,
 } from './constants';
 
 /**
  * Manages Episode 2 map enemies: AI aiming, firing, popup mine logic,
+ * copter patrol/engage, bomber fly-through, hover tank patrol,
  * and collision detection with projectiles and players.
  */
 export class Ep2EnemyManager {
@@ -75,6 +94,86 @@ export class Ep2EnemyManager {
           activationRange: POPUP_MINE_ACTIVATION_RANGE,
           dormantTimer: POPUP_MINE_DORMANT_TIMER * (0.5 + Math.random() * 0.5),
         };
+      case 'rocket-copter':
+        return {
+          ...base,
+          health: ROCKET_COPTER_HEALTH,
+          maxHealth: ROCKET_COPTER_HEALTH,
+          collisionRadius: ROCKET_COPTER_COLLISION_RADIUS,
+          scoreValue: ROCKET_COPTER_SCORE_VALUE,
+          fireRate: ROCKET_COPTER_FIRE_RATE,
+          fireCooldown: ROCKET_COPTER_FIRE_RATE * Math.random(),
+          isAerial: true,
+          behaviorState: 'patrol' as const,
+          velocity: { x: ROCKET_COPTER_SPEED, y: 0 },
+          moveSpeed: ROCKET_COPTER_SPEED,
+          patrolMinX: placement.position.x - ROCKET_COPTER_PATROL_RANGE,
+          patrolMaxX: placement.position.x + ROCKET_COPTER_PATROL_RANGE,
+        };
+      case 'laser-copter':
+        return {
+          ...base,
+          health: LASER_COPTER_HEALTH,
+          maxHealth: LASER_COPTER_HEALTH,
+          collisionRadius: LASER_COPTER_COLLISION_RADIUS,
+          scoreValue: LASER_COPTER_SCORE_VALUE,
+          fireRate: LASER_COPTER_FIRE_RATE,
+          fireCooldown: LASER_COPTER_FIRE_RATE * Math.random(),
+          isAerial: true,
+          behaviorState: 'patrol' as const,
+          velocity: { x: LASER_COPTER_SPEED, y: 0 },
+          moveSpeed: LASER_COPTER_SPEED,
+          patrolMinX: placement.position.x - LASER_COPTER_PATROL_RANGE,
+          patrolMaxX: placement.position.x + LASER_COPTER_PATROL_RANGE,
+        };
+      case 'spread-bomber':
+        return {
+          ...base,
+          health: SPREAD_BOMBER_HEALTH,
+          maxHealth: SPREAD_BOMBER_HEALTH,
+          collisionRadius: SPREAD_BOMBER_COLLISION_RADIUS,
+          scoreValue: SPREAD_BOMBER_SCORE_VALUE,
+          fireRate: SPREAD_BOMBER_FIRE_RATE,
+          fireCooldown: SPREAD_BOMBER_FIRE_RATE * Math.random(),
+          isAerial: true,
+          behaviorState: 'flythrough' as const,
+          velocity: { x: 0, y: SPREAD_BOMBER_SPEED },
+          moveSpeed: SPREAD_BOMBER_SPEED,
+          spawnY: placement.position.y,
+          aimAngle: Math.PI / 2, // Pointing south (toward players below)
+        };
+      case 'homing-bomber':
+        return {
+          ...base,
+          health: HOMING_BOMBER_HEALTH,
+          maxHealth: HOMING_BOMBER_HEALTH,
+          collisionRadius: HOMING_BOMBER_COLLISION_RADIUS,
+          scoreValue: HOMING_BOMBER_SCORE_VALUE,
+          fireRate: HOMING_BOMBER_FIRE_RATE,
+          fireCooldown: HOMING_BOMBER_FIRE_RATE * Math.random(),
+          isAerial: true,
+          behaviorState: 'flythrough' as const,
+          velocity: { x: 0, y: HOMING_BOMBER_SPEED },
+          moveSpeed: HOMING_BOMBER_SPEED,
+          spawnY: placement.position.y,
+          aimAngle: Math.PI / 2, // Pointing south
+        };
+      case 'hover-tank':
+        return {
+          ...base,
+          health: HOVER_TANK_HEALTH,
+          maxHealth: HOVER_TANK_HEALTH,
+          collisionRadius: HOVER_TANK_COLLISION_RADIUS,
+          scoreValue: HOVER_TANK_SCORE_VALUE,
+          fireRate: HOVER_TANK_FIRE_RATE,
+          fireCooldown: HOVER_TANK_FIRE_RATE * Math.random(),
+          isAerial: false,
+          behaviorState: 'patrol' as const,
+          velocity: { x: HOVER_TANK_SPEED, y: 0 },
+          moveSpeed: HOVER_TANK_SPEED,
+          patrolMinX: placement.position.x - HOVER_TANK_PATROL_RANGE,
+          patrolMaxX: placement.position.x + HOVER_TANK_PATROL_RANGE,
+        };
     }
   }
 
@@ -89,12 +188,28 @@ export class Ep2EnemyManager {
     for (const enemy of state.mapEnemies) {
       if (!enemy.isAlive) continue;
       // Only update enemies near the viewport (200px margin)
-      if (!isInViewport(enemy.position.y, state.camera, 200)) continue;
+      // Aerial enemies get bigger margin since they fly through
+      const margin = enemy.isAerial ? 600 : 200;
+      if (!isInViewport(enemy.position.y, state.camera, margin)) continue;
 
-      if (enemy.type === 'popup-mine') {
-        this.updatePopupMine(enemy, alivePlayers, state, dtMs, dtSeconds);
-      } else {
-        this.updateAimingEnemy(enemy, alivePlayers, state, dtMs, dtSeconds);
+      switch (enemy.type) {
+        case 'popup-mine':
+          this.updatePopupMine(enemy, alivePlayers, state, dtMs, dtSeconds);
+          break;
+        case 'rocket-copter':
+        case 'laser-copter':
+          this.updateCopter(enemy, alivePlayers, state, dtMs, dtSeconds);
+          break;
+        case 'spread-bomber':
+        case 'homing-bomber':
+          this.updateBomber(enemy, alivePlayers, state, dtMs, dtSeconds);
+          break;
+        case 'hover-tank':
+          this.updateHoverTank(enemy, alivePlayers, state, dtMs, dtSeconds);
+          break;
+        default:
+          this.updateAimingEnemy(enemy, alivePlayers, state, dtMs, dtSeconds);
+          break;
       }
     }
   }
@@ -144,6 +259,227 @@ export class Ep2EnemyManager {
       }
 
       state.projectiles = [...state.projectiles, proj];
+      SoundManager.play('playerFire');
+    }
+  }
+
+  private updateCopter(
+    enemy: MapEnemy,
+    players: Player[],
+    state: GameState,
+    dtMs: number,
+    dtSeconds: number,
+  ): void {
+    const isRocket = enemy.type === 'rocket-copter';
+    const engageRange = isRocket ? ROCKET_COPTER_ENGAGE_RANGE : LASER_COPTER_ENGAGE_RANGE;
+    const aimSpeed = isRocket ? ROCKET_COPTER_AIM_SPEED : LASER_COPTER_AIM_SPEED;
+    const patrolSpeed = enemy.moveSpeed ?? (isRocket ? ROCKET_COPTER_SPEED : LASER_COPTER_SPEED);
+
+    const nearest = this.findNearestPlayer(enemy, players);
+    const dist = nearest ? distBetween(enemy, nearest) : Infinity;
+
+    // State transitions
+    if (enemy.behaviorState === 'patrol' && dist <= engageRange) {
+      enemy.behaviorState = 'engage';
+    } else if (enemy.behaviorState === 'engage' && dist > engageRange * 1.3) {
+      enemy.behaviorState = 'patrol';
+    }
+
+    if (enemy.behaviorState === 'engage' && nearest) {
+      // Slow down while engaged
+      const engageSpeed = patrolSpeed * 0.4;
+      const dx = nearest.position.x - enemy.position.x;
+      const dy = nearest.position.y - enemy.position.y;
+      const targetAngle = Math.atan2(dy, dx);
+      enemy.aimAngle = rotateToward(enemy.aimAngle, targetAngle, aimSpeed * dtSeconds);
+
+      // Strafe horizontally relative to target
+      if (enemy.velocity) {
+        enemy.velocity.x = Math.cos(enemy.aimAngle + Math.PI / 2) * engageSpeed;
+        enemy.velocity.y = Math.sin(enemy.aimAngle + Math.PI / 2) * engageSpeed;
+      }
+    } else {
+      // Patrol: horizontal movement, reverse at bounds
+      if (enemy.velocity) {
+        if (enemy.patrolMinX !== undefined && enemy.position.x <= enemy.patrolMinX) {
+          enemy.velocity.x = Math.abs(enemy.velocity.x || patrolSpeed);
+        } else if (enemy.patrolMaxX !== undefined && enemy.position.x >= enemy.patrolMaxX) {
+          enemy.velocity.x = -Math.abs(enemy.velocity.x || patrolSpeed);
+        }
+        enemy.velocity.y = 0;
+        // Aim in direction of movement
+        enemy.aimAngle = enemy.velocity.x > 0 ? 0 : Math.PI;
+      }
+    }
+
+    // Move
+    if (enemy.velocity) {
+      enemy.position.x += enemy.velocity.x * dtSeconds;
+      enemy.position.y += enemy.velocity.y * dtSeconds;
+    }
+
+    // Fire cooldown
+    if (enemy.fireCooldown > 0) {
+      enemy.fireCooldown -= dtMs;
+      if (enemy.fireCooldown < 0) enemy.fireCooldown = 0;
+    }
+
+    // Fire only while engaged
+    if (enemy.behaviorState === 'engage' && enemy.fireCooldown <= 0 && nearest) {
+      const owner = { type: 'enemy' as const, id: enemy.id };
+      if (isRocket) {
+        // Slow, high-damage rocket
+        const proj = createEp2EnemyBullet(
+          enemy.position, enemy.aimAngle, owner,
+          ROCKET_COPTER_PROJECTILE_SPEED, ROCKET_COPTER_DAMAGE, 2,
+        );
+        state.projectiles = [...state.projectiles, proj];
+        enemy.fireCooldown = ROCKET_COPTER_FIRE_RATE;
+      } else {
+        // Rapid laser
+        const proj = createEp2EnemyBullet(
+          enemy.position, enemy.aimAngle, owner,
+          LASER_COPTER_PROJECTILE_SPEED, LASER_COPTER_DAMAGE, 2,
+        );
+        state.projectiles = [...state.projectiles, proj];
+        enemy.fireCooldown = LASER_COPTER_FIRE_RATE;
+      }
+      SoundManager.play('playerFire');
+    }
+  }
+
+  private updateBomber(
+    enemy: MapEnemy,
+    players: Player[],
+    state: GameState,
+    dtMs: number,
+    _dtSeconds: number,
+  ): void {
+    const isSpreader = enemy.type === 'spread-bomber';
+    const speed = enemy.moveSpeed ?? (isSpreader ? SPREAD_BOMBER_SPEED : HOMING_BOMBER_SPEED);
+
+    // Move south (increasing Y)
+    enemy.position.y += speed * _dtSeconds;
+
+    // Fire cooldown
+    if (enemy.fireCooldown > 0) {
+      enemy.fireCooldown -= dtMs;
+      if (enemy.fireCooldown < 0) enemy.fireCooldown = 0;
+    }
+
+    // Drop ordnance while in viewport area
+    if (enemy.fireCooldown <= 0 && state.camera) {
+      const owner = { type: 'enemy' as const, id: enemy.id };
+
+      if (isSpreader) {
+        // Fan of 5 projectiles downward
+        const newProjectiles: Projectile[] = [];
+        const spreadAngle = Math.PI / 6; // 30 degree total spread
+        for (let i = 0; i < SPREAD_BOMBER_SPREAD_COUNT; i++) {
+          const angle = Math.PI / 2 + spreadAngle * (i / (SPREAD_BOMBER_SPREAD_COUNT - 1) - 0.5);
+          newProjectiles.push(createEp2EnemyBullet(
+            enemy.position, angle, owner,
+            SPREAD_BOMBER_PROJECTILE_SPEED, SPREAD_BOMBER_DAMAGE, 2,
+          ));
+        }
+        state.projectiles = [...state.projectiles, ...newProjectiles];
+        enemy.fireCooldown = SPREAD_BOMBER_FIRE_RATE;
+      } else {
+        // Homing missile toward nearest player (renders green)
+        const nearest = this.findNearestPlayer(enemy, players);
+        if (nearest) {
+          const dx = nearest.position.x - enemy.position.x;
+          const dy = nearest.position.y - enemy.position.y;
+          const angle = Math.atan2(dy, dx);
+          const proj = createEp2EnemyBullet(
+            enemy.position, angle, owner,
+            HOMING_BOMBER_MISSILE_SPEED, HOMING_BOMBER_DAMAGE, 2,
+          );
+          proj.type = 'missile'; // Render as green homing missile
+          proj.isHoming = true;
+          proj.turnRate = HOMING_BOMBER_MISSILE_TURN_RATE;
+          state.projectiles = [...state.projectiles, proj];
+          enemy.fireCooldown = HOMING_BOMBER_FIRE_RATE;
+        }
+      }
+      SoundManager.play('playerFire');
+    }
+
+    // Re-enter from above viewport when exiting bottom
+    if (state.camera && enemy.position.y > state.camera.worldY + 1200) {
+      enemy.position.y = state.camera.worldY - 200;
+      // Randomize X slightly for variety
+      enemy.position.x = 200 + Math.random() * 800;
+    }
+  }
+
+  private updateHoverTank(
+    enemy: MapEnemy,
+    players: Player[],
+    state: GameState,
+    dtMs: number,
+    dtSeconds: number,
+  ): void {
+    // Patrol horizontally
+    if (enemy.velocity) {
+      if (enemy.patrolMinX !== undefined && enemy.position.x <= enemy.patrolMinX) {
+        enemy.velocity.x = Math.abs(enemy.velocity.x || HOVER_TANK_SPEED);
+      } else if (enemy.patrolMaxX !== undefined && enemy.position.x >= enemy.patrolMaxX) {
+        enemy.velocity.x = -Math.abs(enemy.velocity.x || HOVER_TANK_SPEED);
+      }
+      enemy.position.x += enemy.velocity.x * dtSeconds;
+    }
+
+    // Boulder collision — push hover tank out of overlapping boulders
+    if (state.map) {
+      for (const obj of state.map.objects) {
+        if (obj.type !== 'boulder' && obj.type !== 'destructible-rock') continue;
+        if (!obj.collisionRadius) continue;
+        if (obj.type === 'destructible-rock' && obj.health !== undefined && obj.health <= 0) continue;
+
+        const bx = enemy.position.x - obj.position.x;
+        const by = enemy.position.y - obj.position.y;
+        const bDist = Math.sqrt(bx * bx + by * by);
+        const minDist = obj.collisionRadius + enemy.collisionRadius;
+
+        if (bDist < minDist && bDist > 0) {
+          const overlap = minDist - bDist;
+          enemy.position.x += (bx / bDist) * overlap;
+          enemy.position.y += (by / bDist) * overlap;
+          // Reverse patrol direction on collision
+          if (enemy.velocity) {
+            enemy.velocity.x = -enemy.velocity.x;
+          }
+        }
+      }
+    }
+
+    // Aim at nearest player
+    const nearest = this.findNearestPlayer(enemy, players);
+    if (!nearest) return;
+
+    const dx = nearest.position.x - enemy.position.x;
+    const dy = nearest.position.y - enemy.position.y;
+    const targetAngle = Math.atan2(dy, dx);
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    enemy.aimAngle = rotateToward(enemy.aimAngle, targetAngle, HOVER_TANK_AIM_SPEED * dtSeconds);
+
+    // Fire cooldown
+    if (enemy.fireCooldown > 0) {
+      enemy.fireCooldown -= dtMs;
+      if (enemy.fireCooldown < 0) enemy.fireCooldown = 0;
+    }
+
+    // Fire plasma
+    if (enemy.fireCooldown <= 0 && dist <= EP2_ENEMY_FIRE_RANGE) {
+      const owner = { type: 'enemy' as const, id: enemy.id };
+      const proj = createEp2EnemyPlasma(
+        enemy.position, enemy.aimAngle, owner,
+        HOVER_TANK_PROJECTILE_SPEED, HOVER_TANK_DAMAGE, enemy.elevation,
+      );
+      state.projectiles = [...state.projectiles, proj];
+      enemy.fireCooldown = HOVER_TANK_FIRE_RATE;
       SoundManager.play('playerFire');
     }
   }
@@ -228,8 +564,11 @@ export class Ep2EnemyManager {
       for (const enemy of state.mapEnemies) {
         if (!enemy.isAlive) continue;
 
-        // Elevation check
-        if (Math.abs((proj.elevation ?? 0) - enemy.elevation) > 0.5) continue;
+        // Aerial enemies can be hit regardless of elevation
+        if (!enemy.isAerial) {
+          // Ground enemy: elevation check
+          if (Math.abs((proj.elevation ?? 0) - enemy.elevation) > 0.5) continue;
+        }
 
         const dx = proj.position.x - enemy.position.x;
         const dy = proj.position.y - enemy.position.y;
@@ -282,10 +621,11 @@ export class Ep2EnemyManager {
         const tank = state.tankStates[player.id];
         if (!tank) continue;
 
-        // Elevation check: enemy projectiles from high ground can hit low ground (shooting downhill),
-        // but low ground projectiles cannot hit high ground players (blocked by cliffs).
+        // Aerial projectiles (elevation=2) hit all ground targets.
+        // Ground projectiles: high ground can hit low ground (shooting downhill),
+        // but low ground cannot hit high ground players (blocked by cliffs).
         const projElev = proj.elevation ?? 0;
-        if (projElev < tank.elevation - 0.5) continue;
+        if (projElev < 2 && projElev < tank.elevation - 0.5) continue;
 
         const dx = proj.position.x - player.position.x;
         const dy = proj.position.y - player.position.y;
@@ -336,4 +676,11 @@ function rotateToward(current: number, target: number, maxDelta: number): number
 
   if (Math.abs(diff) <= maxDelta) return target;
   return current + Math.sign(diff) * maxDelta;
+}
+
+/** Distance between two positioned entities. */
+function distBetween(a: { position: { x: number; y: number } }, b: { position: { x: number; y: number } }): number {
+  const dx = a.position.x - b.position.x;
+  const dy = a.position.y - b.position.y;
+  return Math.sqrt(dx * dx + dy * dy);
 }

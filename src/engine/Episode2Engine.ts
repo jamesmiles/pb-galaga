@@ -1,9 +1,10 @@
 import type { GameState, EpisodeEngine, WeaponPickup } from '../types';
 import {
-  GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE,
+  GAME_HEIGHT, CLIFF_ELEVATION_SCALE,
   TANK_BODY_WIDTH, TANK_BODY_HEIGHT,
   GAME_WIDTH, LEVEL6_MAP_WIDTH,
   TANK_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS,
+  TANK_MAX_ARMOUR,
 } from './constants';
 import { InputHandler } from './InputHandler';
 import { SoundManager } from '../audio/SoundManager';
@@ -20,6 +21,7 @@ import { spawnTankProjectiles } from '../objects/player/code/TankWeapons';
 import { updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
 import { createTankState, createTankPlayer } from './StateManager';
 import { level6Map } from '../levels/level6';
+import { level7Map } from '../levels/level7';
 import { drawTank } from '../renderer/drawing/drawTank';
 import { drawMapSurface, drawMapObjects, drawClouds, drawDustEffects, drawFinishLine } from '../renderer/drawing/drawMap';
 import { drawCliffStructures } from '../renderer/drawing/drawCliffs';
@@ -277,7 +279,12 @@ export class Episode2Engine implements EpisodeEngine {
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < TANK_COLLISION_RADIUS + WEAPON_PICKUP_COLLISION_RADIUS) {
           pickup.isActive = false;
-          upgradeWeapon(player, pickup);
+          if (pickup.currentWeapon === 'armour') {
+            // Refill tank armour to max
+            player.health = TANK_MAX_ARMOUR;
+          } else {
+            upgradeWeapon(player, pickup);
+          }
           SoundManager.play('lifePickup');
         }
       }
@@ -290,11 +297,11 @@ export class Episode2Engine implements EpisodeEngine {
     this.mapManager.updateClouds(state.map, dtSeconds);
     this.mapManager.updateDust(state.map, dtSeconds);
 
-    // 10. Check finish line
+    // 10. Check finish line (all alive players must reach it)
     const alivePlayers = state.players.filter(p => p.isAlive);
     if (alivePlayers.length > 0) {
-      const lowestY = Math.min(...alivePlayers.map(p => p.position.y));
-      if (lowestY <= state.map.finishLineY) {
+      const allPastFinish = alivePlayers.every(p => p.position.y <= state.map!.finishLineY);
+      if (allPastFinish) {
         // Level complete
         MusicManager.stop();
         this.inputHandler.clearAll();
@@ -394,7 +401,7 @@ export class Episode2Engine implements EpisodeEngine {
 
   onLevelStart(state: GameState, level: number): void {
     // Load map based on level
-    const map = level === 6 ? level6Map : level6Map; // Only level 6 for now
+    const map = level === 7 ? level7Map : level6Map;
 
     state.map = map;
     // Center camera horizontally on start position
@@ -449,6 +456,7 @@ export class Episode2Engine implements EpisodeEngine {
       'plasma-artillery': '#44ccff',
       rocket: '#aa44ff',
       missile: '#44ff44',
+      armour: '#ff4444',
     };
 
     for (const pickup of pickups) {

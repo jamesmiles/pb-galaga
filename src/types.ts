@@ -222,7 +222,7 @@ export interface RespawnPickup {
 export interface WeaponPickup {
   id: string;
   category: 'primary' | 'secondary';
-  currentWeapon: 'laser' | 'bullet' | 'rocket' | 'missile' | 'cannon' | 'plasma-artillery';
+  currentWeapon: 'laser' | 'bullet' | 'rocket' | 'missile' | 'cannon' | 'plasma-artillery' | 'armour';
   position: Vector2D;
   velocity: Vector2D;
   isActive: boolean;
@@ -336,7 +336,8 @@ export interface DustEffect {
 
 // --- Map Enemies (Episode 2) ---
 
-export type MapEnemyType = 'gun-nest' | 'turret' | 'popup-mine';
+export type MapEnemyType = 'gun-nest' | 'turret' | 'popup-mine'
+  | 'rocket-copter' | 'laser-copter' | 'spread-bomber' | 'homing-bomber' | 'hover-tank';
 
 export interface MapEnemyPlacement {
   id: string;
@@ -366,6 +367,14 @@ export interface MapEnemy {
   popupProgress: number;        // 0..1 animation (0=buried, 1=up)
   burstFired: boolean;          // Has radial burst been fired this cycle?
   cooldownTimer: number;        // ms remaining after burst
+  // Mobile enemy fields (copters, bombers, hover-tank)
+  velocity?: Vector2D;
+  patrolMinX?: number;
+  patrolMaxX?: number;
+  isAerial?: boolean;
+  behaviorState?: 'patrol' | 'engage' | 'flythrough' | 'returning';
+  spawnY?: number;               // Original Y for bomber re-entry
+  moveSpeed?: number;
 }
 
 export interface MapConfig {

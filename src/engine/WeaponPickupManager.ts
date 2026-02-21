@@ -40,11 +40,21 @@ export class WeaponPickupManager {
   maybeSpawnEp2Pickup(state: GameState, position: Vector2D): void {
     if (Math.random() >= EP2_PICKUP_DROP_CHANCE) return;
 
-    const isPrimary = Math.random() < 0.7;
-    const category = isPrimary ? 'primary' : 'secondary';
-    const currentWeapon: WeaponPickup['currentWeapon'] = isPrimary
-      ? (Math.random() < 0.5 ? 'cannon' : 'plasma-artillery')
-      : (Math.random() < 0.5 ? 'rocket' : 'missile');
+    // 20% chance of armour pickup, 80% weapon
+    const roll = Math.random();
+    let category: WeaponPickup['category'];
+    let currentWeapon: WeaponPickup['currentWeapon'];
+
+    if (roll < 0.2) {
+      category = 'primary'; // category doesn't matter for armour, but field is required
+      currentWeapon = 'armour';
+    } else {
+      const isPrimary = Math.random() < 0.7;
+      category = isPrimary ? 'primary' : 'secondary';
+      currentWeapon = isPrimary
+        ? (Math.random() < 0.5 ? 'cannon' : 'plasma-artillery')
+        : (Math.random() < 0.5 ? 'rocket' : 'missile');
+    }
 
     const pickup: WeaponPickup = {
       id: `wp-${nextPickupId++}`,
@@ -78,7 +88,8 @@ export class WeaponPickupManager {
         continue;
       }
 
-      // Cycle weapon type
+      // Cycle weapon type (armour pickups don't cycle)
+      if (pickup.currentWeapon === 'armour') continue;
       pickup.cycleTimer -= dtMs;
       if (pickup.cycleTimer <= 0) {
         pickup.cycleTimer = WEAPON_PICKUP_CYCLE_INTERVAL;
