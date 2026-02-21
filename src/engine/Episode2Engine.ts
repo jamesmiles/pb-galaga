@@ -1,5 +1,5 @@
 import type { GameState, EpisodeEngine } from '../types';
-import { GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE } from './constants';
+import { GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE, TANK_BODY_WIDTH, TANK_BODY_HEIGHT } from './constants';
 import { InputHandler } from './InputHandler';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
@@ -89,6 +89,9 @@ export class Episode2Engine implements EpisodeEngine {
     for (const player of state.players) {
       this.mapManager.checkBoulderCollisions(player, state.map);
     }
+
+    // 4a. Tank-to-tank collision (co-op: prevent driving through each other)
+    this.resolveTankCollisions(state);
 
     // 4b. Cliff collision + elevation resolution
     for (const player of state.players) {
@@ -362,6 +365,50 @@ export class Episode2Engine implements EpisodeEngine {
     // Handled inline in update()
   }
 
+  /**
+   * Push co-op tanks apart so they can't overlap.
+   * Uses each tank's oriented half-dimensions projected onto the
+   * center-to-center direction for an angle-aware collision distance.
+   */
+  private resolveTankCollisions(state: GameState): void {
+    const halfW = TANK_BODY_WIDTH / 2;
+    const halfH = TANK_BODY_HEIGHT / 2;
+    const alive = state.players.filter(p => p.isAlive);
+
+    for (let i = 0; i < alive.length; i++) {
+      for (let j = i + 1; j < alive.length; j++) {
+        const a = alive[i];
+        const b = alive[j];
+        const tankA = state.tankStates?.[a.id];
+        const tankB = state.tankStates?.[b.id];
+        if (!tankA || !tankB) continue;
+
+        const dx = a.position.x - b.position.x;
+        const dy = a.position.y - b.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 1) continue; // Avoid division by zero
+
+        // Unit direction from B to A
+        const nx = dx / dist;
+        const ny = dy / dist;
+
+        // Effective half-extent of each tank projected onto this direction
+        const extentA = tankExtent(tankA.heading, nx, ny, halfW, halfH);
+        const extentB = tankExtent(tankB.heading, nx, ny, halfW, halfH);
+        const minDist = extentA + extentB;
+
+        if (dist < minDist) {
+          const overlap = minDist - dist;
+          const half = overlap / 2;
+          a.position.x += nx * half;
+          a.position.y += ny * half;
+          b.position.x -= nx * half;
+          b.position.y -= ny * half;
+        }
+      }
+    }
+  }
+
   private checkGameOver(state: GameState): void {
     const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
     if (state.players.length > 0 && alivePlayers.length === 0) {
@@ -381,4 +428,17 @@ export class Episode2Engine implements EpisodeEngine {
       };
     }
   }
+}
+
+/**
+ * Half-extent of an oriented rectangle projected onto a direction.
+ * Forward axis: (cos(h), -sin(h)), Right axis: (sin(h), cos(h)).
+ */
+export function tankExtent(
+  heading: number, nx: number, ny: number,
+  halfW: number, halfH: number,
+): number {
+  const fwdDot = Math.abs(Math.cos(heading) * nx + (-Math.sin(heading)) * ny);
+  const rgtDot = Math.abs(Math.sin(heading) * nx + Math.cos(heading) * ny);
+  return halfH * fwdDot + halfW * rgtDot;
 }
