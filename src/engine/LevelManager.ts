@@ -6,15 +6,10 @@ import { createEnemyD } from '../objects/enemies/enemyD/code/EnemyD';
 import { createEnemyE } from '../objects/enemies/enemyE/code/EnemyE';
 import { createEnemyF } from '../objects/enemies/enemyF/code/EnemyF';
 import { createEnemyG } from '../objects/enemies/enemyG/code/EnemyG';
-import { createEnemyH } from '../objects/enemies/enemyH/code/EnemyH';
-import { createEnemyI } from '../objects/enemies/enemyI/code/EnemyI';
-import { createEnemyJ } from '../objects/enemies/enemyJ/code/EnemyJ';
-import { createEnemyK } from '../objects/enemies/enemyK/code/EnemyK';
 import { initFormation } from './FormationManager';
 import { generateFlightPaths } from './FlightPathManager';
 import { LEVEL_CLEAR_DELAY, CHAOS_ENEMY_MULTIPLIER, CHAOS_MINIBOSS_HEALTH_MULTIPLIER, CHAOS_MINIBOSS_FIRE_RATE_DIVISOR } from './constants';
 import { createBoss } from '../objects/boss/code/Boss';
-import { createTankBoss } from '../objects/boss/code/TankBoss';
 
 /** Wave transition duration in ms. */
 const WAVE_TRANSITION_DURATION = 3000;
@@ -28,10 +23,6 @@ const ENEMY_FACTORY: Record<string, (row: number, col: number) => Enemy> = {
   E: createEnemyE,
   F: createEnemyF,
   G: createEnemyG,
-  H: createEnemyH,
-  I: createEnemyI,
-  J: createEnemyJ,
-  K: createEnemyK,
 };
 
 /**
@@ -133,7 +124,7 @@ export class LevelManager {
 
     // Boss wave: spawn boss instead of formation enemies
     if (wave.bossSpawn) {
-      state.boss = wave.bossVariant === 'tank' ? createTankBoss() : createBoss();
+      state.boss = createBoss();
       return;
     }
 
@@ -169,16 +160,6 @@ export class LevelManager {
           enemy.health *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
           enemy.maxHealth *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
           enemy.fireRate /= CHAOS_MINIBOSS_FIRE_RATE_DIVISOR;
-        }
-        // Chaos mode: buff stationary enemies with 2x health
-        if (chaosMultiplier > 1 && enemy.isStationary) {
-          enemy.health *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
-          enemy.maxHealth *= CHAOS_MINIBOSS_HEALTH_MULTIPLIER;
-        }
-        // Place stationary enemies at fixed position if specified
-        if (slot.fixedPosition) {
-          enemy.position = { ...slot.fixedPosition };
-          enemy.isStationary = true;
         }
         state.enemies.push(enemy);
       }

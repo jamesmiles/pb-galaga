@@ -134,7 +134,6 @@ function createEmptyStats(): PlayerStats {
 export function createPlayer(id: 'player1' | 'player2'): Player {
   return {
     id,
-    movementMode: 'ship',
     shipColor: id === 'player1' ? 'red' : 'blue',
     position: {
       x: GAME_WIDTH / 2,

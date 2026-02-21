@@ -9,9 +9,6 @@ import { drawBossLower, drawBossUpper, drawLifePickups, drawRespawnPickups } fro
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
 import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
-import { drawMarsTerrain } from './drawing/drawMarsTerrain';
-import { DustCloudManager } from './drawing/drawDustClouds';
-import { drawTankBossLower, drawTankBossUpper } from './drawing/drawTankBoss';
 
 /**
  * Canvas 2D renderer implementing the GameRenderer interface.
@@ -25,7 +22,6 @@ export class Canvas2DRenderer implements GameRenderer {
   private ctx: CanvasRenderingContext2D;
   private menuOverlay: MenuOverlay;
   private particleSystem: ParticleSystem;
-  private dustCloudManager: DustCloudManager;
 
   // FPS counters passed from GameLoop
   engineFps = 0;
@@ -45,7 +41,6 @@ export class Canvas2DRenderer implements GameRenderer {
   private bgImageCache: Map<string, HTMLImageElement> = new Map();
   private bgScrollOffsets: number[] = [];
   private currentBgLevel = -1;
-  private marsTerrainScroll = 0;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -62,7 +57,6 @@ export class Canvas2DRenderer implements GameRenderer {
 
     this.ctx = this.canvas.getContext('2d')!;
     this.particleSystem = new ParticleSystem();
-    this.dustCloudManager = new DustCloudManager();
 
     // Create CSS menu overlay on top of the canvas
     this.menuOverlay = new MenuOverlay(container);
@@ -103,10 +97,8 @@ export class Canvas2DRenderer implements GameRenderer {
     this.particleSystem.update(renderDt);
 
     if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete' || current.gameStatus === 'levelintro') {
-      // Menu screens: render stars/terrain in background, particles, then overlay
-      if (current.currentLevel === 6) {
-        drawMarsTerrain(ctx, this.marsTerrainScroll);
-      } else if (current.background) {
+      // Menu screens: render stars in background, particles, then overlay
+      if (current.background) {
         drawStars(ctx, current.background.stars);
       }
       this.particleSystem.draw(ctx);
@@ -120,9 +112,7 @@ export class Canvas2DRenderer implements GameRenderer {
       const prevEnemies = new Map(previous.enemies.map(e => [e.id, e]));
       const prevProjectiles = new Map(previous.projectiles.map(p => [p.id, p]));
 
-      if (current.currentLevel === 6) {
-        drawMarsTerrain(ctx, this.marsTerrainScroll);
-      } else if (current.background) {
+      if (current.background) {
         drawStars(ctx, current.background.stars);
       }
       drawEnemies(ctx, current.enemies, prevEnemies, 1);
@@ -148,23 +138,14 @@ export class Canvas2DRenderer implements GameRenderer {
     // Detect deaths and emit particles
     this.detectDeaths(current);
 
-    const isMarsLevel = current.currentLevel === 6;
-
     // Draw layers (back to front)
-    if (isMarsLevel) {
-      this.marsTerrainScroll += renderDt * 0.01;
-      drawMarsTerrain(ctx, this.marsTerrainScroll);
-    } else if (current.background) {
+    if (current.background) {
       drawStars(ctx, current.background.stars);
     }
 
     // Boss lower hull (behind everything gameplay-related)
     if (current.boss) {
-      if (current.boss.variant === 'tank') {
-        drawTankBossLower(ctx, current.boss);
-      } else {
-        drawBossLower(ctx, current.boss);
-      }
+      drawBossLower(ctx, current.boss);
     }
 
     drawEnemies(ctx, current.enemies, prevEnemies, alpha);
@@ -177,17 +158,7 @@ export class Canvas2DRenderer implements GameRenderer {
 
     // Boss upper layer (turrets + bridge, in front of player)
     if (current.boss) {
-      if (current.boss.variant === 'tank') {
-        drawTankBossUpper(ctx, current.boss);
-      } else {
-        drawBossUpper(ctx, current.boss);
-      }
-    }
-
-    // Dust cloud overlay (above entities, below HUD) — Mars level only
-    if (isMarsLevel) {
-      this.dustCloudManager.update(renderDt);
-      this.dustCloudManager.draw(ctx);
+      drawBossUpper(ctx, current.boss);
     }
 
     this.particleSystem.draw(ctx);
