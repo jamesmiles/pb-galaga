@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.1.25';
+export const GAME_VERSION = '1.1.27';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -207,7 +207,7 @@ export const TANK_COLLISION_RADIUS = 18;
 // Tank dimensions (procedural drawing)
 export const TANK_BODY_WIDTH = 32;
 export const TANK_BODY_HEIGHT = 40;
-export const TANK_TURRET_LENGTH = 20;
+export const TANK_TURRET_LENGTH = 26;
 export const TANK_TURRET_RECOIL_DECAY = 5.0;   // 1/s (recoil decays from 1→0)
 
 // Armour (replaces shields in Episode 2)
