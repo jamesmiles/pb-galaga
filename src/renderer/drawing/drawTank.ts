@@ -82,9 +82,10 @@ export function drawTank(
   ctx.save();
   ctx.rotate(-tank.turretAngle);
 
-  // Turret base circle
+  // Turret base circle — yellow glow when locked on
+  const turretGlow = tank.targetEnemyId ? '#ffff00' : glowColor;
   ctx.shadowBlur = 6;
-  ctx.shadowColor = glowColor;
+  ctx.shadowColor = turretGlow;
   ctx.fillStyle = turretColor;
   ctx.beginPath();
   ctx.arc(0, 0, 8, 0, Math.PI * 2);

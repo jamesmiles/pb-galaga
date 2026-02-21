@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.1.28';
+export const GAME_VERSION = '1.1.29';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -275,6 +275,13 @@ export const POPUP_MINE_POPUP_DURATION = 400;   // ms to fully pop up
 export const POPUP_MINE_COOLDOWN = 5000;        // ms after burst before dormant
 export const POPUP_MINE_COLLISION_RADIUS = 12;
 export const POPUP_MINE_SCORE_VALUE = 150;
+
+// Turret targeting (sticky lock-on)
+export const TURRET_ACQUISITION_CONE = 0.35;    // rad (~20°) half-angle to acquire target
+export const TURRET_RETENTION_CONE = 2.356;     // rad (~135°) half-angle to keep lock (270° total)
+export const TURRET_MAX_TARGET_RANGE = 500;     // px max distance to acquire/retain
+export const TURRET_TRACK_SPEED = 3.0;          // rad/s smooth turret rotation toward target
+export const TURRET_ELEVATION_TOLERANCE = 0.5;  // Same as existing elevation checks
 
 // Shared Episode 2 enemy constants
 export const EP2_ENEMY_FIRE_RANGE = 600;        // px max distance to fire
