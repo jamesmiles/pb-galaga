@@ -12,14 +12,19 @@ let nextId = 0;
  * Create a cannon shell fired from a tank turret.
  * The shell travels straight along the turret angle and deactivates at max range.
  */
-export function createCannonShell(position: Vector2D, turretAngle: number, owner: ProjectileOwner): Projectile {
-  // turretAngle is in [0, PI] — 0 = east, PI/2 = north, PI = west
-  // Velocity: cos(angle) for X, -sin(angle) for Y (canvas Y is inverted)
+export function createCannonShell(
+  position: Vector2D,
+  turretAngle: number,
+  owner: ProjectileOwner,
+  overrides?: { damage?: number; range?: number; collisionRadius?: number },
+): Projectile {
+  const damage = overrides?.damage ?? CANNON_DAMAGE;
+  const range = overrides?.range ?? CANNON_RANGE;
+  const cr = overrides?.collisionRadius ?? CANNON_COLLISION_RADIUS;
+
   const vx = Math.cos(turretAngle) * CANNON_SPEED;
   const vy = -Math.sin(turretAngle) * CANNON_SPEED;
-
-  // maxLifetime derived from range / speed
-  const maxLifetime = (CANNON_RANGE / CANNON_SPEED) * 1000;
+  const maxLifetime = (range / CANNON_SPEED) * 1000;
 
   return {
     id: `cannon-${nextId++}`,
@@ -29,11 +34,11 @@ export function createCannonShell(position: Vector2D, turretAngle: number, owner
     velocity: { x: vx, y: vy },
     rotation: turretAngle,
     speed: CANNON_SPEED,
-    damage: CANNON_DAMAGE,
+    damage,
     isActive: true,
     lifetime: 0,
     maxLifetime,
-    collisionRadius: CANNON_COLLISION_RADIUS,
+    collisionRadius: cr,
     hasCollided: false,
   };
 }

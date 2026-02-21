@@ -190,31 +190,62 @@ export const level6Map: MapConfig = {
     { id: 'me-01', type: 'gun-nest', position: { x: 600, y: 5400 }, elevation: 0 },
 
     // --- Section 2: turret guarding passage + popup mine ---
-    { id: 'me-02', type: 'turret', position: { x: 700, y: 5000 }, elevation: 0 },
+    { id: 'me-02', type: 'turret', position: { x: 750, y: 5050 }, elevation: 0 },
     { id: 'me-03', type: 'popup-mine', position: { x: 500, y: 4850 }, elevation: 0 },
 
     // --- Cliff-01 area: gun nest on high ground ---
-    { id: 'me-04', type: 'gun-nest', position: { x: 530, y: 4330 }, elevation: 1 },
+    { id: 'me-04', type: 'gun-nest', position: { x: 590, y: 4380 }, elevation: 1 },
 
     // --- Section 4 (canyon chokepoint): flanking gun nests ---
     { id: 'me-05', type: 'gun-nest', position: { x: 400, y: 3750 }, elevation: 0 },
     { id: 'me-06', type: 'gun-nest', position: { x: 800, y: 3700 }, elevation: 0 },
 
     // --- Cliff-02 area: turret on L-shaped ridge ---
-    { id: 'me-07', type: 'turret', position: { x: 350, y: 3000 }, elevation: 1 },
+    { id: 'me-07', type: 'turret', position: { x: 300, y: 3080 }, elevation: 1 },
 
     // --- Section 6: popup mines in open area ---
     { id: 'me-08', type: 'popup-mine', position: { x: 450, y: 2600 }, elevation: 0 },
-    { id: 'me-09', type: 'popup-mine', position: { x: 700, y: 2400 }, elevation: 0 },
+    { id: 'me-09', type: 'popup-mine', position: { x: 750, y: 2450 }, elevation: 0 },
 
     // --- Cliff-03 (sniper perch): turret on high ground ---
-    { id: 'me-10', type: 'turret', position: { x: 800, y: 1760 }, elevation: 1 },
+    { id: 'me-10', type: 'turret', position: { x: 890, y: 1890 }, elevation: 1 },
 
     // --- Final approach: harder mix ---
     { id: 'me-11', type: 'gun-nest', position: { x: 500, y: 1300 }, elevation: 0 },
     { id: 'me-12', type: 'turret', position: { x: 350, y: 900 }, elevation: 0 },
     { id: 'me-13', type: 'popup-mine', position: { x: 700, y: 700 }, elevation: 0 },
     { id: 'me-14', type: 'gun-nest', position: { x: 900, y: 500 }, elevation: 0 },
+
+    // --- Reinforcements (doubled density) ---
+    // Starting area: second gun nest to the west
+    { id: 'me-15', type: 'gun-nest', position: { x: 450, y: 5650 }, elevation: 0 },
+
+    // Section 2: flanking gun nest + second popup mine
+    { id: 'me-16', type: 'gun-nest', position: { x: 350, y: 5100 }, elevation: 0 },
+    { id: 'me-17', type: 'popup-mine', position: { x: 850, y: 4800 }, elevation: 0 },
+
+    // Cliff-01 area: gun nest at base of ramp
+    { id: 'me-18', type: 'gun-nest', position: { x: 980, y: 4400 }, elevation: 0 },
+
+    // Section 4 (canyon): additional turret + popup mine
+    { id: 'me-19', type: 'turret', position: { x: 600, y: 3800 }, elevation: 0 },
+    { id: 'me-20', type: 'popup-mine', position: { x: 350, y: 3600 }, elevation: 0 },
+
+    // Cliff-02 area: turret at L-shape entry
+    { id: 'me-21', type: 'turret', position: { x: 150, y: 3500 }, elevation: 0 },
+
+    // Section 6: gun nests flanking boulders
+    { id: 'me-22', type: 'gun-nest', position: { x: 900, y: 2700 }, elevation: 0 },
+    { id: 'me-23', type: 'gun-nest', position: { x: 300, y: 2300 }, elevation: 0 },
+
+    // Cliff-03 area: gun nest below sniper perch
+    { id: 'me-24', type: 'gun-nest', position: { x: 600, y: 1850 }, elevation: 0 },
+
+    // Final approach: heavier density
+    { id: 'me-25', type: 'popup-mine', position: { x: 200, y: 1400 }, elevation: 0 },
+    { id: 'me-26', type: 'turret', position: { x: 750, y: 1150 }, elevation: 0 },
+    { id: 'me-27', type: 'gun-nest', position: { x: 150, y: 750 }, elevation: 0 },
+    { id: 'me-28', type: 'popup-mine', position: { x: 1000, y: 350 }, elevation: 0 },
   ],
 };
 

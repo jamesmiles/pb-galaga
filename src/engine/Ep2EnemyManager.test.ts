@@ -511,7 +511,7 @@ describe('Ep2EnemyManager', () => {
       expect(state.players[0].health).toBe(healthBefore - 30);
     });
 
-    it('cross-elevation enemy projectile misses player', () => {
+    it('low-ground enemy projectile misses high-ground player (blocked by cliff)', () => {
       const state = makeState();
       state.players[0].position = { x: 400, y: 5900 };
       state.tankStates!.player1.elevation = 1;
@@ -524,6 +524,22 @@ describe('Ep2EnemyManager', () => {
 
       expect(proj.hasCollided).toBe(false);
       expect(state.players[0].health).toBe(healthBefore);
+    });
+
+    it('high-ground enemy projectile hits low-ground player (shooting downhill)', () => {
+      const state = makeState();
+      state.players[0].position = { x: 400, y: 5900 };
+      state.tankStates!.player1.elevation = 0;
+
+      const proj = makeProjectile(400, 5900, 'enemy', 1);
+      proj.damage = 30;
+      state.projectiles = [proj];
+
+      const healthBefore = state.players[0].health;
+      manager.checkEnemyProjectileVsPlayer(state);
+
+      expect(proj.hasCollided).toBe(true);
+      expect(state.players[0].health).toBe(healthBefore - 30);
     });
 
     it('skips invulnerable player', () => {
@@ -554,7 +570,6 @@ describe('Ep2EnemyManager', () => {
 
       expect(state.players[0].isAlive).toBe(false);
       expect(state.players[0].health).toBe(0);
-      expect(state.players[0].lives).toBeLessThan(3); // lost a life
       expect(state.players[0].stats.deaths).toBe(1);
     });
 

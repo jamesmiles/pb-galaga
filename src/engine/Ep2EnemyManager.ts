@@ -282,8 +282,10 @@ export class Ep2EnemyManager {
         const tank = state.tankStates[player.id];
         if (!tank) continue;
 
-        // Elevation check
-        if (Math.abs((proj.elevation ?? 0) - tank.elevation) > 0.5) continue;
+        // Elevation check: enemy projectiles from high ground can hit low ground (shooting downhill),
+        // but low ground projectiles cannot hit high ground players (blocked by cliffs).
+        const projElev = proj.elevation ?? 0;
+        if (projElev < tank.elevation - 0.5) continue;
 
         const dx = proj.position.x - player.position.x;
         const dy = proj.position.y - player.position.y;
@@ -297,12 +299,12 @@ export class Ep2EnemyManager {
           if (player.health <= 0) {
             player.health = 0;
             player.isAlive = false;
-            player.lives--;
             player.stats.deaths++;
             player.levelStats.deaths++;
+            SoundManager.play('playerDeath');
+          } else {
+            SoundManager.play('tankHit');
           }
-
-          SoundManager.play('shellImpact');
           break;
         }
       }

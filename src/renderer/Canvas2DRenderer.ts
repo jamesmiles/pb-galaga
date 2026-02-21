@@ -210,15 +210,19 @@ export class Canvas2DRenderer implements GameRenderer {
       }
     }
 
-    // Player deaths
+    // Player deaths (world→screen conversion for Episode 2)
     for (const player of current.players) {
       if (!player.isAlive) {
-        this.particleSystem.emit(
-          player.position.x,
-          player.position.y,
-          player.id,
-          'player',
-        );
+        const px = current.camera
+          ? player.position.x - current.camera.worldX
+          : player.position.x;
+        const py = current.camera
+          ? player.position.y - current.camera.worldY
+          : player.position.y;
+        if (px >= -100 && px <= GAME_WIDTH + 100 &&
+            py >= -100 && py <= GAME_HEIGHT + 100) {
+          this.particleSystem.emitLargeExplosion(px, py, player.id, 'player');
+        }
       }
     }
 

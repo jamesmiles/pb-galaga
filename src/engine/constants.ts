@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.2.2';
+export const GAME_VERSION = '1.4.4';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -282,6 +282,38 @@ export const TURRET_RETENTION_CONE = 2.356;     // rad (~135°) half-angle to ke
 export const TURRET_MAX_TARGET_RANGE = 500;     // px max distance to acquire/retain
 export const TURRET_TRACK_SPEED = 3.0;          // rad/s smooth turret rotation toward target
 export const TURRET_ELEVATION_TOLERANCE = 0.5;  // Same as existing elevation checks
+
+// Cannon upgrade path (Player 1 primary, levels 2–5)
+export const CANNON_L2_FIRE_COOLDOWN = 1500;
+export const CANNON_L3_FIRE_COOLDOWN = 1500;
+export const CANNON_L3_DAMAGE = 100;
+export const CANNON_L3_RANGE = 450;
+export const CANNON_L3_SPREAD = 5;              // degrees
+export const CANNON_L4_FIRE_COOLDOWN = 1200;
+export const CANNON_L4_DAMAGE = 100;
+export const CANNON_L4_RANGE = 450;
+export const CANNON_L5_FIRE_COOLDOWN = 1200;
+export const CANNON_L5_DAMAGE = 120;
+export const CANNON_L5_RANGE = 500;
+export const CANNON_L5_SPREAD = 8;              // degrees
+
+// Plasma artillery upgrade path (Player 2 primary, levels 2–5)
+export const PLASMA_BOLT_L2_FIRE_COOLDOWN = 1500;
+export const PLASMA_BOLT_L3_FIRE_COOLDOWN = 1500;
+export const PLASMA_BOLT_L3_DAMAGE = 150;
+export const PLASMA_BOLT_L3_RANGE = 300;
+export const PLASMA_BOLT_L3_RADIUS = 10;
+export const PLASMA_BOLT_L4_FIRE_COOLDOWN = 1200;
+export const PLASMA_BOLT_L4_DAMAGE = 150;
+export const PLASMA_BOLT_L4_RANGE = 300;
+export const PLASMA_BOLT_L4_RADIUS = 12;
+export const PLASMA_BOLT_L5_FIRE_COOLDOWN = 1200;
+export const PLASMA_BOLT_L5_DAMAGE = 180;
+export const PLASMA_BOLT_L5_RANGE = 350;
+export const PLASMA_BOLT_L5_RADIUS = 14;
+
+// Episode 2 weapon pickup
+export const EP2_PICKUP_DROP_CHANCE = 0.15;     // 15% per enemy kill
 
 // Shared Episode 2 enemy constants
 export const EP2_ENEMY_FIRE_RANGE = 600;        // px max distance to fire

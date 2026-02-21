@@ -2,6 +2,7 @@ import type { GameState, WeaponPickup, Vector2D } from '../types';
 import {
   WEAPON_PICKUP_DROP_CHANCE, WEAPON_PICKUP_CYCLE_INTERVAL,
   WEAPON_PICKUP_SPEED, WEAPON_PICKUP_LIFETIME,
+  EP2_PICKUP_DROP_CHANCE,
 } from './constants';
 
 let nextPickupId = 0;
@@ -11,7 +12,7 @@ let nextPickupId = 0;
  */
 export class WeaponPickupManager {
 
-  /** Roll for a weapon pickup drop at the given position. */
+  /** Roll for a weapon pickup drop at the given position (Episode 1). */
   maybeSpawnPickup(state: GameState, position: Vector2D): void {
     if (Math.random() >= WEAPON_PICKUP_DROP_CHANCE) return;
 
@@ -27,6 +28,30 @@ export class WeaponPickupManager {
       currentWeapon,
       position: { x: position.x, y: position.y },
       velocity: { x: 0, y: WEAPON_PICKUP_SPEED },
+      isActive: true,
+      cycleTimer: WEAPON_PICKUP_CYCLE_INTERVAL,
+      lifetime: 0,
+    };
+
+    state.weaponPickups = [...state.weaponPickups, pickup];
+  }
+
+  /** Roll for a weapon pickup drop at the given position (Episode 2 — stationary). */
+  maybeSpawnEp2Pickup(state: GameState, position: Vector2D): void {
+    if (Math.random() >= EP2_PICKUP_DROP_CHANCE) return;
+
+    const isPrimary = Math.random() < 0.7;
+    const category = isPrimary ? 'primary' : 'secondary';
+    const currentWeapon: WeaponPickup['currentWeapon'] = isPrimary
+      ? (Math.random() < 0.5 ? 'cannon' : 'plasma-artillery')
+      : (Math.random() < 0.5 ? 'rocket' : 'missile');
+
+    const pickup: WeaponPickup = {
+      id: `wp-${nextPickupId++}`,
+      category,
+      currentWeapon,
+      position: { x: position.x, y: position.y },
+      velocity: { x: 0, y: 0 }, // Stationary — sits at death position
       isActive: true,
       cycleTimer: WEAPON_PICKUP_CYCLE_INTERVAL,
       lifetime: 0,
@@ -58,7 +83,11 @@ export class WeaponPickupManager {
       if (pickup.cycleTimer <= 0) {
         pickup.cycleTimer = WEAPON_PICKUP_CYCLE_INTERVAL;
         if (pickup.category === 'primary') {
-          pickup.currentWeapon = pickup.currentWeapon === 'laser' ? 'bullet' : 'laser';
+          if (pickup.currentWeapon === 'cannon' || pickup.currentWeapon === 'plasma-artillery') {
+            pickup.currentWeapon = pickup.currentWeapon === 'cannon' ? 'plasma-artillery' : 'cannon';
+          } else {
+            pickup.currentWeapon = pickup.currentWeapon === 'laser' ? 'bullet' : 'laser';
+          }
         } else {
           pickup.currentWeapon = pickup.currentWeapon === 'rocket' ? 'missile' : 'rocket';
         }
