@@ -15,7 +15,7 @@ export function updateTankPlayer(
   if (!player.isAlive) return;
 
   updateTankMovement(player, tank, dtSeconds, mapHeight, mapWidth);
-  updateTurretAngle(tank);
+  // Turret angle is now managed by TurretTargeting module (sticky lock-on)
   updateTurretRecoil(tank, dtSeconds);
   updateInvulnerability(player, dtSeconds);
 }

@@ -192,6 +192,7 @@ export function createTankState(): TankState {
   return {
     heading: Math.PI / 2,       // Facing north initially
     turretAngle: Math.PI / 2,
+    turretTargetAngle: Math.PI / 2,
     turretRecoil: 0,
     speed: 0,
     turnRate: TANK_TURN_RATE,
@@ -200,6 +201,7 @@ export function createTankState(): TankState {
     reverseMaxSpeed: TANK_REVERSE_MAX_SPEED,
     friction: TANK_FRICTION,
     elevation: 0,
+    targetEnemyId: null,
   };
 }
 

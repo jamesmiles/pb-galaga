@@ -8,6 +8,7 @@ import { CliffManager } from './CliffManager';
 import { Ep2EnemyManager } from './Ep2EnemyManager';
 import { createCamera, updateCamera, worldToScreen, isInViewport } from './CameraManager';
 import { updateTankPlayer } from '../objects/player/code/TankPlayer';
+import { updateTurretTargeting } from '../objects/player/code/TurretTargeting';
 import { spawnTankProjectiles } from '../objects/player/code/TankWeapons';
 import { updateAllProjectiles } from '../objects/projectiles/laser/code/Laser';
 import { createTankState, createTankPlayer } from './StateManager';
@@ -83,6 +84,16 @@ export class Episode2Engine implements EpisodeEngine {
       const tank = state.tankStates[player.id];
       if (!tank) continue;
       updateTankPlayer(player, tank, dtSeconds, mapHeight, mapWidth);
+    }
+
+    // 3.5 Turret targeting (sticky lock-on)
+    if (state.mapEnemies) {
+      for (const player of state.players) {
+        if (!player.isAlive) continue;
+        const tank = state.tankStates[player.id];
+        if (!tank) continue;
+        updateTurretTargeting(player, tank, state.mapEnemies, dtSeconds);
+      }
     }
 
     // 4. Boulder collision resolution

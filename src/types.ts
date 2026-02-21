@@ -266,6 +266,7 @@ export interface Powerup {
 export interface TankState {
   heading: number;              // Tank body angle in radians (0 = east, PI/2 = north)
   turretAngle: number;          // Computed turret angle (derived from heading)
+  turretTargetAngle: number;    // Desired turret angle (smooth rotation target)
   turretRecoil: number;         // 0..1 recoil animation progress
   speed: number;                // Current forward speed (can be negative for reverse)
   turnRate: number;             // Radians per second
@@ -274,6 +275,7 @@ export interface TankState {
   reverseMaxSpeed: number;      // px/s backward
   friction: number;             // Deceleration when no input
   elevation: number;            // 0 = low ground, 1 = high ground, fractional on ramps
+  targetEnemyId: string | null; // Locked-on enemy ID (sticky targeting)
 }
 
 // --- Cliff Terrain (Episode 2) ---
