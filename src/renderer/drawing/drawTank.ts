@@ -4,12 +4,14 @@ import { TANK_BODY_WIDTH, TANK_BODY_HEIGHT, TANK_TURRET_LENGTH } from '../../eng
 /**
  * Draw a tank at the given screen position.
  * Procedural Canvas 2D: rectangular body, circular turret base, barrel.
+ * Optional scale param for elevation visual (1.0 + 0.15 * elevation).
  */
 export function drawTank(
   ctx: CanvasRenderingContext2D,
   screenPos: Vector2D,
   tank: TankState,
   player: Player,
+  scale: number = 1.0,
 ): void {
   const isP1 = player.id === 'player1';
   const bodyColor = isP1 ? '#cc2222' : '#2244cc';
@@ -27,6 +29,27 @@ export function drawTank(
 
   ctx.save();
   ctx.translate(screenPos.x, screenPos.y);
+
+  // Drop shadow when elevated
+  if (scale > 1.01) {
+    const shadowOffset = (scale - 1.0) * 40; // Shadow offset proportional to elevation
+    const shadowAlpha = Math.min(0.4, (scale - 1.0) * 2.5);
+    ctx.save();
+    ctx.translate(shadowOffset, shadowOffset);
+    ctx.rotate(-tank.heading);
+    ctx.globalAlpha = shadowAlpha;
+    ctx.fillStyle = '#000000';
+    const hw = TANK_BODY_WIDTH / 2;
+    const hh = TANK_BODY_HEIGHT / 2;
+    ctx.fillRect(-hh, -hw, TANK_BODY_HEIGHT, TANK_BODY_WIDTH);
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // Apply elevation scale
+  if (scale !== 1.0) {
+    ctx.scale(scale, scale);
+  }
 
   // --- Tank body (rotated to heading) ---
   ctx.save();

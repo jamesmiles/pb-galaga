@@ -149,6 +149,7 @@ export interface Projectile {
   isHoming?: boolean;
   homingDelay?: number;
   arcGravity?: number;          // Downward acceleration for arc trajectory (Episode 2)
+  elevation?: number;           // Elevation at spawn (from firing tank's elevation)
 }
 
 // --- Boss ---
@@ -272,6 +273,28 @@ export interface TankState {
   maxSpeed: number;             // px/s forward
   reverseMaxSpeed: number;      // px/s backward
   friction: number;             // Deceleration when no input
+  elevation: number;            // 0 = low ground, 1 = high ground, fractional on ramps
+}
+
+// --- Cliff Terrain (Episode 2) ---
+
+export type CliffTileType =
+  | 'edge-north' | 'edge-south' | 'edge-east' | 'edge-west'
+  | 'corner-ne-convex' | 'corner-nw-convex' | 'corner-se-convex' | 'corner-sw-convex'
+  | 'corner-ne-concave' | 'corner-nw-concave' | 'corner-se-concave' | 'corner-sw-concave'
+  | 'ramp-south-north' | 'ramp-east-west' | 'ramp-west-east'
+  | 'surface';
+
+export interface CliffTile {
+  col: number;
+  row: number;
+  type: CliffTileType;
+}
+
+export interface CliffStructure {
+  id: string;
+  position: Vector2D;           // World position of top-left corner of tile grid
+  tiles: CliffTile[];
 }
 
 // --- Map (Episode 2) ---
@@ -309,6 +332,40 @@ export interface DustEffect {
   sprite: string;               // 'dust-cloud-1' through 'dust-swirl-4'
 }
 
+// --- Map Enemies (Episode 2) ---
+
+export type MapEnemyType = 'gun-nest' | 'turret' | 'popup-mine';
+
+export interface MapEnemyPlacement {
+  id: string;
+  type: MapEnemyType;
+  position: Vector2D;           // World coordinates
+  elevation: number;            // 0 = low ground, 1 = on cliff
+}
+
+export interface MapEnemy {
+  id: string;
+  type: MapEnemyType;
+  position: Vector2D;
+  elevation: number;
+  isAlive: boolean;
+  health: number;
+  maxHealth: number;
+  collisionRadius: number;
+  scoreValue: number;
+  // Turret/aim state
+  aimAngle: number;             // Current turret direction (radians)
+  fireCooldown: number;         // ms remaining until next shot
+  fireRate: number;             // ms between shots
+  // Popup mine state
+  isActivated: boolean;
+  activationRange: number;      // Proximity trigger distance (px)
+  dormantTimer: number;         // ms until auto-activate
+  popupProgress: number;        // 0..1 animation (0=buried, 1=up)
+  burstFired: boolean;          // Has radial burst been fired this cycle?
+  cooldownTimer: number;        // ms remaining after burst
+}
+
 export interface MapConfig {
   totalHeight: number;          // Total map height in pixels
   surfaceTexture: string;       // e.g. 'mars-surface'
@@ -317,6 +374,8 @@ export interface MapConfig {
   objects: MapObject[];
   clouds: CloudOverlay[];
   dustEffects: DustEffect[];
+  cliffs?: CliffStructure[];    // Cliff terrain structures (Episode 2)
+  enemyPlacements?: MapEnemyPlacement[];  // Static enemy positions (Episode 2)
 }
 
 // --- Camera (Episode 2) ---
@@ -414,6 +473,7 @@ export interface GameState {
   tankStates: Record<string, TankState> | null;
   map: MapConfig | null;
   camera: CameraState | null;
+  mapEnemies: MapEnemy[] | null;
   // Pending impact effects queued by engine, consumed by renderer
   pendingImpacts: { x: number; y: number; id: string; type: 'cannon-shell' | 'plasma-bolt' }[];
 }

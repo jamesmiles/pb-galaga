@@ -98,6 +98,33 @@ describe('Laser', () => {
     });
   });
 
+  describe('Episode 2 enemy projectiles', () => {
+    it('survives bounds check when position is in world coords beyond screen', () => {
+      // Episode 2 enemy bullets have elevation set and use world coordinates
+      // that are far beyond the 800×800 screen — they must not be killed by
+      // the Episode 1 screen-space bounds check.
+      const proj = createLaser({ x: 400, y: 5800 }, { type: 'enemy', id: 'enemy-1' });
+      proj.type = 'bullet';
+      proj.elevation = 0;
+      proj.velocity = { x: 0, y: 280 };
+
+      updateProjectile(proj, 1 / 60);
+
+      expect(proj.isActive).toBe(true);
+    });
+
+    it('deactivates when lifetime expires', () => {
+      const proj = createLaser({ x: 400, y: 5800 }, { type: 'enemy', id: 'enemy-1' });
+      proj.type = 'bullet';
+      proj.elevation = 0;
+      proj.lifetime = proj.maxLifetime;
+
+      updateProjectile(proj, 1 / 60);
+
+      expect(proj.isActive).toBe(false);
+    });
+  });
+
   describe('acceleration', () => {
     it('increases speed up to maxSpeed', () => {
       const proj = createLaser({ x: 100, y: 300 }, { type: 'player', id: 'player1' });
