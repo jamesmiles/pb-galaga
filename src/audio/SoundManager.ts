@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam' | 'shellImpact';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam' | 'shellImpact' | 'cannonFire' | 'plasmaFire';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -10,7 +10,7 @@ export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeat
  *          slide, deltaSlide, pitchJump, pitchJumpTime, repeatTime, noise, modulation,
  *          bitCrush, delay, sustainVolume, decay, tremolo]
  */
-const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
+const SOUND_PRESETS: Partial<Record<SoundEffect, ZzFXParams>> = {
   // Short high-pitched laser pew
   playerFire: [0.5, 0.01, 800, 0, 0.02, 0.04, 2, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.02, 0],
   // Lower-pitched enemy fire
@@ -59,6 +59,14 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   shellImpact: [0.7, 0.06, 120, 0, 0.08, 0.25, 3, 1, -8, -2, 0, 0, 0, 0.9, 0, 0, 0, 0.25, 0.12, 0],
 };
 
+/** MP3-backed sound effects (short one-shot samples). */
+const MP3_SFX: Partial<Record<SoundEffect, string>> = {
+  cannonFire: 'audio/cannon-fire.mp3',
+  plasmaFire: 'audio/plasma-fire.mp3',
+};
+
+const MP3_SFX_VOLUME = 0.5;
+
 /**
  * Manages sound effects for the game.
  * Uses ZzFX for procedural audio generation.
@@ -67,6 +75,7 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
 export class SoundManager {
   private static muted = false;
   private static initialized = false;
+  private static mp3Cache = new Map<SoundEffect, HTMLAudioElement>();
 
   /** Initialize the sound system. Safe to call multiple times. */
   static init(): void {
@@ -77,13 +86,36 @@ export class SoundManager {
   static play(effect: SoundEffect): void {
     if (SoundManager.muted) return;
 
-    const params = SOUND_PRESETS[effect];
+    // MP3-backed SFX
+    const mp3Url = MP3_SFX[effect];
+    if (mp3Url) {
+      SoundManager.playMp3(effect, mp3Url);
+      return;
+    }
+
+    // ZzFX procedural SFX
+    const params = SOUND_PRESETS[effect as keyof typeof SOUND_PRESETS];
     if (!params) return;
 
     try {
       zzfx(...params as number[]);
     } catch {
       // Silently fail if AudioContext unavailable (headless, etc.)
+    }
+  }
+
+  private static playMp3(effect: SoundEffect, url: string): void {
+    try {
+      let audio = SoundManager.mp3Cache.get(effect);
+      if (!audio) {
+        audio = new Audio(url);
+        audio.volume = MP3_SFX_VOLUME;
+        SoundManager.mp3Cache.set(effect, audio);
+      }
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    } catch {
+      // Silently fail (headless, etc.)
     }
   }
 
@@ -107,6 +139,7 @@ export class SoundManager {
   static reset(): void {
     SoundManager.muted = false;
     SoundManager.initialized = false;
+    SoundManager.mp3Cache.clear();
   }
 
   /** Get the preset params for a sound effect (for testing). */

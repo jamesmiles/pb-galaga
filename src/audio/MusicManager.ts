@@ -435,7 +435,7 @@ export class MusicManager {
     const url = MP3_TRACKS[track]!;
     const audio = new Audio(url);
     audio.loop = true;
-    audio.volume = 0.3; // Match zzfx master volume
+    audio.volume = 1.0;
     audio.preload = 'auto';
     MusicManager.mp3Elements.set(track, audio);
     return audio;
