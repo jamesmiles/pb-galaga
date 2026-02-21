@@ -417,6 +417,7 @@ export interface MenuState {
     wave?: number;
     introText?: string;
     introChars?: number;
+    levelName?: string;
     testCoop?: boolean;
     pendingMode?: string;
     pendingEpisode?: Episode;
