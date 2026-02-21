@@ -221,6 +221,6 @@ export const level6Map: MapConfig = {
 /** Level config for level 6 (no wave-based enemies in Sprint 1). */
 export const level6: LevelConfig = {
   levelNumber: 6,
-  name: 'Mars Landing',
+  name: 'Express Elevator',
   waves: [],
 };
