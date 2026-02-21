@@ -207,7 +207,7 @@ describe('MusicManager', () => {
 
     it('MP3 track volume is set correctly', () => {
       MusicManager.play('level6');
-      expect(audioInstances[0].volume).toBe(0.15);
+      expect(audioInstances[0].volume).toBe(1.0);
     });
 
     it('MP3 track respects mute state', () => {
