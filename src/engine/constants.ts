@@ -313,7 +313,7 @@ export const PLASMA_BOLT_L5_RANGE = 350;
 export const PLASMA_BOLT_L5_RADIUS = 14;
 
 // Episode 2 weapon pickup
-export const EP2_PICKUP_DROP_CHANCE = 0.30;     // 30% per enemy kill
+export const EP2_PICKUP_DROP_CHANCE = 0.20;     // 20% per enemy kill
 export const EP2_LIFE_PICKUP_DROP_CHANCE = 0.08; // 8% chance of heart (armour refill) per kill
 
 // Rocket Copter (aerial patrol + engage, slow rockets, high damage)
