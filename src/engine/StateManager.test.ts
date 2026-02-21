@@ -116,6 +116,29 @@ describe('copyStateInto', () => {
     expect(target.gameStatus).toBe('playing');
     expect(target.currentLevel).toBe(3);
   });
+
+  // Regression: pendingImpacts was missing from copyStateInto, causing impact
+  // particle effects to be lost during double-buffer swaps. At 30fps the game
+  // loop runs 2 engine updates per render frame; impacts pushed in update 1
+  // were dropped when swapBuffers() copied state into the new current buffer
+  // without including pendingImpacts.
+  it('preserves pendingImpacts across buffer swap', () => {
+    const sm = new StateManager();
+    sm.currentState.pendingImpacts.push(
+      { x: 100, y: 200, id: 'proj-1', type: 'cannon-shell' },
+      { x: 300, y: 400, id: 'proj-2', type: 'plasma-bolt' },
+    );
+
+    sm.swapBuffers();
+
+    expect(sm.currentState.pendingImpacts).toHaveLength(2);
+    expect(sm.currentState.pendingImpacts[0]).toEqual(
+      { x: 100, y: 200, id: 'proj-1', type: 'cannon-shell' },
+    );
+    expect(sm.currentState.pendingImpacts[1]).toEqual(
+      { x: 300, y: 400, id: 'proj-2', type: 'plasma-bolt' },
+    );
+  });
 });
 
 describe('createPlayer', () => {

@@ -110,6 +110,11 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
     }
   }
 
+  // Arc gravity: pull projectile downward (increasing Y in canvas coords)
+  if (proj.arcGravity) {
+    proj.velocity.y += proj.arcGravity * dtSeconds;
+  }
+
   // Move
   proj.position.x += proj.velocity.x * dtSeconds;
   proj.position.y += proj.velocity.y * dtSeconds;
@@ -117,11 +122,40 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
   // Lifetime
   proj.lifetime += dtMs;
 
-  // Deactivate if off-screen or expired
-  if (proj.position.y < -20 || proj.position.y > GAME_HEIGHT + 20 ||
-      proj.position.x < -20 || proj.position.x > GAME_WIDTH + 20 ||
-      proj.lifetime >= proj.maxLifetime || proj.hasCollided) {
+  // Deactivate if collided
+  if (proj.hasCollided) {
     proj.isActive = false;
+    return;
+  }
+
+  // Tank shells "land" when lifetime expires — mark as collided so the renderer
+  // emits a ground impact explosion this frame. The hasCollided check above will
+  // deactivate it next tick.
+  if (proj.lifetime >= proj.maxLifetime) {
+    const isTankShell = proj.type === 'cannon-shell' || proj.type === 'plasma-bolt';
+    if (isTankShell) {
+      proj.hasCollided = true;
+      return; // Stay active one more frame for renderer to detect
+    }
+    proj.isActive = false;
+    return;
+  }
+
+  // Tank shells use lifetime for range — skip all bounds checks
+  const isTankShell = proj.type === 'cannon-shell' || proj.type === 'plasma-bolt';
+  if (isTankShell) {
+    // No bounds check — lifetime handles deactivation
+  } else if (!proj.arcGravity) {
+    // Episode 1 projectiles: screen-space bounds
+    if (proj.position.y < -20 || proj.position.y > GAME_HEIGHT + 20 ||
+        proj.position.x < -20 || proj.position.x > GAME_WIDTH + 20) {
+      proj.isActive = false;
+    }
+  } else {
+    // Arc projectiles: only check X bounds
+    if (proj.position.x < -50 || proj.position.x > GAME_WIDTH + 50) {
+      proj.isActive = false;
+    }
   }
 }
 

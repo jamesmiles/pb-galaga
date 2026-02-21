@@ -1,8 +1,10 @@
-import type { GameState, Player, PlayerStats, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup, RespawnPickup } from '../types';
+import type { GameState, Player, PlayerStats, TankState, Enemy, Projectile, Powerup, WeaponPickup, Asteroid, Star, FormationState, MenuState, BackgroundState, BossState, LifePickup, RespawnPickup } from '../types';
 import {
   GAME_WIDTH, GAME_HEIGHT, PLAYER_START_LIVES, PLAYER_MAX_HEALTH,
   FORMATION_BASE_SPEED, FORMATION_CELL_WIDTH, FORMATION_CELL_HEIGHT,
   STAR_COUNT,
+  TANK_TURN_RATE, TANK_ACCELERATION, TANK_MAX_SPEED, TANK_REVERSE_MAX_SPEED, TANK_FRICTION,
+  TANK_MAX_ARMOUR, TANK_START_LIVES,
 } from './constants';
 
 /**
@@ -71,12 +73,18 @@ export function createInitialState(): GameState {
     menu: {
       type: 'start',
       selectedOption: 0,
-      options: ['1 Player', '2 Players', 'Test Mode', '2P Test Mode'],
+      options: ['Episode 1 - The Invasion Begins', 'Episode 2 - Martian Revolt', 'Test Mode', '2P Test Mode'],
     },
     boss: null,
     lifePickups: [],
     respawnPickups: [],
     autoFire: { p1: false, p2: false },
+    // Episode 2 fields (null during Episode 1)
+    episode: 1,
+    tankStates: null,
+    map: null,
+    camera: null,
+    pendingImpacts: [],
   };
 }
 
@@ -124,6 +132,12 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.lifePickups = source.lifePickups;
   target.respawnPickups = source.respawnPickups;
   target.autoFire = source.autoFire;
+  // Episode 2 fields
+  target.episode = source.episode;
+  target.tankStates = source.tankStates;
+  target.map = source.map;
+  target.camera = source.camera;
+  target.pendingImpacts = source.pendingImpacts;
 }
 
 function createEmptyStats(): PlayerStats {
@@ -169,4 +183,50 @@ export function resetLevelStats(players: Player[]): void {
   for (const player of players) {
     player.levelStats = createEmptyStats();
   }
+}
+
+/** Create a default tank state (Episode 2). */
+export function createTankState(): TankState {
+  return {
+    heading: Math.PI / 2,       // Facing north initially
+    turretAngle: Math.PI / 2,
+    turretRecoil: 0,
+    speed: 0,
+    turnRate: TANK_TURN_RATE,
+    acceleration: TANK_ACCELERATION,
+    maxSpeed: TANK_MAX_SPEED,
+    reverseMaxSpeed: TANK_REVERSE_MAX_SPEED,
+    friction: TANK_FRICTION,
+  };
+}
+
+/** Create a tank player for Episode 2 (higher health/armour, tank weapons). */
+export function createTankPlayer(id: 'player1' | 'player2'): Player {
+  return {
+    id,
+    shipColor: id === 'player1' ? 'red' : 'blue',
+    position: { x: GAME_WIDTH / 2, y: 0 },  // Set by map start position
+    velocity: { x: 0, y: 0 },
+    rotation: 0,
+    isAlive: true,
+    isInvulnerable: true,
+    invulnerabilityTimer: 2000,
+    lives: TANK_START_LIVES,
+    score: 0,
+    health: TANK_MAX_ARMOUR,
+    maxHealth: TANK_MAX_ARMOUR,
+    primaryWeapon: id === 'player1' ? 'cannon' : 'plasma-artillery',
+    primaryLevel: 1,
+    secondaryWeapon: null,
+    secondaryTimer: 0,
+    secondaryCooldown: 0,
+    fireCooldown: 0,
+    isThrusting: false,
+    isFiring: false,
+    collisionState: 'none',
+    input: { left: false, right: false, up: false, down: false, fire: false },
+    deathSequence: null,
+    stats: createEmptyStats(),
+    levelStats: createEmptyStats(),
+  };
 }

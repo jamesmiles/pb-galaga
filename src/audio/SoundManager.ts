@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam' | 'shellImpact';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -55,6 +55,8 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   respawnPickup: [0.6, 0, 500, 0.01, 0.06, 0.15, 0, 1, 15, 3, 600, 0.04, 0.08, 0, 0, 0, 0, 0.8, 0.04, 0],
   // Snake beam: sustained energy hum (stream weapon activation)
   snakeBeam: [0.3, 0.02, 300, 0.05, 0.3, 0.2, 0, 1, 5, 1, 0, 0, 0, 0, 0.5, 0, 0, 0.6, 0.1, 0.3],
+  // Shell ground impact: deep thuddy boom (tank shell / plasma bolt landing)
+  shellImpact: [0.7, 0.06, 120, 0, 0.08, 0.25, 3, 1, -8, -2, 0, 0, 0, 0.9, 0, 0, 0, 0.25, 0.12, 0],
 };
 
 /**

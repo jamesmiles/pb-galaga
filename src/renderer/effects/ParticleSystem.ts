@@ -161,6 +161,49 @@ export class ParticleSystem {
     });
   }
 
+  /**
+   * Emit a ground impact explosion for tank shells / plasma bolts.
+   * Medium burst with dirt/fire particles.
+   */
+  emitGroundImpact(x: number, y: number, projectileId: string, type: 'cannon-shell' | 'plasma-bolt'): void {
+    if (this.impactedProjectiles.has(projectileId)) return;
+    this.impactedProjectiles.add(projectileId);
+
+    const isCannon = type === 'cannon-shell';
+    const colors = isCannon
+      ? ['#ff8844', '#ff6622', '#ffaa44', '#886644']
+      : ['#44ccff', '#22aaff', '#88ddff', '#ffffff'];
+    const count = isCannon ? 18 : 24;
+    const speedRange = isCannon ? 120 : 150;
+    const lifespan = isCannon ? 350 : 450;
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 20 + Math.random() * speedRange;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      this.particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color,
+        life: lifespan,
+        maxLife: lifespan,
+        size: 2 + Math.random() * 3,
+      });
+    }
+
+    // Impact flash
+    this.flashes.push({
+      x, y,
+      radius: isCannon ? 25 : 35,
+      color: isCannon ? '#ff8844' : '#44ccff',
+      life: 80,
+      maxLife: 80,
+      isScreenFlash: false,
+    });
+  }
+
   /** Update particle positions, lifetimes, flashes, and screen shake. */
   update(dt: number): void {
     // Update particles

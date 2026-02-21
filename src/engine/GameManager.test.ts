@@ -8,22 +8,22 @@ function skipIntro(gm: GameManager): void {
   gm.tickHeadless(400);
 }
 
-/** Select "1 Player" → "Normal" difficulty → skip intro → playing. */
+/** Select "Episode 1" → "1 Player" → skip intro → playing. */
 function startSinglePlayer(gm: GameManager): void {
+  gm.inputHandler.injectMenuInput({ confirm: true }); // Select "Episode 1"
+  gm.tickHeadless(1); // → playercount menu
   gm.inputHandler.injectMenuInput({ confirm: true }); // Select "1 Player"
-  gm.tickHeadless(1); // → difficulty menu
-  gm.inputHandler.injectMenuInput({ confirm: true }); // Select "Normal"
   gm.tickHeadless(1); // → levelintro
   skipIntro(gm);
 }
 
-/** Select "2 Players" → "Normal" difficulty → skip intro → playing. */
+/** Select "Episode 1" → "2 Players" → skip intro → playing. */
 function startCoOpGame(gm: GameManager): void {
+  gm.inputHandler.injectMenuInput({ confirm: true }); // Select "Episode 1"
+  gm.tickHeadless(1); // → playercount menu
   gm.inputHandler.injectMenuInput({ down: true });
   gm.tickHeadless(1);
   gm.inputHandler.injectMenuInput({ confirm: true }); // Select "2 Players"
-  gm.tickHeadless(1); // → difficulty menu
-  gm.inputHandler.injectMenuInput({ confirm: true }); // Select "Normal"
   gm.tickHeadless(1); // → levelintro
   skipIntro(gm);
 }
@@ -39,7 +39,7 @@ describe('GameManager', () => {
     it('starts on the menu screen', () => {
       const gm = new GameManager({ headless: true });
       expect(gm.getState().menu?.type).toBe('start');
-      expect(gm.getState().menu?.options).toContain('1 Player');
+      expect(gm.getState().menu?.options).toContain('Episode 1 - The Invasion Begins');
       gm.destroy();
     });
   });
@@ -71,12 +71,12 @@ describe('GameManager', () => {
     it('transitions from menu to playing on Start Game', () => {
       const gm = new GameManager({ headless: true });
 
-      // Select "1 Player" → goes to difficulty menu
+      // Select "Episode 1" → goes to playercount menu
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
-      expect(gm.getState().menu?.type).toBe('difficulty');
+      expect(gm.getState().menu?.type).toBe('playercount');
 
-      // Select "Normal" → goes to level intro
+      // Select "1 Player" → goes to level intro
       gm.inputHandler.injectMenuInput({ confirm: true });
       gm.tickHeadless(1);
       expect(gm.getState().gameStatus).toBe('levelintro');
@@ -89,13 +89,13 @@ describe('GameManager', () => {
       gm.destroy();
     });
 
-    it('difficulty menu starts with selectedOption 0 (Normal)', () => {
+    it('playercount menu starts with selectedOption 0 (1 Player)', () => {
       const gm = new GameManager({ headless: true });
-      gm.inputHandler.injectMenuInput({ confirm: true }); // Select "1 Player"
+      gm.inputHandler.injectMenuInput({ confirm: true }); // Select "Episode 1"
       gm.tickHeadless(1);
-      expect(gm.getState().menu?.type).toBe('difficulty');
+      expect(gm.getState().menu?.type).toBe('playercount');
       expect(gm.getState().menu?.selectedOption).toBe(0);
-      expect(gm.getState().menu?.options[0]).toBe('Normal');
+      expect(gm.getState().menu?.options[0]).toBe('1 Player');
       gm.destroy();
     });
 

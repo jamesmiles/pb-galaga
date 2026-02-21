@@ -17,6 +17,10 @@ export interface Bounds {
   maxY: number;
 }
 
+// --- Episode ---
+
+export type Episode = 1 | 2;
+
 // --- Input ---
 
 export interface PlayerInput {
@@ -63,7 +67,7 @@ export interface Player {
   score: number;
   health: number;
   maxHealth: number;
-  primaryWeapon: 'laser' | 'bullet';
+  primaryWeapon: 'laser' | 'bullet' | 'cannon' | 'plasma-artillery';
   primaryLevel: 1 | 2 | 3 | 4 | 5;
   secondaryWeapon: 'rocket' | 'missile' | null;
   secondaryTimer: number;
@@ -126,7 +130,7 @@ export type ProjectileOwner =
 
 export interface Projectile {
   id: string;
-  type: 'laser' | 'bullet' | 'rocket' | 'missile' | 'plasma' | 'snake';
+  type: 'laser' | 'bullet' | 'rocket' | 'missile' | 'plasma' | 'snake' | 'cannon-shell' | 'plasma-bolt';
   owner: ProjectileOwner;
   position: Vector2D;
   velocity: Vector2D;
@@ -144,6 +148,7 @@ export interface Projectile {
   turnRate?: number;
   isHoming?: boolean;
   homingDelay?: number;
+  arcGravity?: number;          // Downward acceleration for arc trajectory (Episode 2)
 }
 
 // --- Boss ---
@@ -255,6 +260,75 @@ export interface Powerup {
   value: number;
 }
 
+// --- Tank (Episode 2) ---
+
+export interface TankState {
+  heading: number;              // Tank body angle in radians (0 = east, PI/2 = north)
+  turretAngle: number;          // Computed turret angle (derived from heading)
+  turretRecoil: number;         // 0..1 recoil animation progress
+  speed: number;                // Current forward speed (can be negative for reverse)
+  turnRate: number;             // Radians per second
+  acceleration: number;         // px/s^2
+  maxSpeed: number;             // px/s forward
+  reverseMaxSpeed: number;      // px/s backward
+  friction: number;             // Deceleration when no input
+}
+
+// --- Map (Episode 2) ---
+
+export interface MapObject {
+  id: string;
+  type: 'boulder' | 'destructible-rock' | 'decoration' | 'dust-patch';
+  position: Vector2D;           // World coordinates
+  width: number;
+  height: number;
+  health?: number;
+  maxHealth?: number;
+  collisionRadius?: number;     // Only for collidable objects
+  sprite: string;               // Key into sprite lookup (e.g. 'rocks-1')
+  rotation?: number;
+}
+
+export interface CloudOverlay {
+  id: string;
+  position: Vector2D;           // World coordinates
+  width: number;
+  height: number;
+  speed: number;                // Horizontal drift speed (negative = left)
+  alpha: number;
+  sprite: string;               // 'cloud-1' through 'cloud-4'
+}
+
+export interface DustEffect {
+  id: string;
+  position: Vector2D;
+  width: number;
+  height: number;
+  speed: number;
+  alpha: number;
+  sprite: string;               // 'dust-cloud-1' through 'dust-swirl-4'
+}
+
+export interface MapConfig {
+  totalHeight: number;          // Total map height in pixels
+  surfaceTexture: string;       // e.g. 'mars-surface'
+  startPosition: Vector2D;      // Player start in world coords
+  finishLineY: number;          // World Y coordinate of finish line
+  objects: MapObject[];
+  clouds: CloudOverlay[];
+  dustEffects: DustEffect[];
+}
+
+// --- Camera (Episode 2) ---
+
+export interface CameraState {
+  worldY: number;               // Top of viewport in world coordinates
+  targetY: number;              // Where camera wants to be
+  worldX: number;               // Left edge of viewport in world coordinates
+  targetX: number;              // Where camera wants to be horizontally
+  smoothSpeed: number;          // Lerp factor for smooth following
+}
+
 // --- Background ---
 
 export interface Star {
@@ -272,7 +346,7 @@ export interface BackgroundState {
 // --- Menu ---
 
 export interface MenuState {
-  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro' | 'gamecomplete' | 'difficulty' | 'levelstats';
+  type: 'start' | 'pause' | 'gameover' | 'levelcomplete' | 'levelselect' | 'levelintro' | 'gamecomplete' | 'difficulty' | 'levelstats' | 'playercount';
   selectedOption: number;
   options: string[];
   data?: {
@@ -284,6 +358,7 @@ export interface MenuState {
     introChars?: number;
     testCoop?: boolean;
     pendingMode?: string;
+    pendingEpisode?: Episode;
     p1LevelStats?: PlayerStats;
     p2LevelStats?: PlayerStats;
     p1GameStats?: PlayerStats;
@@ -334,6 +409,13 @@ export interface GameState {
   lifePickups: LifePickup[];
   respawnPickups: RespawnPickup[];
   autoFire: { p1: boolean; p2: boolean };
+  // Episode 2 fields (null during Episode 1)
+  episode: Episode;
+  tankStates: Record<string, TankState> | null;
+  map: MapConfig | null;
+  camera: CameraState | null;
+  // Pending impact effects queued by engine, consumed by renderer
+  pendingImpacts: { x: number; y: number; id: string; type: 'cannon-shell' | 'plasma-bolt' }[];
 }
 
 // --- Level Config ---
@@ -370,9 +452,20 @@ export interface EnemySpawnConfig {
   spawnDelay: number;
 }
 
+// --- Episode Engine Interface ---
+
+export interface EpisodeEngine {
+  update(state: GameState, dtSeconds: number): void;
+  render(ctx: CanvasRenderingContext2D, current: GameState, previous: GameState, alpha: number, renderDt: number): void;
+  onLevelStart(state: GameState, level: number): void;
+  onLevelComplete(state: GameState): void;
+  detectDeaths?(current: GameState, particleSystem: any): void;
+}
+
 // --- Renderer Interface ---
 
 export interface GameRenderer {
   render(current: GameState, previous: GameState, alpha: number): void;
   destroy(): void;
+  setActiveEngine?(engine: EpisodeEngine): void;
 }

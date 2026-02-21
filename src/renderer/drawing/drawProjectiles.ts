@@ -31,7 +31,11 @@ export function drawProjectiles(
     const ny = vLen > 0 ? vy / vLen : -1; // Default upward for stationary
 
     // Draw trails (additive blending)
-    if (proj.type === 'laser') {
+    if (proj.type === 'cannon-shell') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff8844', 5, 8);
+    } else if (proj.type === 'plasma-bolt') {
+      drawTrails(ctx, pos.x, pos.y, nx, ny, '#44ccff', 7, 10);
+    } else if (proj.type === 'laser') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#00ffff', 4, 12);
     } else if (proj.type === 'plasma') {
       drawTrails(ctx, pos.x, pos.y, nx, ny, '#ff00ff', 6, 10);
@@ -56,7 +60,37 @@ export function drawProjectiles(
     // Draw main projectile
     ctx.save();
 
-    if (proj.type === 'laser') {
+    if (proj.type === 'cannon-shell') {
+      // Orange cannon shell — solid round with glow
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#ff8844';
+      ctx.fillStyle = '#ff8844';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // White hot core
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (proj.type === 'plasma-bolt') {
+      // Blue-white plasma bolt — larger glowing orb
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = '#44ccff';
+      ctx.fillStyle = '#44ccff';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bright white core
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (proj.type === 'laser') {
       // Cyan laser beam with glow
       ctx.shadowBlur = 8;
       ctx.shadowColor = '#00ffff';
