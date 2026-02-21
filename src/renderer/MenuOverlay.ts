@@ -222,12 +222,13 @@ export class MenuOverlay {
       `;
     } else if (type === 'levelintro') {
       const level = data?.level ?? 1;
+      const levelName = (data?.levelName as string) ?? '';
       const text = (data?.introText as string) ?? '';
       const chars = (data?.introChars as number) ?? 0;
       const revealed = text.slice(0, chars).replace(/\n/g, '<br>');
       const done = chars >= text.length;
       this.overlay.innerHTML = `
-        <div class="intro-level-label">Level ${level}</div>
+        <div class="intro-level-label">Level ${level}${levelName ? ': ' + levelName : ''}</div>
         <div class="intro-typing">${revealed}${done ? '' : '<span class="intro-cursor">_</span>'}</div>
       `;
     } else if (type === 'levelselect') {

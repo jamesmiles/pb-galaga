@@ -2,7 +2,7 @@ import type { LevelConfig, MapConfig, CliffStructure, MapEnemyPlacement } from '
 import { LEVEL6_MAP_HEIGHT, LEVEL6_MAP_WIDTH } from '../engine/constants';
 
 /**
- * Level 6 map data — Mars Landing.
+ * Level 6 map data — Express Elevator.
  *
  * The map is 1200px wide × 6400px tall. Players start near the bottom
  * and drive northward (decreasing Y) toward the finish line near the top.
