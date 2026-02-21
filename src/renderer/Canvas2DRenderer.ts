@@ -196,6 +196,20 @@ export class Canvas2DRenderer implements GameRenderer {
       }
     }
 
+    // Map enemy deaths (Episode 2) — world→screen conversion needed
+    if (current.mapEnemies && current.camera) {
+      for (const enemy of current.mapEnemies) {
+        if (!enemy.isAlive) {
+          const screenX = enemy.position.x - current.camera.worldX;
+          const screenY = enemy.position.y - current.camera.worldY;
+          if (screenX >= -100 && screenX <= GAME_WIDTH + 100 &&
+              screenY >= -100 && screenY <= GAME_HEIGHT + 100) {
+            this.particleSystem.emit(screenX, screenY, enemy.id, enemy.type);
+          }
+        }
+      }
+    }
+
     // Player deaths
     for (const player of current.players) {
       if (!player.isAlive) {

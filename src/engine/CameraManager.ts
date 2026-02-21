@@ -33,10 +33,14 @@ export function updateCamera(
   camera.targetY = lowestPlayerY - CAMERA_PLAYER_ANCHOR_Y;
 
   if (camera.targetY < camera.worldY) {
+    // Northward (advancing) — full smooth lerp
     camera.worldY += (camera.targetY - camera.worldY) * camera.smoothSpeed * dtSeconds;
   } else {
+    // Southward (backtracking) — smooth lerp at reduced rate, with minimum speed floor
+    const lerpDelta = (camera.targetY - camera.worldY) * camera.smoothSpeed * 0.5 * dtSeconds;
+    const minDelta = CAMERA_MIN_BACKTRACK_SPEED * dtSeconds;
     const backtrackDelta = Math.min(
-      CAMERA_MIN_BACKTRACK_SPEED * dtSeconds,
+      Math.max(lerpDelta, minDelta),
       camera.targetY - camera.worldY,
     );
     camera.worldY += backtrackDelta;
