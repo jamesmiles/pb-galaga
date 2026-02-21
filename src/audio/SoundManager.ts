@@ -1,7 +1,7 @@
 import { zzfx, type ZzFXParams } from './zzfx';
 
 /** Named sound effects. */
-export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitH' | 'hitI' | 'hitJ' | 'hitK' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam';
+export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeath' | 'menuSelect' | 'hitA' | 'hitB' | 'hitC' | 'hitD' | 'hitE' | 'hitF' | 'hitG' | 'hitGClang' | 'bridgeHit' | 'typeKey' | 'asteroidHit' | 'asteroidExplode' | 'missileWhistle' | 'bossExplosion' | 'lifePickup' | 'respawnPickup' | 'snakeBeam';
 
 /**
  * ZzFX parameter presets for each sound effect.
@@ -47,14 +47,6 @@ const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
   lifePickup: [0.4, 0, 800, 0, 0.02, 0.08, 0, 1, 10, 0, 400, 0.02, 0, 0, 0, 0, 0, 0.7, 0.02, 0],
   // Mini-boss death: heavy resonant explosion (between F and boss)
   hitG: [1, 0.08, 80, 0.03, 0.15, 0.4, 3, 1, -10, -3, 0, 0, 0, 1.2, 0, 0, 0.1, 0.2, 0.2, 0],
-  // Type H hit: turret cannon destruction (metallic clatter)
-  hitH: [0.6, 0.04, 350, 0, 0.05, 0.12, 3, 1, -5, -1, 0, 0, 0, 0.6, 0, 0, 0, 0.3, 0.08, 0],
-  // Type I hit: artillery destruction (deep heavy thud)
-  hitI: [0.7, 0.05, 200, 0.01, 0.08, 0.2, 3, 1, -8, -2, 0, 0, 0, 0.8, 0, 0, 0, 0.2, 0.12, 0],
-  // Type J hit: mech warrior destruction (mechanical crunch)
-  hitJ: [0.6, 0.03, 400, 0, 0.04, 0.1, 3, 1, 10, 2, 50, 0.02, 0, 0.5, 0, 0, 0, 0.4, 0.06, 0],
-  // Type K hit: missile launcher destruction (sharp blast)
-  hitK: [0.5, 0.03, 500, 0, 0.03, 0.08, 3, 1, 20, 3, 80, 0.02, 0, 0.4, 0, 0, 0, 0.4, 0.05, 0],
   // Mini-boss per-hit: short metallic clang (high freq, sharp attack, ring-out)
   hitGClang: [0.4, 0.02, 1800, 0, 0.01, 0.06, 0, 0.5, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.03, 0],
   // Boss bridge per-hit: heavy metallic impact clunk (low freq, noisy, punchy)

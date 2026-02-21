@@ -40,86 +40,28 @@ export function drawPlayers(
     ctx.shadowBlur = 12;
     ctx.shadowColor = colors.glow;
 
-    if (player.movementMode === 'tank') {
-      drawPlayerTank(ctx, pos.x, pos.y, colors);
-    } else {
-      drawPlayerShip(ctx, pos.x, pos.y, colors);
-    }
+    // Draw ship as a triangle (inspired by copilot's design)
+    ctx.fillStyle = colors.fill;
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y - 14);      // Nose (top)
+    ctx.lineTo(pos.x - 12, pos.y + 12); // Left wing
+    ctx.lineTo(pos.x + 12, pos.y + 12); // Right wing
+    ctx.closePath();
+    ctx.fill();
+
+    // Cockpit accent
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = colors.cockpit;
+    ctx.fillRect(pos.x - 2, pos.y - 2, 4, 6);
+
+    // Engine glow (small bright dots at the back)
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#ffaa22';
+    ctx.fillStyle = '#ffff44';
+    ctx.fillRect(pos.x - 5, pos.y + 10, 3, 3);
+    ctx.fillRect(pos.x + 2, pos.y + 10, 3, 3);
+    ctx.shadowBlur = 0;
 
     ctx.restore();
   }
-}
-
-/** Draw the standard spaceship. */
-function drawPlayerShip(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number,
-  colors: { fill: string; glow: string; cockpit: string },
-): void {
-  // Ship triangle
-  ctx.fillStyle = colors.fill;
-  ctx.beginPath();
-  ctx.moveTo(x, y - 14);      // Nose (top)
-  ctx.lineTo(x - 12, y + 12); // Left wing
-  ctx.lineTo(x + 12, y + 12); // Right wing
-  ctx.closePath();
-  ctx.fill();
-
-  // Cockpit accent
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = colors.cockpit;
-  ctx.fillRect(x - 2, y - 2, 4, 6);
-
-  // Engine glow
-  ctx.shadowBlur = 6;
-  ctx.shadowColor = '#ffaa22';
-  ctx.fillStyle = '#ffff44';
-  ctx.fillRect(x - 5, y + 10, 3, 3);
-  ctx.fillRect(x + 2, y + 10, 3, 3);
-  ctx.shadowBlur = 0;
-}
-
-/** Draw the player tank (Mars ground mode). */
-function drawPlayerTank(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number,
-  colors: { fill: string; glow: string; cockpit: string },
-): void {
-  // Tank hull (rectangular)
-  ctx.fillStyle = colors.fill;
-  ctx.fillRect(x - 14, y - 4, 28, 14);
-
-  // Track sections (darker, on sides)
-  ctx.fillStyle = '#333333';
-  ctx.fillRect(x - 16, y + 2, 4, 10);
-  ctx.fillRect(x + 12, y + 2, 4, 10);
-
-  // Track detail lines
-  ctx.fillStyle = '#555555';
-  ctx.fillRect(x - 15, y + 4, 2, 2);
-  ctx.fillRect(x - 15, y + 8, 2, 2);
-  ctx.fillRect(x + 13, y + 4, 2, 2);
-  ctx.fillRect(x + 13, y + 8, 2, 2);
-
-  // Turret dome (on top)
-  ctx.fillStyle = colors.fill;
-  ctx.beginPath();
-  ctx.arc(x, y - 4, 8, Math.PI, 0);
-  ctx.fill();
-
-  // Barrel (pointing up)
-  ctx.fillStyle = colors.cockpit;
-  ctx.fillRect(x - 2, y - 18, 4, 14);
-
-  // Barrel tip
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(x - 2, y - 19, 4, 2);
-
-  // Exhaust glow (rear of tank)
-  ctx.shadowBlur = 6;
-  ctx.shadowColor = '#ffaa22';
-  ctx.fillStyle = '#ffff44';
-  ctx.fillRect(x - 10, y + 10, 3, 3);
-  ctx.fillRect(x + 7, y + 10, 3, 3);
-  ctx.shadowBlur = 0;
 }
