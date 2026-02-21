@@ -3,11 +3,12 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5' | 'level6';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5' | 'level6' | 'level7';
 
 /** MP3 tracks — lazy-loaded from public/audio/ at runtime. */
 const MP3_TRACKS: Partial<Record<MusicTrack, string>> = {
   level6: 'audio/sector-9-overdrive.mp3',
+  level7: 'audio/sector-assault.mp3',
 };
 
 /**
@@ -435,7 +436,7 @@ export class MusicManager {
     const url = MP3_TRACKS[track]!;
     const audio = new Audio(url);
     audio.loop = true;
-    audio.volume = 0.8;
+    audio.volume = 0.66;
     audio.preload = 'auto';
     MusicManager.mp3Elements.set(track, audio);
     return audio;

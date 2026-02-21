@@ -58,7 +58,7 @@ const SOUND_PRESETS: Partial<Record<SoundEffect, ZzFXParams>> = {
   // Shell ground impact: deep thuddy boom (tank shell / plasma bolt landing)
   shellImpact: [0.7, 0.06, 120, 0, 0.08, 0.25, 3, 1, -8, -2, 0, 0, 0, 0.9, 0, 0, 0, 0.25, 0.12, 0],
   // Tank armour hit: sharp metallic clank (player tank takes damage)
-  tankHit: [0.6, 0.03, 500, 0, 0.03, 0.1, 3, 1, -20, -3, 0, 0, 0, 0.5, 0, 0, 0, 0.4, 0.06, 0],
+  tankHit: [0.9, 0.03, 500, 0, 0.04, 0.12, 3, 1, -20, -3, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0.06, 0],
 };
 
 /** MP3-backed sound effects (short one-shot samples). */

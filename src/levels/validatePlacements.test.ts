@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { validateEnemyPlacements } from './validatePlacements';
 import { level6Map } from './level6';
+import { level7Map } from './level7';
 
 describe('validateEnemyPlacements', () => {
   it('all level 6 enemy placements should be clear of obstacles', () => {
@@ -37,5 +38,17 @@ describe('validateEnemyPlacements', () => {
     ];
     const issues = validateEnemyPlacements(level6Map, fakePlacements);
     expect(issues.length).toBe(0);
+  });
+
+  it('all level 7 ground enemy placements should be clear of obstacles', () => {
+    // Filter to ground-only placements (aerial enemies float above obstacles)
+    const groundPlacements = (level7Map.enemyPlacements ?? []).filter(
+      p => !['rocket-copter', 'laser-copter', 'spread-bomber', 'homing-bomber'].includes(p.type),
+    );
+    const issues = validateEnemyPlacements(level7Map, groundPlacements);
+    if (issues.length > 0) {
+      const msg = issues.map(i => `  ${i.enemyId}: ${i.reason}`).join('\n');
+      expect.fail(`Level 7 placement issues found:\n${msg}`);
+    }
   });
 });
