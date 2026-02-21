@@ -250,6 +250,15 @@ export class MenuOverlay {
         <div class="menu-title levelcomplete">${levelLabel}</div>
         ${scoreHtml}
       `;
+    } else if (type === 'playercount') {
+      const episodeLabel = (data?.pendingEpisode === 2) ? 'EPISODE 2 — MARTIAN REVOLT' : 'EPISODE 1 — THE INVASION BEGINS';
+      this.overlay.innerHTML = `
+        <div class="menu-title">${episodeLabel}</div>
+        <div class="menu-controls-group">
+          <div class="menu-controls">Press ESC to go back</div>
+        </div>
+        ${this.buildOptions(options)}
+      `;
     } else if (type === 'difficulty') {
       this.overlay.innerHTML = `
         <div class="menu-title">SELECT DIFFICULTY</div>

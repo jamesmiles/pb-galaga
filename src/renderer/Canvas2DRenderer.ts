@@ -1,27 +1,22 @@
-import type { GameState, GameRenderer, WeaponPickup, Asteroid } from '../types';
-import { GAME_WIDTH, GAME_HEIGHT, SECONDARY_WEAPON_DURATION } from '../engine/constants';
+import type { GameState, GameRenderer, EpisodeEngine } from '../types';
+import { GAME_WIDTH, GAME_HEIGHT } from '../engine/constants';
 import { MenuOverlay } from './MenuOverlay';
 import { drawStars } from './drawing/drawStars';
-import { drawPlayers } from './drawing/drawPlayer';
-import { drawEnemies } from './drawing/drawEnemies';
-import { drawProjectiles } from './drawing/drawProjectiles';
-import { drawBossLower, drawBossUpper, drawLifePickups, drawRespawnPickups } from './drawing/drawBoss';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
-import { LEVEL_BACKGROUNDS, type BackgroundObjectConfig } from '../levels/backgrounds';
+import { LEVEL_BACKGROUNDS } from '../levels/backgrounds';
 
 /**
  * Canvas 2D renderer implementing the GameRenderer interface.
  *
- * Uses direct Canvas 2D API with per-entity shadowBlur for neon glow effects.
- * Replaces the previous Phaser-based renderer — rendering is driven by our
- * GameLoop's render callback, not by any framework loop.
+ * Handles shared rendering concerns (clear, backgrounds, particles, HUD, menu overlay)
+ * and delegates gameplay layer drawing to the active EpisodeEngine.
  */
 export class Canvas2DRenderer implements GameRenderer {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private menuOverlay: MenuOverlay;
-  private particleSystem: ParticleSystem;
+  readonly particleSystem: ParticleSystem;
 
   // FPS counters passed from GameLoop
   engineFps = 0;
@@ -41,6 +36,9 @@ export class Canvas2DRenderer implements GameRenderer {
   private bgImageCache: Map<string, HTMLImageElement> = new Map();
   private bgScrollOffsets: number[] = [];
   private currentBgLevel = -1;
+
+  // Active episode engine for gameplay rendering
+  private activeEngine: EpisodeEngine | null = null;
 
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
@@ -66,6 +64,11 @@ export class Canvas2DRenderer implements GameRenderer {
   setFpsCounters(engineFps: number, renderFps: number): void {
     this.engineFps = engineFps;
     this.renderFps = renderFps;
+  }
+
+  /** Set the active episode engine for gameplay rendering delegation. */
+  setActiveEngine(engine: EpisodeEngine): void {
+    this.activeEngine = engine;
   }
 
   render(current: GameState, previous: GameState, alpha: number): void {
@@ -108,18 +111,15 @@ export class Canvas2DRenderer implements GameRenderer {
 
     if (current.gameStatus === 'paused') {
       // Render the frozen game scene behind the pause overlay
-      const prevPlayers = new Map(previous.players.map(p => [p.id, p]));
-      const prevEnemies = new Map(previous.enemies.map(e => [e.id, e]));
-      const prevProjectiles = new Map(previous.projectiles.map(p => [p.id, p]));
-
-      if (current.background) {
-        drawStars(ctx, current.background.stars);
+      if (this.activeEngine) {
+        // Episode engines handle their own paused rendering if they have it
+        const ep1 = this.activeEngine as any;
+        if (typeof ep1.renderPaused === 'function') {
+          ep1.renderPaused(ctx, current, previous);
+        } else {
+          this.activeEngine.render(ctx, current, previous, 1, 0);
+        }
       }
-      drawEnemies(ctx, current.enemies, prevEnemies, 1);
-      drawProjectiles(ctx, current.projectiles, prevProjectiles, 1);
-      this.drawAsteroids(ctx, current.asteroids);
-      this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
-      drawPlayers(ctx, current.players, prevPlayers, 1, current.currentTime);
       this.particleSystem.draw(ctx);
       drawHUD(ctx, current, this.engineFps, this.renderFps);
       this.menuOverlay.update(current);
@@ -130,35 +130,12 @@ export class Canvas2DRenderer implements GameRenderer {
     ctx.save();
     ctx.translate(this.particleSystem.shakeOffsetX, this.particleSystem.shakeOffsetY);
 
-    // Build previous-state lookup maps for interpolation
-    const prevPlayers = new Map(previous.players.map(p => [p.id, p]));
-    const prevEnemies = new Map(previous.enemies.map(e => [e.id, e]));
-    const prevProjectiles = new Map(previous.projectiles.map(p => [p.id, p]));
-
     // Detect deaths and emit particles
     this.detectDeaths(current);
 
-    // Draw layers (back to front)
-    if (current.background) {
-      drawStars(ctx, current.background.stars);
-    }
-
-    // Boss lower hull (behind everything gameplay-related)
-    if (current.boss) {
-      drawBossLower(ctx, current.boss);
-    }
-
-    drawEnemies(ctx, current.enemies, prevEnemies, alpha);
-    drawProjectiles(ctx, current.projectiles, prevProjectiles, alpha);
-    this.drawAsteroids(ctx, current.asteroids);
-    this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime);
-    drawLifePickups(ctx, current.lifePickups, current.currentTime);
-    drawRespawnPickups(ctx, current.respawnPickups, current.currentTime);
-    drawPlayers(ctx, current.players, prevPlayers, alpha, current.currentTime);
-
-    // Boss upper layer (turrets + bridge, in front of player)
-    if (current.boss) {
-      drawBossUpper(ctx, current.boss);
+    // Delegate gameplay rendering to the active episode engine
+    if (this.activeEngine) {
+      this.activeEngine.render(ctx, current, previous, alpha, renderDt);
     }
 
     this.particleSystem.draw(ctx);
@@ -267,7 +244,23 @@ export class Canvas2DRenderer implements GameRenderer {
       }
     }
 
-    // Projectile impacts — emit localized flash at collision point
+    // Tank shell impacts — consume pendingImpacts queue (survives multi-update frames)
+    for (const impact of current.pendingImpacts) {
+      const screenX = current.camera
+        ? impact.x - current.camera.worldX
+        : impact.x;
+      const screenY = current.camera
+        ? impact.y - current.camera.worldY
+        : impact.y;
+      if (screenX >= -50 && screenX <= GAME_WIDTH + 50 &&
+          screenY >= -50 && screenY <= GAME_HEIGHT + 50) {
+        this.particleSystem.emitGroundImpact(screenX, screenY, impact.id, impact.type);
+      }
+    }
+    // Clear queue after processing
+    current.pendingImpacts.length = 0;
+
+    // Other projectile impacts (Episode 1 style) — emit localized flash at collision point
     for (const proj of current.projectiles) {
       if (proj.hasCollided && !proj.isActive) {
         const color = proj.owner.type === 'player' ? '#00ffff' : '#ff8800';
@@ -298,8 +291,6 @@ export class Canvas2DRenderer implements GameRenderer {
 
   /**
    * Draw background celestial bodies behind starfield.
-   * Each object starts above the screen and drifts downward through the viewport.
-   * The config `y` value staggers entry timing (higher y = enters later).
    */
   private drawBackgrounds(ctx: CanvasRenderingContext2D, level: number, dt: number): void {
     const configs = LEVEL_BACKGROUNDS[level] ?? [];
@@ -310,99 +301,18 @@ export class Canvas2DRenderer implements GameRenderer {
       const img = this.bgImageCache.get(config.url);
       if (!img || !img.complete) continue;
 
-      // Advance scroll (accumulates downward distance)
       this.bgScrollOffsets[i] += config.scrollSpeed * dt / 1000;
 
       const h = img.height * config.scale;
       const w = img.width * config.scale;
-      // Start above screen; y config acts as stagger (higher = enters later)
       const drawY = -(h / 2) - config.y + this.bgScrollOffsets[i];
       const drawX = config.x;
 
-      // Only draw while visible
       if (drawY - h / 2 > GAME_HEIGHT || drawY + h / 2 < 0) continue;
 
       ctx.save();
       ctx.globalAlpha = config.alpha;
       ctx.drawImage(img, drawX - w / 2, drawY - h / 2, w, h);
-      ctx.restore();
-    }
-  }
-
-  /** Draw active weapon pickups as pulsing colored orbs. */
-  private drawWeaponPickups(ctx: CanvasRenderingContext2D, pickups: WeaponPickup[], time: number): void {
-    for (const pickup of pickups) {
-      if (!pickup.isActive) continue;
-
-      const colors: Record<string, string> = {
-        laser: '#4488ff',
-        bullet: '#ff4444',
-        rocket: '#aa44ff',
-        missile: '#44ff44',
-      };
-      const color = colors[pickup.currentWeapon] ?? '#ffffff';
-      const pulse = 0.7 + 0.3 * Math.sin(time * 0.005);
-      const radius = 10 * pulse;
-
-      ctx.save();
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = color;
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(pickup.position.x, pickup.position.y, radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // White center
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#ffffff';
-      ctx.globalAlpha = 0.8;
-      ctx.beginPath();
-      ctx.arc(pickup.position.x, pickup.position.y, radius * 0.4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  /** Draw asteroids as rocky polygon shapes. */
-  private drawAsteroids(ctx: CanvasRenderingContext2D, asteroids: Asteroid[]): void {
-    for (const asteroid of asteroids) {
-      if (!asteroid.isAlive) continue;
-
-      const r = asteroid.collisionRadius;
-      const sides = asteroid.size === 'large' ? 8 : 6;
-      const color = asteroid.size === 'large' ? '#887766' : '#998877';
-
-      ctx.save();
-      ctx.translate(asteroid.position.x, asteroid.position.y);
-      ctx.rotate(asteroid.rotation);
-
-      // Rocky polygon outline
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = '#665544';
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      for (let i = 0; i < sides; i++) {
-        const angle = (i / sides) * Math.PI * 2;
-        const wobble = 0.8 + 0.2 * Math.sin(i * 2.5);
-        const px = Math.cos(angle) * r * wobble;
-        const py = Math.sin(angle) * r * wobble;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fill();
-
-      // Darker crater marks
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#554433';
-      ctx.beginPath();
-      ctx.arc(r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(-r * 0.3, r * 0.1, r * 0.1, 0, Math.PI * 2);
-      ctx.fill();
-
       ctx.restore();
     }
   }

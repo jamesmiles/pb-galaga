@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '0.9.5';
+export const GAME_VERSION = '1.0.20';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -191,3 +191,52 @@ export const DEATH_SEQUENCE_DURATION = 2000; // ms
 // Background
 export const STAR_COUNT = 100;
 export const STAR_BASE_SCROLL_SPEED = 30; // pixels per second
+
+// ============================================================
+// Episode 2 — Tank Mode (Levels 6-10)
+// ============================================================
+
+// Tank physics
+export const TANK_TURN_RATE = 2.5;              // rad/s
+export const TANK_ACCELERATION = 150;           // px/s^2
+export const TANK_MAX_SPEED = 200;              // px/s forward
+export const TANK_REVERSE_MAX_SPEED = 80;       // px/s backward
+export const TANK_FRICTION = 120;               // px/s^2 deceleration when no input
+export const TANK_COLLISION_RADIUS = 18;
+
+// Tank dimensions (procedural drawing)
+export const TANK_BODY_WIDTH = 32;
+export const TANK_BODY_HEIGHT = 40;
+export const TANK_TURRET_LENGTH = 20;
+export const TANK_TURRET_RECOIL_DECAY = 5.0;   // 1/s (recoil decays from 1→0)
+
+// Armour (replaces shields in Episode 2)
+export const TANK_MAX_ARMOUR = 1000;
+export const TANK_START_LIVES = 3;
+
+// Cannon weapon (Player 1 primary — long range, moderate damage)
+export const CANNON_FIRE_COOLDOWN = 2000;       // ms
+export const CANNON_SPEED = 400;                // px/s
+export const CANNON_DAMAGE = 80;
+export const CANNON_RANGE = 400;                // ~1/2 screen (800px viewport)
+export const CANNON_COLLISION_RADIUS = 6;
+
+// Plasma artillery weapon (Player 2 primary — short range, high damage)
+export const PLASMA_BOLT_FIRE_COOLDOWN = 2000;  // ms
+export const PLASMA_BOLT_SPEED = 350;           // px/s
+export const PLASMA_BOLT_DAMAGE = 120;
+export const PLASMA_BOLT_RANGE = 267;           // ~1/3 screen (800px viewport)
+export const PLASMA_BOLT_COLLISION_RADIUS = 8;
+
+// Camera
+export const CAMERA_SMOOTH_SPEED = 3.0;         // Lerp factor
+export const CAMERA_PLAYER_ANCHOR_Y = 600;      // Players anchored near bottom of 800px viewport
+export const CAMERA_MIN_BACKTRACK_SPEED = 20;   // px/s allowed backtracking
+
+// Map
+export const MAP_WIDTH = 800;                   // Same as game width
+export const LEVEL6_MAP_WIDTH = 1200;           // 800 + 200 each side (25% wider)
+export const LEVEL6_MAP_HEIGHT = 6400;          // 8x screen height
+
+// Camera X
+export const CAMERA_PLAYER_ANCHOR_X = 400;      // Center of 800px viewport

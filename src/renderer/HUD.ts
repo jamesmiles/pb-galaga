@@ -164,5 +164,7 @@ function drawPlayerStatusBar(
   ctx.font = '10px monospace';
   ctx.fillStyle = isP2 ? '#4488ff' : '#aaaaaa';
   ctx.textAlign = shieldLabelAlign;
-  ctx.fillText('SHIELD', shieldLabelX, barY - 4);
+  // Use "ARMOUR" label for tank weapons (Episode 2)
+  const isTank = player.primaryWeapon === 'cannon' || player.primaryWeapon === 'plasma-artillery';
+  ctx.fillText(isTank ? 'ARMOUR' : 'SHIELD', shieldLabelX, barY - 4);
 }
