@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.0.20';
+export const GAME_VERSION = '1.1.0';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)

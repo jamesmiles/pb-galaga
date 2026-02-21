@@ -13,6 +13,7 @@ import { level6Map } from '../levels/level6';
 import { drawTank } from '../renderer/drawing/drawTank';
 import { drawMapSurface, drawMapObjects, drawClouds, drawDustEffects, drawFinishLine } from '../renderer/drawing/drawMap';
 import { drawProjectiles } from '../renderer/drawing/drawProjectiles';
+import type { TankTrailEffect } from '../renderer/effects/TankTrailEffect';
 import { GAME_WIDTH, LEVEL6_MAP_WIDTH } from './constants';
 
 /**
@@ -22,10 +23,15 @@ import { GAME_WIDTH, LEVEL6_MAP_WIDTH } from './constants';
 export class Episode2Engine implements EpisodeEngine {
   private inputHandler: InputHandler;
   private mapManager: MapManager;
+  private tankTrailEffect: TankTrailEffect | null = null;
 
   constructor(inputHandler: InputHandler) {
     this.inputHandler = inputHandler;
     this.mapManager = new MapManager();
+  }
+
+  setTankTrailEffect(effect: TankTrailEffect): void {
+    this.tankTrailEffect = effect;
   }
 
   update(state: GameState, dtSeconds: number): void {
@@ -197,6 +203,12 @@ export class Episode2Engine implements EpisodeEngine {
 
     // 2. Map objects (boulders, rocks, decorations)
     drawMapObjects(ctx, current.map, camera);
+
+    // 2b. Tank tracks + dust (on the ground, under tanks)
+    if (this.tankTrailEffect) {
+      this.tankTrailEffect.update(_renderDt, current.players, current.tankStates);
+      this.tankTrailEffect.draw(ctx, camera);
+    }
 
     // 3. Finish line indicator
     drawFinishLine(ctx, current.map.finishLineY, camera);

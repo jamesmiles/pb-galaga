@@ -352,6 +352,11 @@ export class GameManager {
       },
     };
     this.introTimer = 0;
+
+    // Start MP3 music during intro so it carries through into gameplay
+    if (level >= 6) {
+      MusicManager.play(('level' + level) as import('../audio/MusicManager').MusicTrack);
+    }
   }
 
   /** Get main menu options. */
