@@ -3,7 +3,12 @@ import { zzfxM, type ZzFXMSong } from './zzfxm';
 import { SoundManager } from './SoundManager';
 
 /** Available music tracks. */
-export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5';
+export type MusicTrack = 'menu' | 'level1' | 'level2' | 'level3' | 'level4' | 'level5' | 'level6';
+
+/** MP3 tracks — lazy-loaded from public/audio/ at runtime. */
+const MP3_TRACKS: Partial<Record<MusicTrack, string>> = {
+  level6: 'audio/sector-9-overdrive.mp3',
+};
 
 /**
  * Simple chiptune song data in ZzFXM format.
@@ -267,7 +272,7 @@ const LEVEL5_SONG: ZzFXMSong = [
   145, // BPM — heavy boss rock
 ];
 
-const TRACKS: Record<MusicTrack, ZzFXMSong> = {
+const TRACKS: Partial<Record<MusicTrack, ZzFXMSong>> = {
   menu: MENU_SONG,
   level1: LEVEL1_SONG,
   level2: LEVEL2_SONG,
@@ -278,13 +283,17 @@ const TRACKS: Record<MusicTrack, ZzFXMSong> = {
 
 /**
  * Manages background music playback.
- * Uses ZzFXM to render chiptune songs from compact data arrays.
+ * Supports ZzFXM chiptune (levels 1-5, menu) and MP3 files (level 6+).
+ * MP3 tracks use HTMLAudioElement for broad compatibility (works with
+ * file:// protocol, no AudioContext needed, native loop support).
  * Shares mute state with SoundManager.
  */
 export class MusicManager {
   private static currentTrack: MusicTrack | null = null;
   private static sourceNode: AudioBufferSourceNode | null = null;
+  private static mp3Element: HTMLAudioElement | null = null;
   private static playing = false;
+  private static mp3Elements = new Map<MusicTrack, HTMLAudioElement>();
 
   /** Play a music track on loop. Stops any currently playing track first. */
   static play(track: MusicTrack): void {
@@ -305,6 +314,16 @@ export class MusicManager {
     MusicManager.startPlayback(track);
   }
 
+  /**
+   * Preload an MP3 track. No-op for ZzFXM tracks.
+   * Creates the HTMLAudioElement and triggers browser preloading.
+   */
+  static preload(track: MusicTrack): void {
+    if (!MP3_TRACKS[track]) return;
+    if (MusicManager.mp3Elements.has(track)) return;
+    MusicManager.getOrCreateAudio(track);
+  }
+
   /** Stop the current track. */
   static stop(): void {
     if (MusicManager.sourceNode) {
@@ -314,6 +333,11 @@ export class MusicManager {
         // Already stopped
       }
       MusicManager.sourceNode = null;
+    }
+    if (MusicManager.mp3Element) {
+      MusicManager.mp3Element.pause();
+      MusicManager.mp3Element.currentTime = 0;
+      MusicManager.mp3Element = null;
     }
     MusicManager.currentTrack = null;
     MusicManager.playing = false;
@@ -332,7 +356,7 @@ export class MusicManager {
   /** Called when mute state changes — pause/resume music accordingly. */
   static onMuteChanged(muted: boolean): void {
     if (muted) {
-      // Stop audio playback but remember track
+      // Stop ZzFXM playback but remember track
       if (MusicManager.sourceNode) {
         try {
           MusicManager.sourceNode.stop();
@@ -341,9 +365,17 @@ export class MusicManager {
         }
         MusicManager.sourceNode = null;
       }
+      // Pause MP3 playback
+      if (MusicManager.mp3Element) {
+        MusicManager.mp3Element.pause();
+      }
     } else if (MusicManager.currentTrack && MusicManager.playing) {
       // Resume playback
-      MusicManager.startPlayback(MusicManager.currentTrack);
+      if (MusicManager.mp3Element) {
+        MusicManager.mp3Element.play().catch(() => {});
+      } else {
+        MusicManager.startPlayback(MusicManager.currentTrack);
+      }
     }
   }
 
@@ -352,7 +384,21 @@ export class MusicManager {
     MusicManager.stop();
   }
 
+  /** Clear cached MP3 elements (for testing). */
+  static clearCache(): void {
+    for (const audio of MusicManager.mp3Elements.values()) {
+      audio.pause();
+      audio.src = '';
+    }
+    MusicManager.mp3Elements.clear();
+  }
+
   private static startPlayback(track: MusicTrack): void {
+    if (MP3_TRACKS[track]) {
+      MusicManager.startMp3Playback(track);
+      return;
+    }
+
     const song = TRACKS[track];
     if (!song) return;
 
@@ -368,5 +414,30 @@ export class MusicManager {
       // Silently fail if AudioContext unavailable (headless, etc.)
       MusicManager.playing = true; // Still mark as "playing" logically
     }
+  }
+
+  private static startMp3Playback(track: MusicTrack): void {
+    try {
+      const audio = MusicManager.getOrCreateAudio(track);
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+      MusicManager.mp3Element = audio;
+      MusicManager.playing = true;
+    } catch {
+      MusicManager.playing = true;
+    }
+  }
+
+  private static getOrCreateAudio(track: MusicTrack): HTMLAudioElement {
+    const existing = MusicManager.mp3Elements.get(track);
+    if (existing) return existing;
+
+    const url = MP3_TRACKS[track]!;
+    const audio = new Audio(url);
+    audio.loop = true;
+    audio.volume = 0.3; // Match zzfx master volume
+    audio.preload = 'auto';
+    MusicManager.mp3Elements.set(track, audio);
+    return audio;
   }
 }

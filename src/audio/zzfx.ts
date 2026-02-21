@@ -18,6 +18,21 @@ let zzfxContext: AudioContext | undefined;
 let zzfxVolume = 0.3;
 
 /**
+ * Get or create the shared AudioContext.
+ * Returns undefined if AudioContext is unavailable (headless, etc.).
+ */
+export function getOrCreateAudioContext(): AudioContext | undefined {
+  if (!zzfxContext) {
+    try {
+      zzfxContext = new AudioContext();
+    } catch {
+      return undefined;
+    }
+  }
+  return zzfxContext;
+}
+
+/**
  * Set the master volume.
  */
 export function zzfxSetVolume(vol: number): void {
@@ -36,26 +51,21 @@ export function zzfx(...params: number[]): AudioBufferSourceNode | undefined {
  * Play a pre-generated audio buffer.
  */
 export function zzfxPlay(buffer: number[]): AudioBufferSourceNode | undefined {
-  if (!zzfxContext) {
-    try {
-      zzfxContext = new AudioContext();
-    } catch {
-      return undefined;
-    }
-  }
+  const ctx = getOrCreateAudioContext();
+  if (!ctx) return undefined;
 
-  const audioBuffer = zzfxContext.createBuffer(1, buffer.length, zzfxContext.sampleRate);
+  const audioBuffer = ctx.createBuffer(1, buffer.length, ctx.sampleRate);
   const channelData = audioBuffer.getChannelData(0);
   for (let i = 0; i < buffer.length; i++) {
     channelData[i] = buffer[i];
   }
 
-  const source = zzfxContext.createBufferSource();
-  const gain = zzfxContext.createGain();
+  const source = ctx.createBufferSource();
+  const gain = ctx.createGain();
   gain.gain.value = zzfxVolume;
   source.buffer = audioBuffer;
   source.connect(gain);
-  gain.connect(zzfxContext.destination);
+  gain.connect(ctx.destination);
   source.start();
   return source;
 }

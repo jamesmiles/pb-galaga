@@ -4,6 +4,8 @@ import { MenuOverlay } from './MenuOverlay';
 import { drawStars } from './drawing/drawStars';
 import { drawHUD } from './HUD';
 import { ParticleSystem } from './effects/ParticleSystem';
+import { WindParticleOverlay } from './effects/WindParticleOverlay';
+import { TankTrailEffect } from './effects/TankTrailEffect';
 import { LEVEL_BACKGROUNDS } from '../levels/backgrounds';
 
 /**
@@ -17,6 +19,8 @@ export class Canvas2DRenderer implements GameRenderer {
   private ctx: CanvasRenderingContext2D;
   private menuOverlay: MenuOverlay;
   readonly particleSystem: ParticleSystem;
+  readonly windOverlay: WindParticleOverlay;
+  readonly tankTrailEffect: TankTrailEffect;
 
   // FPS counters passed from GameLoop
   engineFps = 0;
@@ -40,6 +44,10 @@ export class Canvas2DRenderer implements GameRenderer {
   // Active episode engine for gameplay rendering
   private activeEngine: EpisodeEngine | null = null;
 
+  // Track camera position for wind overlay world-anchoring
+  private lastCameraX = 0;
+  private lastCameraY = 0;
+
   constructor(containerId: string) {
     const container = document.getElementById(containerId);
     if (!container) throw new Error(`Container #${containerId} not found`);
@@ -55,6 +63,8 @@ export class Canvas2DRenderer implements GameRenderer {
 
     this.ctx = this.canvas.getContext('2d')!;
     this.particleSystem = new ParticleSystem();
+    this.windOverlay = new WindParticleOverlay();
+    this.tankTrailEffect = new TankTrailEffect();
 
     // Create CSS menu overlay on top of the canvas
     this.menuOverlay = new MenuOverlay(container);
@@ -69,6 +79,10 @@ export class Canvas2DRenderer implements GameRenderer {
   /** Set the active episode engine for gameplay rendering delegation. */
   setActiveEngine(engine: EpisodeEngine): void {
     this.activeEngine = engine;
+    // Wire tank trail effect into Episode 2 engine
+    if ('setTankTrailEffect' in engine) {
+      (engine as any).setTankTrailEffect(this.tankTrailEffect);
+    }
   }
 
   render(current: GameState, previous: GameState, alpha: number): void {
@@ -80,6 +94,8 @@ export class Canvas2DRenderer implements GameRenderer {
     // Clear explosion tracking on game (re)start
     if (current.gameStatus === 'playing' && this.lastGameStatus !== 'playing') {
       this.particleSystem.clearTracking();
+      this.windOverlay.reset();
+      this.tankTrailEffect.reset();
     }
     this.lastGameStatus = current.gameStatus;
 
@@ -98,6 +114,15 @@ export class Canvas2DRenderer implements GameRenderer {
 
     // Update particles (runs regardless of game status for lingering effects)
     this.particleSystem.update(renderDt);
+
+    // Update wind overlay (freezes when paused, anchored to world via camera delta)
+    if (current.currentLevel >= 6 && current.camera) {
+      const cameraDx = current.camera.worldX - this.lastCameraX;
+      const cameraDy = current.camera.worldY - this.lastCameraY;
+      this.windOverlay.update(bgDt, cameraDx, cameraDy);
+      this.lastCameraX = current.camera.worldX;
+      this.lastCameraY = current.camera.worldY;
+    }
 
     if (current.gameStatus === 'menu' || current.gameStatus === 'gameover' || current.gameStatus === 'levelcomplete' || current.gameStatus === 'levelintro') {
       // Menu screens: render stars in background, particles, then overlay
@@ -136,6 +161,11 @@ export class Canvas2DRenderer implements GameRenderer {
     // Delegate gameplay rendering to the active episode engine
     if (this.activeEngine) {
       this.activeEngine.render(ctx, current, previous, alpha, renderDt);
+    }
+
+    // Wind particle overlay (Episode 2 — drawn over clouds, under explosions)
+    if (current.currentLevel >= 6) {
+      this.windOverlay.draw(ctx);
     }
 
     this.particleSystem.draw(ctx);
