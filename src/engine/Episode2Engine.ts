@@ -1,11 +1,18 @@
-import type { GameState, EpisodeEngine } from '../types';
-import { GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE, TANK_BODY_WIDTH, TANK_BODY_HEIGHT } from './constants';
+import type { GameState, EpisodeEngine, WeaponPickup } from '../types';
+import {
+  GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE,
+  TANK_BODY_WIDTH, TANK_BODY_HEIGHT,
+  GAME_WIDTH, LEVEL6_MAP_WIDTH,
+  TANK_COLLISION_RADIUS, WEAPON_PICKUP_COLLISION_RADIUS,
+} from './constants';
 import { InputHandler } from './InputHandler';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
 import { MapManager } from './MapManager';
 import { CliffManager } from './CliffManager';
 import { Ep2EnemyManager } from './Ep2EnemyManager';
+import { WeaponPickupManager } from './WeaponPickupManager';
+import { upgradeWeapon, updateSecondaryTimer } from './WeaponManager';
 import { createCamera, updateCamera, worldToScreen, isInViewport } from './CameraManager';
 import { updateTankPlayer } from '../objects/player/code/TankPlayer';
 import { updateTurretTargeting } from '../objects/player/code/TurretTargeting';
@@ -19,7 +26,6 @@ import { drawCliffStructures } from '../renderer/drawing/drawCliffs';
 import { drawMapEnemies } from '../renderer/drawing/drawMapEnemies';
 import { drawProjectiles } from '../renderer/drawing/drawProjectiles';
 import type { TankTrailEffect } from '../renderer/effects/TankTrailEffect';
-import { GAME_WIDTH, LEVEL6_MAP_WIDTH } from './constants';
 
 /**
  * Episode 2 engine — tank mode on Mars.
@@ -31,12 +37,14 @@ export class Episode2Engine implements EpisodeEngine {
   private tankTrailEffect: TankTrailEffect | null = null;
   private cliffManager: CliffManager;
   private ep2EnemyManager: Ep2EnemyManager;
+  private weaponPickupManager: WeaponPickupManager;
 
   constructor(inputHandler: InputHandler) {
     this.inputHandler = inputHandler;
     this.mapManager = new MapManager();
     this.cliffManager = new CliffManager();
     this.ep2EnemyManager = new Ep2EnemyManager();
+    this.weaponPickupManager = new WeaponPickupManager();
   }
 
   setTankTrailEffect(effect: TankTrailEffect): void {
@@ -113,12 +121,20 @@ export class Episode2Engine implements EpisodeEngine {
       this.cliffManager.resolveElevationState(player, tank, state.map);
     }
 
-    // 5. Fire cooldown and set firing state from input
+    // 5. Fire cooldown, secondary timer, and set firing state from input
+    const dtMs = dtSeconds * 1000;
     for (const player of state.players) {
       if (player.fireCooldown > 0) {
-        player.fireCooldown -= dtSeconds * 1000;
+        player.fireCooldown -= dtMs;
         if (player.fireCooldown < 0) player.fireCooldown = 0;
       }
+      // Secondary weapon cooldown
+      if (player.secondaryCooldown > 0) {
+        player.secondaryCooldown -= dtMs;
+        if (player.secondaryCooldown < 0) player.secondaryCooldown = 0;
+      }
+      // Secondary weapon timer (expires after duration)
+      updateSecondaryTimer(player, dtMs);
       player.isFiring = player.input.fire && player.fireCooldown <= 0 && player.isAlive;
     }
     const projCountBefore = state.projectiles.length;
@@ -185,10 +201,9 @@ export class Episode2Engine implements EpisodeEngine {
       }
     }
 
-    // 7. Projectile vs map object collisions (boulders block, destructible rocks take damage)
+    // 7. Projectile vs map object collisions (all projectiles blocked by boulders/rocks)
     for (const proj of state.projectiles) {
       if (!proj.isActive || proj.hasCollided) continue;
-      if (proj.owner.type !== 'player') continue;
       // High-ground projectiles pass over low-ground boulders
       if (this.cliffManager.shouldIgnoreLowGroundObject(proj.elevation)) continue;
 
@@ -210,7 +225,8 @@ export class Episode2Engine implements EpisodeEngine {
             id: proj.id,
             type: proj.type as 'cannon-shell' | 'plasma-bolt',
           });
-          if (obj.type === 'destructible-rock') {
+          // Only player projectiles damage destructible rocks
+          if (obj.type === 'destructible-rock' && proj.owner.type === 'player') {
             this.mapManager.damageMapObject(obj, proj.damage);
           }
           SoundManager.play('shellImpact');
@@ -224,14 +240,47 @@ export class Episode2Engine implements EpisodeEngine {
       this.ep2EnemyManager.update(state, dtSeconds);
     }
 
-    // 7c. Player projectile vs map enemy collisions
+    // 7c. Snapshot enemy alive state (for pickup spawning on death)
+    const enemyAliveSnapshot = state.mapEnemies
+      ? new Map(state.mapEnemies.map(e => [e.id, e.isAlive]))
+      : new Map<string, boolean>();
+
+    // 7d. Player projectile vs map enemy collisions
     if (state.mapEnemies) {
       this.ep2EnemyManager.checkProjectileCollisions(state);
     }
 
-    // 7d. Enemy projectile vs player tank collisions
+    // 7e. Spawn pickups from newly killed enemies
+    if (state.mapEnemies) {
+      for (const enemy of state.mapEnemies) {
+        if (enemyAliveSnapshot.get(enemy.id) && !enemy.isAlive) {
+          this.weaponPickupManager.maybeSpawnEp2Pickup(state, enemy.position);
+        }
+      }
+    }
+
+    // 7f. Enemy projectile vs player tank collisions
     if (state.mapEnemies) {
       this.ep2EnemyManager.checkEnemyProjectileVsPlayer(state);
+    }
+
+    // 7g. Update weapon pickups (cycling + despawn)
+    this.weaponPickupManager.updatePickups(state, dtMs);
+
+    // 7h. Pickup collection (tank vs pickup world-space circle collision)
+    for (const player of state.players) {
+      if (!player.isAlive) continue;
+      for (const pickup of state.weaponPickups) {
+        if (!pickup.isActive) continue;
+        const dx = player.position.x - pickup.position.x;
+        const dy = player.position.y - pickup.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < TANK_COLLISION_RADIUS + WEAPON_PICKUP_COLLISION_RADIUS) {
+          pickup.isActive = false;
+          upgradeWeapon(player, pickup);
+          SoundManager.play('lifePickup');
+        }
+      }
     }
 
     // 8. Update camera to follow players
@@ -310,6 +359,9 @@ export class Episode2Engine implements EpisodeEngine {
       drawMapEnemies(ctx, current.mapEnemies, camera);
     }
 
+    // 4c. Weapon pickups (world→screen)
+    this.drawWeaponPickups(ctx, current.weaponPickups, current.currentTime, camera);
+
     // 5. Tanks (world→screen) — sorted by elevation (low ground first, painter's algorithm)
     const sortedPlayers = [...current.players]
       .filter(p => p.isAlive && current.tankStates![p.id])
@@ -373,6 +425,7 @@ export class Episode2Engine implements EpisodeEngine {
     state.projectiles = [];
     state.enemies = [];
     state.asteroids = [];
+    state.weaponPickups = [];
 
     // Create live map enemies from placement templates
     state.mapEnemies = map.enemyPlacements
@@ -382,6 +435,54 @@ export class Episode2Engine implements EpisodeEngine {
 
   onLevelComplete(_state: GameState): void {
     // Handled inline in update()
+  }
+
+  /** Draw active weapon pickups as pulsing colored orbs (world→screen). */
+  private drawWeaponPickups(
+    ctx: CanvasRenderingContext2D,
+    pickups: WeaponPickup[],
+    time: number,
+    camera: { worldX: number; worldY: number },
+  ): void {
+    const colors: Record<string, string> = {
+      cannon: '#ff8844',
+      'plasma-artillery': '#44ccff',
+      rocket: '#aa44ff',
+      missile: '#44ff44',
+    };
+
+    for (const pickup of pickups) {
+      if (!pickup.isActive) continue;
+
+      const screenX = pickup.position.x - camera.worldX;
+      const screenY = pickup.position.y - camera.worldY;
+
+      // Skip off-screen pickups
+      if (screenX < -30 || screenX > GAME_WIDTH + 30 ||
+          screenY < -30 || screenY > GAME_HEIGHT + 30) continue;
+
+      const color = colors[pickup.currentWeapon] ?? '#ffffff';
+      const pulse = 0.7 + 0.3 * Math.sin(time * 0.005);
+      const radius = 10 * pulse;
+
+      ctx.save();
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = color;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner bright core
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(screenX, screenY, radius * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   /**
@@ -429,7 +530,7 @@ export class Episode2Engine implements EpisodeEngine {
   }
 
   private checkGameOver(state: GameState): void {
-    const alivePlayers = state.players.filter(p => p.isAlive || p.lives > 0);
+    const alivePlayers = state.players.filter(p => p.isAlive);
     if (state.players.length > 0 && alivePlayers.length === 0) {
       state.gameStatus = 'gameover';
       MusicManager.play('menu');

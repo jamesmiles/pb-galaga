@@ -222,7 +222,7 @@ export interface RespawnPickup {
 export interface WeaponPickup {
   id: string;
   category: 'primary' | 'secondary';
-  currentWeapon: 'laser' | 'bullet' | 'rocket' | 'missile';
+  currentWeapon: 'laser' | 'bullet' | 'rocket' | 'missile' | 'cannon' | 'plasma-artillery';
   position: Vector2D;
   velocity: Vector2D;
   isActive: boolean;

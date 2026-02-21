@@ -8,7 +8,7 @@ import { SECONDARY_WEAPON_DURATION } from './constants';
 /** Apply a weapon pickup to the player. */
 export function upgradeWeapon(player: Player, pickup: WeaponPickup): void {
   if (pickup.category === 'primary') {
-    const weapon = pickup.currentWeapon as 'laser' | 'bullet';
+    const weapon = pickup.currentWeapon as 'laser' | 'bullet' | 'cannon' | 'plasma-artillery';
     if (weapon === player.primaryWeapon) {
       // Same type: upgrade level (cap at 5)
       if (player.primaryLevel < 5) {
