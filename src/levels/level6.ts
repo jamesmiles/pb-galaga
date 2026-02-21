@@ -1,4 +1,4 @@
-import type { LevelConfig, MapConfig } from '../types';
+import type { LevelConfig, MapConfig, CliffStructure, MapEnemyPlacement } from '../types';
 import { LEVEL6_MAP_HEIGHT, LEVEL6_MAP_WIDTH } from '../engine/constants';
 
 /**
@@ -44,13 +44,9 @@ export const level6Map: MapConfig = {
     { id: 'b-09', type: 'boulder', position: { x: 400, y: 4700 }, width: 200, height: 200, collisionRadius: 80, sprite: 'rocks-2' },
     { id: 'r-09', type: 'destructible-rock', position: { x: 150, y: 4650 }, width: 30, height: 30, health: 120, maxHealth: 120, collisionRadius: 15, sprite: 'rocks-3' },
 
-    // --- Section 3 (Y 4600-4000): open area with clusters ---
-    { id: 'b-10', type: 'boulder', position: { x: 300, y: 4500 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-1' },
-    { id: 'r-10', type: 'destructible-rock', position: { x: 450, y: 4450 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
-    { id: 'b-11', type: 'boulder', position: { x: 850, y: 4400 }, width: 190, height: 190, collisionRadius: 76, sprite: 'rocks-2' },
+    // --- Section 3 (Y 4600-4000): open area with clusters + cliff-01 ---
     { id: 'r-11', type: 'destructible-rock', position: { x: 950, y: 4350 }, width: 35, height: 35, health: 150, maxHealth: 150, collisionRadius: 18, sprite: 'rocks-3' },
     { id: 'b-12', type: 'boulder', position: { x: 100, y: 4300 }, width: 220, height: 220, collisionRadius: 88, sprite: 'rocks-1' },
-    { id: 'b-13', type: 'boulder', position: { x: 600, y: 4200 }, width: 200, height: 200, collisionRadius: 80, sprite: 'rocks-2' },
     { id: 'r-12', type: 'destructible-rock', position: { x: 750, y: 4100 }, width: 50, height: 50, health: 300, maxHealth: 300, collisionRadius: 25, sprite: 'rocks-3' },
     { id: 'r-13', type: 'destructible-rock', position: { x: 1100, y: 4200 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
 
@@ -65,14 +61,9 @@ export const level6Map: MapConfig = {
     { id: 'r-15', type: 'destructible-rock', position: { x: 650, y: 3600 }, width: 50, height: 50, health: 250, maxHealth: 250, collisionRadius: 25, sprite: 'rocks-3' },
     { id: 'r-16', type: 'destructible-rock', position: { x: 400, y: 3500 }, width: 35, height: 35, health: 150, maxHealth: 150, collisionRadius: 18, sprite: 'rocks-3' },
 
-    // --- Section 5 (Y 3400-2800): scattered field ---
-    { id: 'b-20', type: 'boulder', position: { x: 300, y: 3300 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-1' },
-    { id: 'b-21', type: 'boulder', position: { x: 700, y: 3200 }, width: 190, height: 190, collisionRadius: 76, sprite: 'rocks-2' },
-    { id: 'r-17', type: 'destructible-rock', position: { x: 500, y: 3250 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
+    // --- Section 5 (Y 3400-2800): scattered field + cliff-02 ---
     { id: 'r-18', type: 'destructible-rock', position: { x: 1000, y: 3150 }, width: 45, height: 45, health: 200, maxHealth: 200, collisionRadius: 22, sprite: 'rocks-3' },
-    { id: 'b-22', type: 'boulder', position: { x: 150, y: 3050 }, width: 220, height: 220, collisionRadius: 88, sprite: 'rocks-1' },
     { id: 'b-23', type: 'boulder', position: { x: 850, y: 2900 }, width: 200, height: 200, collisionRadius: 80, sprite: 'rocks-2' },
-    { id: 'r-19', type: 'destructible-rock', position: { x: 600, y: 2950 }, width: 35, height: 35, health: 150, maxHealth: 150, collisionRadius: 18, sprite: 'rocks-3' },
     { id: 'r-20', type: 'destructible-rock', position: { x: 400, y: 2850 }, width: 50, height: 50, health: 300, maxHealth: 300, collisionRadius: 25, sprite: 'rocks-3' },
 
     // --- Section 6 (Y 2800-2200): mixed terrain ---
@@ -85,13 +76,10 @@ export const level6Map: MapConfig = {
     { id: 'r-23', type: 'destructible-rock', position: { x: 400, y: 2250 }, width: 35, height: 35, health: 150, maxHealth: 150, collisionRadius: 18, sprite: 'rocks-3' },
     { id: 'r-24', type: 'destructible-rock', position: { x: 900, y: 2300 }, width: 50, height: 50, health: 300, maxHealth: 300, collisionRadius: 25, sprite: 'rocks-3' },
 
-    // --- Section 7 (Y 2200-1600): narrowing approach ---
+    // --- Section 7 (Y 2200-1600): narrowing approach + cliff-03 ---
     { id: 'b-28', type: 'boulder', position: { x: 150, y: 2100 }, width: 240, height: 240, collisionRadius: 96, sprite: 'rocks-1' },
-    { id: 'b-29', type: 'boulder', position: { x: 950, y: 2000 }, width: 240, height: 240, collisionRadius: 96, sprite: 'rocks-2' },
     { id: 'b-30', type: 'boulder', position: { x: 250, y: 1900 }, width: 210, height: 210, collisionRadius: 84, sprite: 'rocks-1' },
-    { id: 'b-31', type: 'boulder', position: { x: 900, y: 1800 }, width: 220, height: 220, collisionRadius: 88, sprite: 'rocks-2' },
     { id: 'r-25', type: 'destructible-rock', position: { x: 500, y: 2050 }, width: 45, height: 45, health: 200, maxHealth: 200, collisionRadius: 22, sprite: 'rocks-3' },
-    { id: 'r-26', type: 'destructible-rock', position: { x: 700, y: 1850 }, width: 40, height: 40, health: 200, maxHealth: 200, collisionRadius: 20, sprite: 'rocks-3' },
     { id: 'b-32', type: 'boulder', position: { x: 400, y: 1700 }, width: 190, height: 190, collisionRadius: 76, sprite: 'rocks-1' },
     { id: 'r-27', type: 'destructible-rock', position: { x: 650, y: 1650 }, width: 35, height: 35, health: 150, maxHealth: 150, collisionRadius: 18, sprite: 'rocks-3' },
 
@@ -115,6 +103,78 @@ export const level6Map: MapConfig = {
     { id: 'cloud-06', position: { x: 450, y: 1600 }, width: 300, height: 150, speed: -26, alpha: 0.22, sprite: 'cloud-4' },
     { id: 'cloud-07', position: { x: 700, y: 800 }, width: 285, height: 143, speed: -30, alpha: 0.15, sprite: 'cloud-1' },
   ],
+  cliffs: [
+    // --- Cliff 1: Small outpost at Y ~4400 (Section 3, open area) ---
+    // A 4-wide × 3-tall elevated platform with ramp access from the south
+    {
+      id: 'cliff-01',
+      position: { x: 400, y: 4200 },
+      tiles: [
+        // Top row: north edge with NW and NE convex corners
+        { col: 0, row: 0, type: 'corner-nw-convex' },
+        { col: 1, row: 0, type: 'edge-north' },
+        { col: 2, row: 0, type: 'edge-north' },
+        { col: 3, row: 0, type: 'corner-ne-convex' },
+        // Middle row: west edge, surface, surface, east edge
+        { col: 0, row: 1, type: 'edge-west' },
+        { col: 1, row: 1, type: 'surface' },
+        { col: 2, row: 1, type: 'surface' },
+        { col: 3, row: 1, type: 'edge-east' },
+        // Bottom row: SW convex, ramp, surface, SE convex
+        { col: 0, row: 2, type: 'corner-sw-convex' },
+        { col: 1, row: 2, type: 'ramp-south-north' },
+        { col: 2, row: 2, type: 'edge-south' },
+        { col: 3, row: 2, type: 'corner-se-convex' },
+      ],
+    },
+    // --- Cliff 2: L-shaped ridge at Y ~3000 (Section 5) ---
+    // 5-wide × 4-tall L-shape with ramp on east side
+    {
+      id: 'cliff-02',
+      position: { x: 100, y: 2900 },
+      tiles: [
+        // Row 0: full top edge
+        { col: 0, row: 0, type: 'corner-nw-convex' },
+        { col: 1, row: 0, type: 'edge-north' },
+        { col: 2, row: 0, type: 'edge-north' },
+        { col: 3, row: 0, type: 'edge-north' },
+        { col: 4, row: 0, type: 'corner-ne-convex' },
+        // Row 1: west edge, surface fill, east edge
+        { col: 0, row: 1, type: 'edge-west' },
+        { col: 1, row: 1, type: 'surface' },
+        { col: 2, row: 1, type: 'surface' },
+        { col: 3, row: 1, type: 'surface' },
+        { col: 4, row: 1, type: 'ramp-east-west' },
+        // Row 2: L-shape narrows — bottom of upper section
+        { col: 0, row: 2, type: 'edge-west' },
+        { col: 1, row: 2, type: 'surface' },
+        { col: 2, row: 2, type: 'edge-south' },
+        { col: 3, row: 2, type: 'edge-south' },
+        { col: 4, row: 2, type: 'corner-se-convex' },
+        // Row 3: bottom of L
+        { col: 0, row: 3, type: 'corner-sw-convex' },
+        { col: 1, row: 3, type: 'ramp-south-north' },
+      ],
+    },
+    // --- Cliff 3: Sniper perch at Y ~1800 (Section 7) ---
+    // Small 3×2 elevated platform with west-facing ramp
+    {
+      id: 'cliff-03',
+      position: { x: 700, y: 1700 },
+      tiles: [
+        // Row 0: top edge
+        { col: 0, row: 0, type: 'corner-nw-convex' },
+        { col: 1, row: 0, type: 'edge-north' },
+        { col: 2, row: 0, type: 'corner-ne-convex' },
+        // Row 1: ramp on west, surface, east edge
+        { col: 0, row: 1, type: 'ramp-west-east' },
+        { col: 1, row: 1, type: 'surface' },
+        { col: 2, row: 1, type: 'edge-east' },
+        // Row 2: bottom edge (no access from south)
+        // Intentionally omitted — open bottom so ramp is the only way up
+      ],
+    },
+  ],
   dustEffects: [
     { id: 'dust-01', position: { x: 200, y: 6000 }, width: 100, height: 80, speed: -20, alpha: 0.15, sprite: 'dust-cloud-1' },
     { id: 'dust-02', position: { x: 500, y: 5400 }, width: 120, height: 90, speed: -18, alpha: 0.12, sprite: 'dust-swirl-1' },
@@ -124,6 +184,37 @@ export const level6Map: MapConfig = {
     { id: 'dust-06', position: { x: 700, y: 2200 }, width: 100, height: 80, speed: -19, alpha: 0.11, sprite: 'dust-swirl-3' },
     { id: 'dust-07', position: { x: 250, y: 1400 }, width: 115, height: 88, speed: -21, alpha: 0.12, sprite: 'dust-cloud-4' },
     { id: 'dust-08', position: { x: 550, y: 600 }, width: 105, height: 82, speed: -17, alpha: 0.1, sprite: 'dust-swirl-4' },
+  ],
+  enemyPlacements: [
+    // --- Starting area: 1 easy gun nest to introduce combat ---
+    { id: 'me-01', type: 'gun-nest', position: { x: 600, y: 5400 }, elevation: 0 },
+
+    // --- Section 2: turret guarding passage + popup mine ---
+    { id: 'me-02', type: 'turret', position: { x: 700, y: 5000 }, elevation: 0 },
+    { id: 'me-03', type: 'popup-mine', position: { x: 500, y: 4850 }, elevation: 0 },
+
+    // --- Cliff-01 area: gun nest on high ground ---
+    { id: 'me-04', type: 'gun-nest', position: { x: 530, y: 4330 }, elevation: 1 },
+
+    // --- Section 4 (canyon chokepoint): flanking gun nests ---
+    { id: 'me-05', type: 'gun-nest', position: { x: 400, y: 3750 }, elevation: 0 },
+    { id: 'me-06', type: 'gun-nest', position: { x: 800, y: 3700 }, elevation: 0 },
+
+    // --- Cliff-02 area: turret on L-shaped ridge ---
+    { id: 'me-07', type: 'turret', position: { x: 350, y: 3000 }, elevation: 1 },
+
+    // --- Section 6: popup mines in open area ---
+    { id: 'me-08', type: 'popup-mine', position: { x: 450, y: 2600 }, elevation: 0 },
+    { id: 'me-09', type: 'popup-mine', position: { x: 700, y: 2400 }, elevation: 0 },
+
+    // --- Cliff-03 (sniper perch): turret on high ground ---
+    { id: 'me-10', type: 'turret', position: { x: 800, y: 1760 }, elevation: 1 },
+
+    // --- Final approach: harder mix ---
+    { id: 'me-11', type: 'gun-nest', position: { x: 500, y: 1300 }, elevation: 0 },
+    { id: 'me-12', type: 'turret', position: { x: 350, y: 900 }, elevation: 0 },
+    { id: 'me-13', type: 'popup-mine', position: { x: 700, y: 700 }, elevation: 0 },
+    { id: 'me-14', type: 'gun-nest', position: { x: 900, y: 500 }, elevation: 0 },
   ],
 };
 

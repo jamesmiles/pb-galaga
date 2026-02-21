@@ -141,9 +141,11 @@ export function updateProjectile(proj: Projectile, dtSeconds: number, state?: Ga
     return;
   }
 
-  // Tank shells use lifetime for range — skip all bounds checks
-  const isTankShell = proj.type === 'cannon-shell' || proj.type === 'plasma-bolt';
-  if (isTankShell) {
+  // Episode 2 projectiles use lifetime for range — skip screen-space bounds checks.
+  // This includes tank shells and enemy directional projectiles (which have elevation set).
+  const isEp2Projectile = proj.type === 'cannon-shell' || proj.type === 'plasma-bolt'
+    || proj.elevation !== undefined;
+  if (isEp2Projectile) {
     // No bounds check — lifetime handles deactivation
   } else if (!proj.arcGravity) {
     // Episode 1 projectiles: screen-space bounds

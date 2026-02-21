@@ -84,6 +84,7 @@ export function createInitialState(): GameState {
     tankStates: null,
     map: null,
     camera: null,
+    mapEnemies: null,
     pendingImpacts: [],
   };
 }
@@ -137,6 +138,7 @@ export function copyStateInto(target: GameState, source: GameState): void {
   target.tankStates = source.tankStates;
   target.map = source.map;
   target.camera = source.camera;
+  target.mapEnemies = source.mapEnemies;
   target.pendingImpacts = source.pendingImpacts;
 }
 
@@ -197,6 +199,7 @@ export function createTankState(): TankState {
     maxSpeed: TANK_MAX_SPEED,
     reverseMaxSpeed: TANK_REVERSE_MAX_SPEED,
     friction: TANK_FRICTION,
+    elevation: 0,
   };
 }
 

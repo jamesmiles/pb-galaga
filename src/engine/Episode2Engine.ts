@@ -1,9 +1,11 @@
 import type { GameState, EpisodeEngine } from '../types';
-import { GAME_HEIGHT, LEVEL6_MAP_HEIGHT } from './constants';
+import { GAME_HEIGHT, LEVEL6_MAP_HEIGHT, CLIFF_ELEVATION_SCALE } from './constants';
 import { InputHandler } from './InputHandler';
 import { SoundManager } from '../audio/SoundManager';
 import { MusicManager } from '../audio/MusicManager';
 import { MapManager } from './MapManager';
+import { CliffManager } from './CliffManager';
+import { Ep2EnemyManager } from './Ep2EnemyManager';
 import { createCamera, updateCamera, worldToScreen, isInViewport } from './CameraManager';
 import { updateTankPlayer } from '../objects/player/code/TankPlayer';
 import { spawnTankProjectiles } from '../objects/player/code/TankWeapons';
@@ -12,6 +14,8 @@ import { createTankState, createTankPlayer } from './StateManager';
 import { level6Map } from '../levels/level6';
 import { drawTank } from '../renderer/drawing/drawTank';
 import { drawMapSurface, drawMapObjects, drawClouds, drawDustEffects, drawFinishLine } from '../renderer/drawing/drawMap';
+import { drawCliffStructures } from '../renderer/drawing/drawCliffs';
+import { drawMapEnemies } from '../renderer/drawing/drawMapEnemies';
 import { drawProjectiles } from '../renderer/drawing/drawProjectiles';
 import type { TankTrailEffect } from '../renderer/effects/TankTrailEffect';
 import { GAME_WIDTH, LEVEL6_MAP_WIDTH } from './constants';
@@ -24,10 +28,14 @@ export class Episode2Engine implements EpisodeEngine {
   private inputHandler: InputHandler;
   private mapManager: MapManager;
   private tankTrailEffect: TankTrailEffect | null = null;
+  private cliffManager: CliffManager;
+  private ep2EnemyManager: Ep2EnemyManager;
 
   constructor(inputHandler: InputHandler) {
     this.inputHandler = inputHandler;
     this.mapManager = new MapManager();
+    this.cliffManager = new CliffManager();
+    this.ep2EnemyManager = new Ep2EnemyManager();
   }
 
   setTankTrailEffect(effect: TankTrailEffect): void {
@@ -82,6 +90,15 @@ export class Episode2Engine implements EpisodeEngine {
       this.mapManager.checkBoulderCollisions(player, state.map);
     }
 
+    // 4b. Cliff collision + elevation resolution
+    for (const player of state.players) {
+      if (!player.isAlive) continue;
+      const tank = state.tankStates[player.id];
+      if (!tank) continue;
+      this.cliffManager.checkCliffCollisions(player, tank, state.map);
+      this.cliffManager.resolveElevationState(player, tank, state.map);
+    }
+
     // 5. Fire cooldown and set firing state from input
     for (const player of state.players) {
       if (player.fireCooldown > 0) {
@@ -92,7 +109,15 @@ export class Episode2Engine implements EpisodeEngine {
     }
     const projCountBefore = state.projectiles.length;
     spawnTankProjectiles(state);
+    // Tag newly spawned projectiles with firing tank's elevation
     if (state.projectiles.length > projCountBefore) {
+      for (let i = projCountBefore; i < state.projectiles.length; i++) {
+        const proj = state.projectiles[i];
+        if (proj.owner.type === 'player') {
+          const tank = state.tankStates[proj.owner.id];
+          if (tank) proj.elevation = tank.elevation;
+        }
+      }
       SoundManager.play('playerFire');
     }
 
@@ -122,10 +147,28 @@ export class Episode2Engine implements EpisodeEngine {
       }
     }
 
+    // 6c. Projectile vs cliff wall collisions (low-ground projectiles destroyed)
+    for (const proj of state.projectiles) {
+      if (!proj.isActive || proj.hasCollided) continue;
+      if (this.cliffManager.checkProjectileCliffCollision(proj, state.map)) {
+        proj.hasCollided = true;
+        proj.isActive = false;
+        state.pendingImpacts.push({
+          x: proj.position.x,
+          y: proj.position.y,
+          id: proj.id,
+          type: proj.type as 'cannon-shell' | 'plasma-bolt',
+        });
+        SoundManager.play('shellImpact');
+      }
+    }
+
     // 7. Projectile vs map object collisions (boulders block, destructible rocks take damage)
     for (const proj of state.projectiles) {
       if (!proj.isActive || proj.hasCollided) continue;
       if (proj.owner.type !== 'player') continue;
+      // High-ground projectiles pass over low-ground boulders
+      if (this.cliffManager.shouldIgnoreLowGroundObject(proj.elevation)) continue;
 
       for (const obj of state.map.objects) {
         if (obj.type !== 'boulder' && obj.type !== 'destructible-rock') continue;
@@ -152,6 +195,21 @@ export class Episode2Engine implements EpisodeEngine {
           break;
         }
       }
+    }
+
+    // 7b. Map enemy AI + firing
+    if (state.mapEnemies) {
+      this.ep2EnemyManager.update(state, dtSeconds);
+    }
+
+    // 7c. Player projectile vs map enemy collisions
+    if (state.mapEnemies) {
+      this.ep2EnemyManager.checkProjectileCollisions(state);
+    }
+
+    // 7d. Enemy projectile vs player tank collisions
+    if (state.mapEnemies) {
+      this.ep2EnemyManager.checkEnemyProjectileVsPlayer(state);
     }
 
     // 8. Update camera to follow players
@@ -210,6 +268,11 @@ export class Episode2Engine implements EpisodeEngine {
       this.tankTrailEffect.draw(ctx, camera);
     }
 
+    // 2c. Cliff structures
+    if (current.map.cliffs) {
+      drawCliffStructures(ctx, current.map.cliffs, camera);
+    }
+
     // 3. Finish line indicator
     drawFinishLine(ctx, current.map.finishLineY, camera);
 
@@ -220,13 +283,24 @@ export class Episode2Engine implements EpisodeEngine {
     drawProjectiles(ctx, current.projectiles, prevProjectiles, _alpha);
     ctx.restore();
 
-    // 5. Tanks (world→screen)
-    for (const player of current.players) {
-      if (!player.isAlive) continue;
-      const tank = current.tankStates[player.id];
-      if (!tank) continue;
+    // 4b. Map enemies
+    if (current.mapEnemies) {
+      drawMapEnemies(ctx, current.mapEnemies, camera);
+    }
+
+    // 5. Tanks (world→screen) — sorted by elevation (low ground first, painter's algorithm)
+    const sortedPlayers = [...current.players]
+      .filter(p => p.isAlive && current.tankStates![p.id])
+      .sort((a, b) => {
+        const ea = current.tankStates![a.id]?.elevation ?? 0;
+        const eb = current.tankStates![b.id]?.elevation ?? 0;
+        return ea - eb;
+      });
+    for (const player of sortedPlayers) {
+      const tank = current.tankStates[player.id]!;
       const screenPos = worldToScreen(player.position, camera);
-      drawTank(ctx, screenPos, tank, player);
+      const elevationScale = 1.0 + CLIFF_ELEVATION_SCALE * tank.elevation;
+      drawTank(ctx, screenPos, tank, player, elevationScale);
     }
 
     // 6. Clouds overlay (foreground)
@@ -277,6 +351,11 @@ export class Episode2Engine implements EpisodeEngine {
     state.projectiles = [];
     state.enemies = [];
     state.asteroids = [];
+
+    // Create live map enemies from placement templates
+    state.mapEnemies = map.enemyPlacements
+      ? this.ep2EnemyManager.createFromPlacements(map.enemyPlacements)
+      : [];
   }
 
   onLevelComplete(_state: GameState): void {

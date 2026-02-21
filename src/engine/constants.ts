@@ -1,5 +1,5 @@
 // Version
-export const GAME_VERSION = '1.1.0';
+export const GAME_VERSION = '1.1.25';
 
 // Game loop timing
 export const FIXED_TIMESTEP = 1000 / 60; // ~16.667ms per tick (60Hz)
@@ -240,3 +240,42 @@ export const LEVEL6_MAP_HEIGHT = 6400;          // 8x screen height
 
 // Camera X
 export const CAMERA_PLAYER_ANCHOR_X = 400;      // Center of 800px viewport
+
+// Cliff terrain
+export const CLIFF_TILE_SIZE = 128;             // px per tile (3x tank width)
+export const CLIFF_ELEVATION_SCALE = 0.03;      // 3% visual scale increase at full elevation
+
+// Episode 2 — Map Enemies
+// Machine Gun Nest
+export const GUN_NEST_HEALTH = 150;
+export const GUN_NEST_FIRE_RATE = 300;          // ms between shots
+export const GUN_NEST_DAMAGE = 15;
+export const GUN_NEST_BULLET_SPEED = 280;       // px/s
+export const GUN_NEST_COLLISION_RADIUS = 16;
+export const GUN_NEST_SCORE_VALUE = 200;
+export const GUN_NEST_AIM_SPEED = 2.0;          // rad/s turret rotation
+
+// Turret (heavy)
+export const TURRET_HEALTH = 250;
+export const TURRET_FIRE_RATE = 2500;           // ms between shots
+export const TURRET_DAMAGE = 60;
+export const TURRET_PLASMA_SPEED = 200;         // px/s
+export const TURRET_COLLISION_RADIUS = 20;
+export const TURRET_SCORE_VALUE = 400;
+export const TURRET_AIM_SPEED = 1.5;            // rad/s turret rotation
+
+// Popup Mine
+export const POPUP_MINE_HEALTH = 80;
+export const POPUP_MINE_ACTIVATION_RANGE = 150; // px proximity trigger
+export const POPUP_MINE_DORMANT_TIMER = 8000;   // ms random auto-activate
+export const POPUP_MINE_BURST_PROJECTILES = 8;
+export const POPUP_MINE_BURST_DAMAGE = 25;
+export const POPUP_MINE_BURST_SPEED = 220;      // px/s
+export const POPUP_MINE_POPUP_DURATION = 400;   // ms to fully pop up
+export const POPUP_MINE_COOLDOWN = 5000;        // ms after burst before dormant
+export const POPUP_MINE_COLLISION_RADIUS = 12;
+export const POPUP_MINE_SCORE_VALUE = 150;
+
+// Shared Episode 2 enemy constants
+export const EP2_ENEMY_FIRE_RANGE = 600;        // px max distance to fire
+export const EP2_ENEMY_PROJECTILE_LIFETIME = 4000; // ms
