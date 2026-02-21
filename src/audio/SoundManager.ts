@@ -10,7 +10,7 @@ export type SoundEffect = 'playerFire' | 'enemyFire' | 'explosion' | 'playerDeat
  *          slide, deltaSlide, pitchJump, pitchJumpTime, repeatTime, noise, modulation,
  *          bitCrush, delay, sustainVolume, decay, tremolo]
  */
-const SOUND_PRESETS: Record<SoundEffect, ZzFXParams> = {
+const SOUND_PRESETS: Partial<Record<SoundEffect, ZzFXParams>> = {
   // Short high-pitched laser pew
   playerFire: [0.5, 0.01, 800, 0, 0.02, 0.04, 2, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.02, 0],
   // Lower-pitched enemy fire
