@@ -10,6 +10,16 @@ import { MusicManager } from '../audio/MusicManager';
 import { Episode1Engine } from './Episode1Engine';
 import { Episode2Engine } from './Episode2Engine';
 
+/** Level names per level number. */
+const LEVEL_NAMES: Record<number, string> = {
+  1: 'Invasion',
+  2: 'Earth Defence',
+  3: 'Moon Battle',
+  4: 'Asteroid Belt',
+  5: 'Defeat Mars Colony',
+  6: 'Express Elevator',
+};
+
 /** Intro text per level number. */
 const LEVEL_INTRO_TEXT: Record<number, string> = {
   1: '2029.07.04 // 03:17 UTC\nfirst contact confirmed. space force scrambled to defend earth.',
@@ -339,6 +349,7 @@ export class GameManager {
   /** Begin the level intro typing sequence, then transition to playing. */
   private startLevelIntro(state: GameState, level: number): void {
     const introText = LEVEL_INTRO_TEXT[level] ?? `level ${level}`;
+    const levelName = LEVEL_NAMES[level] ?? '';
     state.currentLevel = level;
     state.gameStatus = 'levelintro';
     state.menu = {
@@ -347,6 +358,7 @@ export class GameManager {
       options: [],
       data: {
         level,
+        levelName,
         introText,
         introChars: 0,
       },
@@ -371,7 +383,7 @@ export class GameManager {
       options.push(`Level ${i}: ${this.episode1Engine.levelManager.getLevelName(i)}`);
     }
     // Episode 2 levels
-    options.push('Level 6: Mars Landing');
+    options.push(`Level 6: ${LEVEL_NAMES[6]}`);
     options.push('Back');
     return options;
   }
