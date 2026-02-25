@@ -1,7 +1,19 @@
 {
   "displayName": "Regression Analyst",
-  "icon": "search",
+  "icon": "microscope",
   "order": 7,
-  "purpose": [],
+  "default_model": "opus",
+  "context": {
+    "document_libraries": true,
+    "boards": false,
+    "backlog_items": {
+      "enabled": false,
+      "statuses": []
+    },
+    "pull_requests": false
+  },
+  "purpose": [
+    "Create/modify project documentation"
+  ],
   "triggers": []
 }
