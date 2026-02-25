@@ -1,7 +1,7 @@
 {
   "displayName": "Merge Bot",
   "icon": "settings",
-  "order": 4,
+  "order": 5,
   "default_model": "opus",
   "context": {
     "document_libraries": false,

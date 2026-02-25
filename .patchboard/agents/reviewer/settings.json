@@ -1,7 +1,7 @@
 {
   "displayName": "Reviewer",
   "icon": "eye",
-  "order": 6,
+  "order": 4,
   "default_model": "opus",
   "context": {
     "document_libraries": false,

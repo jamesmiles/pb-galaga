@@ -1,7 +1,7 @@
 {
   "displayName": "Explorer",
   "icon": "compass",
-  "order": 5,
+  "order": 6,
   "default_model": "opus",
   "context": {
     "document_libraries": true,
